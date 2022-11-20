@@ -1,6 +1,6 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes, useLocation } from "react-router-dom"
 import LoginPage from "./pages/Login"
 import { useDispatch } from "react-redux"
 import { axiosInstance } from "./api"
@@ -8,12 +8,16 @@ import { login } from "./redux/features/authSlice"
 import GuestRoute from "./component/GuestRoute"
 import Register from "./pages/Register"
 import RegisterVerification from "./pages/RegisterVerification"
+import { Box } from "@chakra-ui/react"
+import Navbar from "./component/Navbar"
+import Footer from "./component/Footer"
+import HomePage from "./pages/Home"
 
 function App() {
   const [message, setMessage] = useState("")
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       const { data } = await axios.get(
         `${process.env.REACT_APP_API_BASE_URL}/greetings`
       )
@@ -24,6 +28,8 @@ function App() {
   const [authCheck, setAuthCheck] = useState(false)
 
   const dispatch = useDispatch()
+
+  const location = useLocation()
 
   const keepUserLoggedIn = async () => {
     try {
@@ -54,7 +60,14 @@ function App() {
 
   return (
     <>
+      {location.pathname === "/login" || location.pathname === "/register" ? null : (
+        <Box>
+          <Navbar />
+        </Box>
+      )}
+
       <Routes>
+        <Route path="/" element={<HomePage />} />
         <Route
           path="/login"
           element={
@@ -69,6 +82,12 @@ function App() {
           element={<RegisterVerification />}
         />
       </Routes>
+
+      {location.pathname === "/login" || location.pathname === "/register" ? null : (
+        <Box>
+          <Footer />
+        </Box>
+      )}
     </>
   )
 }
