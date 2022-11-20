@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
+            User.hasMany(models.Address)
         }
     }
     User.init(
@@ -16,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
             username: DataTypes.STRING,
             email: DataTypes.STRING,
             password: DataTypes.STRING,
-            phone_number: DataTypes.INTEGER,
+            phone_number: DataTypes.BIGINT,
             profile_picture: DataTypes.STRING,
             is_verify: {
                 type: DataTypes.BOOLEAN,
