@@ -12,6 +12,12 @@ import { Box } from "@chakra-ui/react"
 import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
 import HomePage from "./pages/Home"
+import AdminDashboard from "./components/admin/AdminDashboard"
+import "./AdminDashboard.css"
+import SideNavBar from "./components/SideNavBar"
+import WarehouseManagement from "./components/admin/WarehouseManagement"
+import ChangePassword from "./pages/profile/ChangePassword"
+import Profile from "./pages/profile/Profile"
 
 function App() {
   const [message, setMessage] = useState("")
@@ -66,28 +72,44 @@ function App() {
         </Box>
       )}
 
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route
-          path="/login"
-          element={
-            <GuestRoute>
-              <LoginPage />
-            </GuestRoute>
-          }
-        />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/register/verification"
-          element={<RegisterVerification />}
-        />
-      </Routes>
+      <SideNavBar />
+      <Box marginLeft="275px" marginTop={"50px"}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/login"
+            element={
+              <GuestRoute>
+                <LoginPage />
+              </GuestRoute>
+            }
+          />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/register/verification"
+            element={<RegisterVerification />}
+          />
+          <Route
+            path="/admin-dashboard"
+            element={<AdminDashboard />}
+          />
+          <Route
+            path="/warehouse-management"
+            element={<WarehouseManagement />}
+          />
+          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/profile/change-password"
+            element={<ChangePassword />}
+          />
+        </Routes>
 
-      {location.pathname === "/login" || location.pathname === "/register" ? null : (
-        <Box>
-          <Footer />
-        </Box>
-      )}
+        {location.pathname === "/login" || location.pathname === "/register" ? null : (
+          <Box>
+            <Footer />
+          </Box>
+        )}
+      </Box>
     </>
   )
 }
