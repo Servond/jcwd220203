@@ -1,5 +1,5 @@
 import { Box } from "@chakra-ui/react"
-import CarouselSlider from "../component/Carousel"
+import CarouselSlider from "../components/Carousel"
 
 const HomePage = () => {
     return (

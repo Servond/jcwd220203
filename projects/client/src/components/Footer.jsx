@@ -1,8 +1,8 @@
 import { Box, Grid, GridItem, HStack, Image, Stack, Text } from "@chakra-ui/react"
 import footer from "../assets/footer.png"
 import { BsFacebook, BsInstagram, BsPinterest, BsTwitter } from "react-icons/bs"
-import AppStoreBadge from '../component/AppStoreBadge'
-import PlayStoreBadge from '../component/PlayStoreBadge'
+import AppStoreBadge from '../components/AppStoreBadge'
+import PlayStoreBadge from '../components/PlayStoreBadge'
 import shopediaImg from "../assets/shopedia-image.svg"
 import logo from "../assets/logo.png"
 
