@@ -18,7 +18,6 @@ const authSlice = createSlice({
             state.email = action.payload.email
             state.phone_number = action.payload.phone_number
             state.profile_picture = action.payload.profile_picture
-            console.log(action.payload)
         },
         logout: (state) => {
             state.id = 0
