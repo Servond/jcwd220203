@@ -64,8 +64,8 @@ const UserInfo = () => {
             }
         },
         validationSchema: Yup.object({
-            username: Yup.string().required(),
-            phone_number: Yup.number(),
+            username: Yup.string().min(3),
+            phone_number: Yup.number().min(3),
         }),
         validateOnChange: false,
     })

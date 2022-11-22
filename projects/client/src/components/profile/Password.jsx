@@ -49,7 +49,7 @@ const UserInfo = () => {
             }
         },
         validationSchema: Yup.object({
-            password: Yup.string().required("Password is required"),
+            password: Yup.string().min(3),
             password_confirmation: Yup.string().oneOf(
                 [Yup.ref("password"), null],
                 "Passwords must match"

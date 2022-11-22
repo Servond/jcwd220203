@@ -1,5 +1,6 @@
 const db = require("../models")
 const { Op } = require("sequelize")
+const bcrypt = require("bcrypt")
 
 const User = db.User
 
@@ -28,8 +29,26 @@ const profileController = {
                 req.body.profile_picture = `http://localhost:8000/public/${req.file.filename}`
             }
 
-            const { id } = req.params
-            await User.update({ ...req.body }, { where: { id: req.user.id } })
+            const {
+                id,
+                password,
+                username,
+                phone_number,
+                profile_picture,
+                email,
+            } = req.body
+
+            const hashedPassword = bcrypt.hashSync(password, 5)
+            await User.update(
+                {
+                    username,
+                    password: hashedPassword,
+                    email,
+                    profile_picture,
+                    phone_number,
+                },
+                { where: { id: req.user.id } }
+            )
             const findUserById = await User.findByPk(id)
 
             return res.status(200).json({
