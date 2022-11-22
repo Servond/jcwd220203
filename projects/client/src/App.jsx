@@ -21,6 +21,7 @@ import AdminRoute from "./components/admin/AdminRoute"
 import GuestRoute from "./components/GuestRoute"
 import AddressList from "./pages/profile/AddressList"
 
+
 function App() {
     const [message, setMessage] = useState("")
     const authSelector = useSelector((state) => state.auth)
@@ -119,6 +120,7 @@ function App() {
                     element={<ChangePassword />}
                 />
                 <Route path="/user/profile/address" element={<AddressList />} />
+
             </Routes>
 
             {location.pathname === "/login" ||
