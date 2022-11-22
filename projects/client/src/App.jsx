@@ -1,69 +1,70 @@
-import axios from "axios"
-import { useEffect, useState } from "react"
-import { Route, Routes, useLocation } from "react-router-dom"
-import LoginPage from "./pages/Login"
-import { useDispatch, useSelector } from "react-redux"
-import { axiosInstance } from "./api"
-import { login } from "./redux/features/authSlice"
-import GuestRoute from "./components/GuestRoute"
-import Register from "./pages/Register"
-import RegisterVerification from "./pages/RegisterVerification"
-import { Box } from "@chakra-ui/react"
-import Navbar from "./components/Navbar"
-import Footer from "./components/Footer"
-import HomePage from "./pages/Home"
-import AdminDashboard from "./components/admin/AdminDashboard"
-import "./AdminDashboard.css"
-import SideNavBar from "./components/SideNavBar"
-import WarehouseManagement from "./components/admin/WarehouseManagement"
-import ChangePassword from "./pages/profile/ChangePassword"
-import Profile from "./pages/profile/Profile"
+0import axios from "axios";
+import { useEffect, useState } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
+import LoginPage from "./pages/Login";
+import { useDispatch } from "react-redux";
+import { axiosInstance } from "./api";
+import { login } from "./redux/features/authSlice";
+import GuestRoute from "./components/GuestRoute";
+import Register from "./pages/Register";
+import RegisterVerification from "./pages/RegisterVerification";
+import { Box } from "@chakra-ui/react";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import HomePage from "./pages/Home";
+import AdminDashboard from "./components/admin/AdminDashboard";
+import UserDataInformation from "./components/admin/UserDataInformation";
+import "./AdminDashboard.css";
+import SideNavBar from "./components/SideNavBar";
+import WarehouseManagement from "./components/admin/WarehouseManagement";
+import ChangePassword from "./pages/profile/ChangePassword";
+import Profile from "./pages/profile/Profile";
+import { useSelector } from "react-redux"
 
 function App() {
-  const [message, setMessage] = useState("")
-  const authSelector = useSelector((state) => state.auth)
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    ;(async () => {
+    (async () => {
       const { data } = await axios.get(
         `${process.env.REACT_APP_API_BASE_URL}/greetings`
-      )
-      setMessage(data?.message || "")
-    })()
-  }, [])
+      );
+      setMessage(data?.message || "");
+    })();
+  }, []);
 
-  const [authCheck, setAuthCheck] = useState(false)
+  const [authCheck, setAuthCheck] = useState(false);
+  const authSelector = useSelector((state) => state.auth)
+  const dispatch = useDispatch();
 
-  const dispatch = useDispatch()
-
-  const location = useLocation()
+  const location = useLocation();
 
   const keepUserLoggedIn = async () => {
     try {
-      const auth_token = localStorage.getItem("auth_token")
+      const auth_token = localStorage.getItem("auth_token");
 
       if (!auth_token) {
-        setAuthCheck(true)
-        return
+        setAuthCheck(true);
+        return;
       }
 
-      const response = await axiosInstance.get("/auth/refresh-token")
+      const response = await axiosInstance.get("/auth/refresh-token");
 
-      dispatch(login(response.data.data))
+      dispatch(login(response.data.data));
 
-      localStorage.setItem("auth_token", response.data.token)
-      setAuthCheck(true)
+      localStorage.setItem("auth_token", response.data.token);
+      setAuthCheck(true);
     } catch (err) {
-      console.log(err)
-      setAuthCheck(true)
+      console.log(err);
+      setAuthCheck(true);
     } finally {
-      setAuthCheck(true)
+      setAuthCheck(true);
     }
-  }
+  };
 
   useEffect(() => {
-    keepUserLoggedIn()
-  }, [])
+    keepUserLoggedIn();
+  }, []);
 
   return (
     <>
@@ -78,7 +79,8 @@ function App() {
         <Box>
           <Navbar />
         </Box>
-      )}
+      )
+    }
 
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -96,6 +98,7 @@ function App() {
           element={<RegisterVerification />}
         />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/user-data" element={<UserDataInformation />} />
         <Route path="/warehouse-management" element={<WarehouseManagement />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/profile/change-password" element={<ChangePassword />} />
@@ -112,7 +115,7 @@ function App() {
         </Box>
       )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
