@@ -12,9 +12,9 @@ import {
 } from "@chakra-ui/react"
 import { useFormik } from "formik"
 import { useState } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { axiosInstance } from "../api"
-import * as Yup from 'yup'
+import * as Yup from "yup"
 import { login } from "../redux/features/authSlice"
 import React, { useEffect } from "react"
 import { FcGoogle } from "react-icons/fc"
@@ -32,8 +32,9 @@ const clientId =
     "551516387346-2skc8ac82egk828q4agk7htffth1iiga.apps.googleusercontent.com"
 
 const LoginPage = () => {
-
     const [showPassword, setShowPassword] = useState(false)
+
+    const authSelector = useSelector((state) => state.auth)
 
     const dispatch = useDispatch()
 
@@ -51,15 +52,16 @@ const LoginPage = () => {
     const formik = useFormik({
         initialValues: {
             email: "",
-            password: ""
+            password: "",
+            role: "",
         },
-        onSubmit: async ({ email, password }) => {
+        onSubmit: async ({ email, password, role }) => {
             try {
-                const response = await axiosInstance.post(`/auth/login`, {
+                const response = await axiosInstance.post(`/auth/login/`, {
                     email,
-                    password
+                    password,
+                    role,
                 })
-
                 toast({
                     title: "Login Succesful",
                     status: "success",
@@ -67,16 +69,20 @@ const LoginPage = () => {
                 })
 
                 localStorage.setItem("auth_token", response.data.token)
+
                 dispatch(
                     login({
                         id: response.data.data.id,
+                        role: response.data.data.role,
                         email: response.data.data.email,
-                        username: response.data.data.username
+                        username: response.data.data.username,
+                        phone_number: response.data.data.phone_number,
+                        profile_picture: response.data.data.profile_picture,
                     })
                 )
+
                 formik.setFieldValue("email", "")
                 formik.setFieldValue("password", "")
-
             } catch (err) {
                 console.log(err)
                 toast({
@@ -86,6 +92,7 @@ const LoginPage = () => {
                 })
             }
         },
+
         validationSchema: Yup.object({
             email: Yup.string().required(),
             password: Yup.string().required(),
@@ -94,17 +101,25 @@ const LoginPage = () => {
     })
 
     const formChangeHandler = ({ target }) => {
-        const { name, value } = target;
+        const { name, value } = target
         formik.setFieldValue(name, value)
+    }
+    if (authSelector.role === "admin") {
+        navigate("/admin-dashboard")
+    } else if (authSelector.role === "user") {
+        navigate(-1)
     }
 
     // facebook login
     const responseFacebook = async (res) => {
         try {
-            const response = await axiosInstance.post("/auth/loginSocialMedia", {
-                username: res.name,
-                email: res.email,
-            })
+            const response = await axiosInstance.post(
+                "/auth/loginSocialMedia",
+                {
+                    username: res.name,
+                    email: res.email,
+                }
+            )
 
             toast({
                 title: "Login Succesful",
@@ -116,23 +131,29 @@ const LoginPage = () => {
             dispatch(
                 login({
                     id: response.data.data.id,
+                    role: response.data.data.role,
                     email: response.data.data.email,
-                    username: response.data.data.username
+                    username: response.data.data.username,
+                    phone_number: response.data.data.phone_number,
+                    profile_picture: response.data.data.profile_picture,
                 })
             )
         } catch (error) {
             console.log(error)
         }
-        navigate(location.state.from)
+        // navigate(location.state.from)
     }
 
     // google login
     const onSuccess = async (res) => {
         try {
-            const response = await axiosInstance.post("/auth/loginSocialMedia", {
-                username: res.profileObj.name,
-                email: res.profileObj.email,
-            })
+            const response = await axiosInstance.post(
+                "/auth/loginSocialMedia",
+                {
+                    username: res.profileObj.name,
+                    email: res.profileObj.email,
+                }
+            )
 
             toast({
                 title: "Login Succesful",
@@ -144,14 +165,17 @@ const LoginPage = () => {
             dispatch(
                 login({
                     id: response.data.data.id,
+                    role: response.data.data.role,
                     email: response.data.data.email,
-                    username: response.data.data.username
+                    username: response.data.data.username,
+                    phone_number: response.data.data.phone_number,
+                    profile_picture: response.data.data.profile_picture,
                 })
             )
         } catch (error) {
             console.log(error)
         }
-        navigate(location.state.from)
+        // navigate(location.state.from)
     }
 
     const onFailure = (err) => {
@@ -160,7 +184,7 @@ const LoginPage = () => {
 
     const myStyle = {
         color: "#F7931E",
-        paddingLeft: "5px"
+        paddingLeft: "5px",
     }
 
     useEffect(() => {
@@ -173,15 +197,21 @@ const LoginPage = () => {
         gapi.load("client:auth2", start)
     }, [])
 
-
     return (
-        <Box >
+        <Box>
             {/* logo for mobile */}
-            <Box textAlign={"center"} mt="30px" mb={'10px'} minW={"100px"} display={{ lg: "none", md: "none", base: "flex" }} justifyContent={'center'} >
-                <Link to={'/'}>
-                    <Image src={logo} width={'50px'} display={'inline'} />
+            <Box
+                textAlign={"center"}
+                mt="30px"
+                mb={"10px"}
+                minW={"100px"}
+                display={{ lg: "none", md: "none", base: "flex" }}
+                justifyContent={"center"}
+            >
+                <Link to={"/"}>
+                    <Image src={logo} width={"50px"} display={"inline"} />
                 </Link>
-                <Link to={'/'}>
+                <Link to={"/"}>
                     <Text
                         fontSize={"30px"}
                         fontWeight="bold"
@@ -191,7 +221,7 @@ const LoginPage = () => {
                         Shop
                     </Text>
                     <Text
-                        pl={'0'}
+                        pl={"0"}
                         fontSize={"30px"}
                         fontWeight="bold"
                         color={"#F7931E"}
@@ -202,11 +232,23 @@ const LoginPage = () => {
                 </Link>
             </Box>
             {/* logo for dekstop */}
-            <Box textAlign={"center"} mt="20px" mb={'15px'} minW={"960px"} display={{ lg: "flex", md: "none", base: "none" }} justifyContent={'center'} >
-                <Link to={'/'}>
-                    <Image src={logo} width={'50px'} display={'inline'} mt={'5px'} />
+            <Box
+                textAlign={"center"}
+                mt="20px"
+                mb={"15px"}
+                minW={"960px"}
+                display={{ lg: "flex", md: "none", base: "none" }}
+                justifyContent={"center"}
+            >
+                <Link to={"/"}>
+                    <Image
+                        src={logo}
+                        width={"50px"}
+                        display={"inline"}
+                        mt={"5px"}
+                    />
                 </Link>
-                <Link to={'/'}>
+                <Link to={"/"}>
                     <Text
                         fontSize={"40px"}
                         fontWeight="bold"
@@ -216,7 +258,7 @@ const LoginPage = () => {
                         Shop
                     </Text>
                     <Text
-                        pl={'0'}
+                        pl={"0"}
                         fontSize={"40px"}
                         fontWeight="bold"
                         color={"#F7931E"}
@@ -226,21 +268,35 @@ const LoginPage = () => {
                     </Text>
                 </Link>
             </Box>
-            <Box display={"flex"} maxW="100%" mt="10px" pt="50px" mx={"auto"} bgColor={'#F9A88C'} height={'590px'} >
+
+            {/* background image */}
+            <Box
+                display={"flex"}
+                maxW="100%"
+                mt="10px"
+                pt="50px"
+                mx={"auto"}
+                bgColor={"#E5F9F6"}
+                height={"590px"}
+            >
                 <Box
                     width={"50%"}
                     display={{ lg: "flex", md: "none", base: "none" }}
                     justifyContent={"flex-end"}
                     pr="80px"
                 >
-                    <Box mt={'40px'}>
-                        <Image src={Oshop} width="480px" justifyContent={"end"} />
+                    <Box mt={"40px"}>
+                        <Image
+                            src={Oshop}
+                            width="480px"
+                            justifyContent={"end"}
+                        />
                         <Text
                             m="27px 0 8px"
                             fontSize={"22.4px"}
                             fontWeight="bold"
                             textAlign={"center"}
-                            color={'#009CE2'}
+                            color={"#009CE2"}
                         >
                             It's not complicated at Shopedia
                         </Text>
@@ -249,14 +305,16 @@ const LoginPage = () => {
                             fontSize={"13px"}
                             fontWeight="semibold"
                             textAlign={"center"}
-                            color={'#009CE2'}
+                            color={"#009CE2"}
                         >
-                            Join and feel the convenience of transactions on Shopedia
+                            Join and feel the convenience of transactions on
+                            Shopedia
                         </Text>
                     </Box>
                 </Box>
 
-                <Box fontSize="14px" width={"50%"} mt={'5px'} >
+                {/* login box */}
+                <Box fontSize="14px" width={"50%"} mt={"5px"}>
                     <Box
                         w="400px"
                         mx={"auto"}
@@ -266,64 +324,91 @@ const LoginPage = () => {
                         borderRadius={"10px"}
                         p="24px 40px 32px "
                         textAlign={"center"}
-                        bgColor={'white'}
+                        bgColor={"white"}
                     >
-                        <Text fontSize="22px" fontWeight={"bold"} textAlign={'left'} color={'#0095DA'}>
-                            Log in                        </Text>
-                        <Box mt="8px" fontSize={"12px"} textAlign="left" color={'#F7931E'}>
-                            <Text display={"inline"} mr="1" color={'#F37121'}>
-                                Welcome to Shopedia, please put your login credentials below to access our website
+                        <Text
+                            fontSize="22px"
+                            fontWeight={"bold"}
+                            textAlign={"left"}
+                            color={"#0095DA"}
+                        >
+                            Log in{" "}
+                        </Text>
+                        <Box
+                            mt="8px"
+                            fontSize={"12px"}
+                            textAlign="left"
+                            color={"#F7931E"}
+                        >
+                            <Text display={"inline"} mr="1" color={"#F37121"}>
+                                Welcome to Shopedia, please put your login
+                                credentials below to access our website
                             </Text>
                         </Box>
 
+                        {/* normal login */}
                         <form onSubmit={formik.handleSubmit}>
                             <Box m="20px 0 8px">
                                 <FormControl isInvalid={formik.errors.email}>
                                     <Input
-                                        pl={'10px'}
+                                        pl={"10px"}
                                         value={formik.values.email}
                                         name="email"
                                         type="text"
                                         onChange={formChangeHandler}
                                         border={"1px solid #e2e8f0"}
-                                        placeholder={'Email'}
+                                        placeholder={"Email"}
                                     />
-                                    <FormErrorMessage>{formik.errors.email}</FormErrorMessage>
+                                    <FormErrorMessage>
+                                        {formik.errors.email}
+                                    </FormErrorMessage>
                                 </FormControl>
-                                <Box mt={'20px'}>
-                                    <FormControl isInvalid={formik.errors.password}>
+                                <Box mt={"20px"}>
+                                    <FormControl
+                                        isInvalid={formik.errors.password}
+                                    >
                                         <InputGroup>
                                             <Input
-                                                pl={'10px'}
+                                                pl={"10px"}
                                                 value={formik.values.password}
                                                 name="password"
-                                                type={showPassword ? 'text' : 'password'}
+                                                type={
+                                                    showPassword
+                                                        ? "text"
+                                                        : "password"
+                                                }
                                                 onChange={formChangeHandler}
                                                 border={"1px solid #e2e8f0"}
-                                                placeholder={'Password'}
+                                                placeholder={"Password"}
                                             />
-                                            <InputRightElement width={'4.5rem'}>
+                                            <InputRightElement width={"4.5rem"}>
                                                 <Button
-                                                    ml={'19px'}
-                                                    size={'md'}
-                                                    bg={'#white'}
+                                                    ml={"19px"}
+                                                    size={"md"}
+                                                    bg={"#white"}
                                                     onClick={togglePassword}
-                                                    color={'#F37121'}
+                                                    color={"#F37121"}
                                                 >
-                                                    {showPassword ? <BiShow /> : <BiHide />}
+                                                    {showPassword ? (
+                                                        <BiShow />
+                                                    ) : (
+                                                        <BiHide />
+                                                    )}
                                                 </Button>
                                             </InputRightElement>
                                         </InputGroup>
-                                        <FormErrorMessage>{formik.errors.password}</FormErrorMessage>
+                                        <FormErrorMessage>
+                                            {formik.errors.password}
+                                        </FormErrorMessage>
                                     </FormControl>
                                     <Box>
                                         <Link to="/login/reset-password">
                                             <Text
-                                                cursor={'pointer'}
-                                                textAlign={'right'}
-                                                color={'#0095DA'}
-                                                fontSize={'11px'}
-                                                mt={'5px'}
+                                                cursor={"pointer"}
+                                                textAlign={"right"}
+                                                color={"#0095DA"}
+                                                fontSize={"11px"}
+                                                mt={"5px"}
                                             >
                                                 Forgot password?
                                             </Text>
@@ -340,13 +425,16 @@ const LoginPage = () => {
                                 m="16px 0"
                                 color={"white"}
                                 isDisabled={!formik.values.email}
-                                type={'submit'}
+                                type={"submit"}
                             >
                                 <Text fontWeight={"bold"}>Log in</Text>
                             </Button>
 
                             <Box margin="30px 0">
-                                <Box justifyContent={"space-between"} display="flex">
+                                <Box
+                                    justifyContent={"space-between"}
+                                    display="flex"
+                                >
                                     <Box width="42%">
                                         <hr />
                                     </Box>
@@ -360,7 +448,7 @@ const LoginPage = () => {
                                     mt="-13px"
                                     mx={"auto"}
                                     bgColor={"white"}
-                                    color={'#B0BFBF'}
+                                    color={"#B0BFBF"}
                                 >
                                     or
                                 </Text>
@@ -408,31 +496,31 @@ const LoginPage = () => {
                                             _hover={false}
                                         >
                                             <Box mr="6px" my={"auto"}>
-                                                <FaFacebook color="#3b5998" size={"25px"} />
+                                                <FaFacebook
+                                                    color="#3b5998"
+                                                    size={"25px"}
+                                                />
                                             </Box>
                                             <Text>FaceBook</Text>
                                         </Button>
                                     )}
                                 />
                             </Box>
-                            <Box textAlign={'center'} mt={'30px'}>
-                                <Text
-                                    color={'#0095DA'}
-                                    fontSize={'12px'}
-                                >
+
+                            {/* redirect register */}
+                            <Box textAlign={"center"} mt={"30px"}>
+                                <Text color={"#0095DA"} fontSize={"12px"}>
                                     Don't have an account?
-                                    <span style={myStyle} >
-                                        <Link to={'/register'}>
-                                            Sign up
-                                        </Link>
+                                    <span style={myStyle}>
+                                        <Link to={"/register"}>Sign up</Link>
                                     </span>
                                 </Text>
                             </Box>
                         </form>
                     </Box>
                 </Box>
-            </Box >
-        </Box >
+            </Box>
+        </Box>
     )
 }
 

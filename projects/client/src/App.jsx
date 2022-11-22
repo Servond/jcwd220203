@@ -15,6 +15,7 @@ import { Box } from "@chakra-ui/react"
 import WarehouseManagement from "./components/admin/WarehouseManagement"
 import ChangePassword from "./pages/profile/ChangePassword"
 import Profile from "./pages/profile/Profile"
+import AddressList from "./pages/profile/AddressList"
 
 function App() {
     const [message, setMessage] = useState("")
@@ -85,10 +86,14 @@ function App() {
                         path="/warehouse-management"
                         element={<WarehouseManagement />}
                     />
-                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/user/profile" element={<Profile />} />
                     <Route
-                        path="/profile/change-password"
+                        path="/user/profile/change-password"
                         element={<ChangePassword />}
+                    />
+                    <Route
+                        path="/user/profile/address-list"
+                        element={<AddressList />}
                     />
                 </Routes>
             </Box>
