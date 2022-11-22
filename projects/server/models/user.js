@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
             // define association here
             User.hasMany(models.Address)
             User.hasMany(models.Warehouse)
+            User.belongsTo(models.Role)
         }
     }
     User.init(
@@ -23,10 +24,6 @@ module.exports = (sequelize, DataTypes) => {
             is_verify: {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
-            },
-            role: {
-                type: DataTypes.STRING,
-                defaultValue: "user",
             },
         },
         {

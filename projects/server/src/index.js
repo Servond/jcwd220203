@@ -3,13 +3,15 @@ const express = require("express")
 const cors = require("cors")
 const { join } = require("path")
 const db = require("../models")
+const { verifyToken } = require("../middlewares/authMiddleware")
+
 const fs = require("fs")
 
 // Import Routes
 const profileRoute = require("../routes/profileRoute")
 const authRoute = require("../routes/authRoute")
 const warehouseRoute = require("../routes/warehouseRoute.js")
-const { verifyToken } = require("../middlewares/authMiddleware")
+const adminRoute = require("../routes/adminRoute")
 
 const PORT = process.env.PORT || 8000
 const app = express()
@@ -29,10 +31,12 @@ app.use(express.json())
 
 // ===========================
 // NOTE : Add your routes here
+app.use("/admin", adminRoute)
 
 app.use("/warehouse", warehouseRoute)
 
 app.use("/auth", authRoute)
+
 app.use("/profile", verifyToken, profileRoute)
 
 app.use("/public", express.static("public"))

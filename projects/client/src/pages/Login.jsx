@@ -34,8 +34,6 @@ const clientId =
 const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false)
 
-    const authSelector = useSelector((state) => state.auth)
-
     const dispatch = useDispatch()
 
     const toast = useToast()
@@ -53,15 +51,14 @@ const LoginPage = () => {
         initialValues: {
             email: "",
             password: "",
-            role: "",
         },
-        onSubmit: async ({ email, password, role }) => {
+        onSubmit: async ({ email, password }) => {
             try {
-                const response = await axiosInstance.post(`/auth/login/`, {
+                const response = await axiosInstance.post(`/auth/login`, {
                     email,
                     password,
-                    role,
                 })
+
                 toast({
                     title: "Login Succesful",
                     status: "success",
@@ -69,18 +66,16 @@ const LoginPage = () => {
                 })
 
                 localStorage.setItem("auth_token", response.data.token)
-
                 dispatch(
                     login({
                         id: response.data.data.id,
-                        role: response.data.data.role,
+                        RoleId: response.data.data.RoleId,
                         email: response.data.data.email,
                         username: response.data.data.username,
                         phone_number: response.data.data.phone_number,
                         profile_picture: response.data.data.profile_picture,
                     })
                 )
-
                 formik.setFieldValue("email", "")
                 formik.setFieldValue("password", "")
             } catch (err) {
@@ -92,7 +87,6 @@ const LoginPage = () => {
                 })
             }
         },
-
         validationSchema: Yup.object({
             email: Yup.string().required(),
             password: Yup.string().required(),
@@ -103,11 +97,6 @@ const LoginPage = () => {
     const formChangeHandler = ({ target }) => {
         const { name, value } = target
         formik.setFieldValue(name, value)
-    }
-    if (authSelector.role === "admin") {
-        navigate("/admin-dashboard")
-    } else if (authSelector.role === "user") {
-        navigate(-1)
     }
 
     // facebook login
@@ -131,7 +120,7 @@ const LoginPage = () => {
             dispatch(
                 login({
                     id: response.data.data.id,
-                    role: response.data.data.role,
+                    RoleId: response.data.data.RoleId,
                     email: response.data.data.email,
                     username: response.data.data.username,
                     phone_number: response.data.data.phone_number,
@@ -141,7 +130,7 @@ const LoginPage = () => {
         } catch (error) {
             console.log(error)
         }
-        // navigate(location.state.from)
+        navigate(location.state.from)
     }
 
     // google login
@@ -165,7 +154,7 @@ const LoginPage = () => {
             dispatch(
                 login({
                     id: response.data.data.id,
-                    role: response.data.data.role,
+                    RoleId: response.data.data.RoleId,
                     email: response.data.data.email,
                     username: response.data.data.username,
                     phone_number: response.data.data.phone_number,
@@ -175,7 +164,7 @@ const LoginPage = () => {
         } catch (error) {
             console.log(error)
         }
-        // navigate(location.state.from)
+        navigate(location.state.from)
     }
 
     const onFailure = (err) => {
