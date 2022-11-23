@@ -5,7 +5,6 @@ import LoginPage from "./pages/Login"
 import { useDispatch, useSelector } from "react-redux"
 import { axiosInstance } from "./api"
 import { login } from "./redux/features/authSlice"
-import GuestRoute from "./components/GuestRoute"
 import Register from "./pages/Register"
 import RegisterVerification from "./pages/RegisterVerification"
 import { Box } from "@chakra-ui/react"
@@ -18,107 +17,124 @@ import SideNavBar from "./components/SideNavBar"
 import WarehouseManagement from "./components/admin/WarehouseManagement"
 import ChangePassword from "./pages/profile/ChangePassword"
 import Profile from "./pages/profile/Profile"
-import AdminRoute from "./component/admin/AdminRoute"
+import AdminRoute from "./components/admin/AdminRoute"
+import GuestRoute from "./components/GuestRoute"
+import AddressList from "./pages/profile/AddressList"
+
 
 function App() {
-  const [message, setMessage] = useState("");
+    const [message, setMessage] = useState("")
+    const authSelector = useSelector((state) => state.auth)
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/greetings`
-      );
-      setMessage(data?.message || "");
-    })();
-  }, []);
+    useEffect(() => {
+        ;(async () => {
+            const { data } = await axios.get(
+                `${process.env.REACT_APP_API_BASE_URL}/greetings`
+            )
+            setMessage(data?.message || "")
+        })()
+    }, [])
 
-  const [authCheck, setAuthCheck] = useState(false);
-  const authSelector = useSelector((state) => state.auth)
-  const dispatch = useDispatch();
+    const [authCheck, setAuthCheck] = useState(false)
 
-  const location = useLocation();
+    const dispatch = useDispatch()
 
-  const keepUserLoggedIn = async () => {
-    try {
-      const auth_token = localStorage.getItem("auth_token");
+    const location = useLocation()
 
-      if (!auth_token) {
-        setAuthCheck(true);
-        return;
-      }
+    const keepUserLoggedIn = async () => {
+        try {
+            const auth_token = localStorage.getItem("auth_token")
 
-      const response = await axiosInstance.get("/auth/refresh-token");
+            if (!auth_token) {
+                setAuthCheck(true)
+                return
+            }
 
-      dispatch(login(response.data.data));
+            const response = await axiosInstance.get("/auth/refresh-token")
 
-      localStorage.setItem("auth_token", response.data.token);
-      setAuthCheck(true);
-    } catch (err) {
-      console.log(err);
-      setAuthCheck(true);
-    } finally {
-      setAuthCheck(true);
-    }
-  };
+            dispatch(login(response.data.data))
 
-  useEffect(() => {
-    keepUserLoggedIn();
-  }, []);
-
-  return (
-    <>
-      {authSelector.RoleId === 3 || authSelector.RoleId === 2 ? <SideNavBar /> : null}
-
-      {location.pathname === "/login" ||
-      location.pathname === "/register" ||
-      location.pathname === "/reset-password-confirmation" ||
-      location.pathname === "/request-reset-password" ||
-      authSelector.RoleId === 3 ||
-      authSelector.RoleId === 2 ? null : (
-        <Box>
-          <Navbar />
-        </Box>
-      )
+            localStorage.setItem("auth_token", response.data.token)
+            setAuthCheck(true)
+        } catch (err) {
+            console.log(err)
+            setAuthCheck(true)
+        } finally {
+            setAuthCheck(true)
+        }
     }
 
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route
-          path="/login"
-          element={
-            <GuestRoute>
-              <LoginPage />
-            </GuestRoute>
-          }
-        />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/register/verification"
-          element={<RegisterVerification />}
-        />
-        <Route path="/admin-dashboard" element={
-        <AdminRoute>
-          <AdminDashboard />
-        </AdminRoute>
-        
-        } />
-        <Route path="/warehouse-management" element={<WarehouseManagement />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/profile/change-password" element={<ChangePassword />} />
-      </Routes>
+    useEffect(() => {
+        keepUserLoggedIn()
+    }, [])
 
-      {location.pathname === "/login" ||
-      location.pathname === "/register" ||
-      location.pathname === "/reset-password-confirmation" ||
-      location.pathname === "/request-reset-password" ||
-      authSelector.RoleId === 3 ||
-      authSelector.RoleId === 2 ? null : (
-        <Box>
-          <Footer />
-        </Box>
-      )}
-    </>
-  );
+    return (
+        <>
+            {authSelector.RoleId === 3 || authSelector.RoleId === 2 ? (
+                <SideNavBar />
+            ) : null}
+
+            {location.pathname === "/login" ||
+            location.pathname === "/register" ||
+            location.pathname === "/reset-password-confirmation" ||
+            location.pathname === "/request-reset-password" ||
+            authSelector.RoleId === 3 ||
+            authSelector.RoleId === 2 ? null : (
+                <Box>
+                    <Navbar />
+                </Box>
+            )}
+
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route
+                    path="/login"
+                    element={
+                        <GuestRoute>
+                            <LoginPage />
+                        </GuestRoute>
+                    }
+                />
+                <Route path="/register" element={<Register />} />
+                <Route
+                    path="/register/verification"
+                    element={<RegisterVerification />}
+                />
+                <Route
+                    path="/admin-dashboard"
+                    element={
+                        <AdminRoute>
+                            <AdminDashboard />
+                        </AdminRoute>
+                    }
+                />
+                <Route
+                    path="/warehouse-management"
+                    element={<WarehouseManagement />}
+                />
+
+                {/* Profiling Route */}
+                <Route path="/user/profile" element={<Profile />} />
+                <Route
+                    path="/user/profile/change-password"
+                    element={<ChangePassword />}
+                />
+                <Route path="/user/profile/address" element={<AddressList />} />
+
+            </Routes>
+
+            {location.pathname === "/login" ||
+            location.pathname === "/register" ||
+            location.pathname === "/reset-password-confirmation" ||
+            location.pathname === "/request-reset-password" ||
+            authSelector.RoleId === 3 ||
+            authSelector.RoleId === 2 ? null : (
+                <Box>
+                    <Footer />
+                </Box>
+            )}
+        </>
+    )
 }
 
 export default App;

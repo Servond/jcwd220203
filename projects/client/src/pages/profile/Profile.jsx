@@ -1,53 +1,14 @@
-import { Box, Button, Text, HStack, useToast } from "@chakra-ui/react"
-import { useEffect } from "react"
-import { useState } from "react"
+import { Box, Button, Text, HStack } from "@chakra-ui/react"
+
 import { BiUser } from "react-icons/bi"
-import { axiosInstance } from "../../api"
+
 import UserInfo from "../../components/profile/UserInfo"
 import { Link } from "react-router-dom"
 import { useSelector } from "react-redux"
-import { useDispatch } from "react-redux"
-import { login } from "../../redux/features/authSlice"
-import {
-    addToProfile,
-    fillDataProfile,
-} from "../../redux/features/profileSlice"
 
 const Profile = () => {
-    const [userProfile, setUserProfile] = useState([])
     const authSelector = useSelector((state) => state.auth)
-    const profileSelector = useSelector((state) => state.profile)
-    const dispatch = useDispatch()
 
-    const fetchUserDataById = async () => {
-        try {
-            const response = await axiosInstance.get(`/profile/3`)
-
-            setUserProfile([response.data.data])
-            // dispatch(fillDataProfile([response.data.data]))
-            // console.log(profileSelector)
-        } catch (err) {
-            console.log(err)
-        }
-    }
-    const renderPersonalInfo = () => {
-        return userProfile.map((val) => {
-            return (
-                <UserInfo
-                    key={val.id.toString()}
-                    username={val.username}
-                    email={val.email}
-                    phone_number={val.phone_number}
-                    profile_picture={val.profile_picture}
-                    fetchUserDataById={fetchUserDataById}
-                />
-            )
-        })
-    }
-
-    useEffect(() => {
-        fetchUserDataById()
-    }, [])
     return (
         <Box mt="55px" fontSize={"16px"} color="rgba(0,0,0,.54)">
             <Box w="1208px" marginX={"auto"}>
@@ -62,6 +23,7 @@ const Profile = () => {
 
                 <Box border={"1px solid #dfe1e3"} borderRadius="10px">
                     <HStack>
+                        {/* Personal Info */}
                         <Box display={"flex"} height="53px" fontWeight={"bold"}>
                             <Button
                                 p="16px 24px"
@@ -74,8 +36,9 @@ const Profile = () => {
                             </Button>
                         </Box>
 
+                        {/* Change Password */}
                         <Box display={"flex"} height="53px" fontWeight={"bold"}>
-                            <Link to="/profile/change-password">
+                            <Link to="/user/profile/change-password">
                                 <Box
                                     p="16px 24px"
                                     _hover={{ color: "#0095DA" }}
@@ -84,8 +47,20 @@ const Profile = () => {
                                 </Box>
                             </Link>
                         </Box>
+
+                        {/* Address List */}
+                        <Box display={"flex"} height="53px" fontWeight={"bold"}>
+                            <Link to="/user/profile/address">
+                                <Box
+                                    p="16px 24px"
+                                    _hover={{ color: "#0095DA" }}
+                                >
+                                    <Text>Address List</Text>
+                                </Box>
+                            </Link>
+                        </Box>
                     </HStack>
-                    {renderPersonalInfo()}
+                    <UserInfo />
                 </Box>
             </Box>
         </Box>
