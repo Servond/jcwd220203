@@ -29,30 +29,49 @@ const profileController = {
                 req.body.profile_picture = `http://localhost:8000/public/${req.file.filename}`
             }
 
-            const {
-                id,
-                password,
-                username,
-                phone_number,
-                profile_picture,
-                email,
-            } = req.body
+            const { password, username, phone_number, profile_picture, email } =
+                req.body
 
-            const hashedPassword = bcrypt.hashSync(password, 5)
+            // const salt = bcrypt.genSaltSync(5)
+            // let hashedPassword = bcrypt.hashSync(password, salt)
+
             await User.update(
                 {
                     username,
-                    password: hashedPassword,
+                    // password: hashedPassword,
                     email,
                     profile_picture,
                     phone_number,
                 },
                 { where: { id: req.user.id } }
             )
-            const findUserById = await User.findByPk(id)
+            const findUserById = await User.findByPk(req.user.id)
+            return res.status(200).json({
+                message: "Data updated",
+                data: findUserById,
+            })
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({
+                message: "Server Error",
+            })
+        }
+    },
+
+    editPassword: async (req, res) => {
+        try {
+            const { password } = req.body
+            const findUserById = await User.findByPk(req.user.id)
+
+            const hashedPassword = bcrypt.hashSync(password, 5)
+
+            await User.update(
+                { password: hashedPassword },
+                { where: { id: req.user.id } }
+            )
 
             return res.status(200).json({
-                message: "Edited user data",
+                message: "Password Updated",
                 data: findUserById,
             })
         } catch (err) {

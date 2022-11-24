@@ -14,4 +14,6 @@ router.patch(
     profileController.editUserProfile
 )
 
+router.patch("/password/:id", profileController.editPassword)
+
 module.exports = router

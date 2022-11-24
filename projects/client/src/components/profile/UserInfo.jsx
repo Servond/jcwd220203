@@ -18,9 +18,11 @@ import { useFormik } from "formik"
 import { useSelector } from "react-redux"
 import * as Yup from "yup"
 import { axiosInstance } from "../../api"
-import { useRef } from "react"
+import { useRef, useState } from "react"
+import { useEffect } from "react"
 
 const UserInfo = () => {
+    const [imgUrl, setImgUrl] = useState("")
     const toast = useToast()
 
     const authSelector = useSelector((state) => state.auth)
@@ -49,7 +51,7 @@ const UserInfo = () => {
                     `/profile/${authSelector.id}`,
                     userData
                 )
-
+                setImgUrl(response.data.data.profile_picture)
                 toast({
                     title: "Updated Success",
                     description: response.data.message,
@@ -65,7 +67,7 @@ const UserInfo = () => {
         },
         validationSchema: Yup.object({
             username: Yup.string().min(3),
-            phone_number: Yup.number().min(3),
+            phone_number: Yup.string().min(3),
         }),
         validateOnChange: false,
     })
@@ -75,6 +77,9 @@ const UserInfo = () => {
         formik.setFieldValue(name, value)
     }
 
+    useEffect(() => {
+        setImgUrl(authSelector.profile_picture)
+    }, [authSelector.profile_picture])
     return (
         <Box p="16px 0" display={"flex"} border="1px solid #dfe1e3">
             {/* Profile Photo */}
@@ -86,7 +91,7 @@ const UserInfo = () => {
                     borderRadius="8px"
                 >
                     <Image
-                        src={authSelector.profile_picture}
+                        src={imgUrl}
                         alt="Jane Doe"
                         w={"258px"}
                         mb="16px"

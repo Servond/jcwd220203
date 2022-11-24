@@ -14,6 +14,7 @@ import {
     useToast,
 } from "@chakra-ui/react"
 import { useFormik } from "formik"
+import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import * as Yup from "yup"
 import { axiosInstance } from "../../api"
@@ -24,17 +25,15 @@ const UserInfo = () => {
     const formik = useFormik({
         initialValues: {
             password: "",
-            password_confirmaton: "",
         },
         onSubmit: async ({ password }) => {
             try {
                 const response = await axiosInstance.patch(
-                    `/profile/${authSelector.id}`,
+                    `/profile/password/${authSelector.id}`,
                     {
                         password,
                     }
                 )
-
                 toast({
                     title: "Updated Success",
                     description: response.data.message,
@@ -50,17 +49,6 @@ const UserInfo = () => {
         },
         validationSchema: Yup.object({
             password: Yup.string().min(3),
-            password_confirmation: Yup.string().oneOf(
-                [Yup.ref("password"), null],
-                "Passwords must match"
-            ),
-            // password_confirmaton: Yup.string().when("password", {
-            //     is: (val) => (val && val.length > 0 ? true : false),
-            //     then: Yup.string().oneOf(
-            //         [Yup.ref("password")],
-            //         "Both password need to be the same"
-            //     ),
-            // }),
         }),
         validateOnChange: false,
     })
