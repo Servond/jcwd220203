@@ -12,6 +12,7 @@ const profileRoute = require("../routes/profileRoute")
 const authRoute = require("../routes/authRoute")
 const warehouseRoute = require("../routes/warehouseRoute.js")
 const adminRoute = require("../routes/adminRoute")
+const productRoute = require("../routes/productRoute")
 
 const PORT = process.env.PORT || 8000
 const app = express()
@@ -40,6 +41,8 @@ app.use("/auth", authRoute)
 app.use("/profile", verifyToken, profileRoute)
 
 app.use("/public", express.static("public"))
+
+app.use("/product", productRoute)
 
 app.get("/api", (req, res) => {
     res.send(`Hello, this is my API`)

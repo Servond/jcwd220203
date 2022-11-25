@@ -20,7 +20,8 @@ import Profile from "./pages/profile/Profile"
 import AdminRoute from "./components/admin/AdminRoute"
 import GuestRoute from "./components/GuestRoute"
 import AddressList from "./pages/profile/AddressList"
-
+import Product from "./pages/product/Product"
+import ProductDetail from "./pages/product/ProductDetail"
 
 function App() {
     const [message, setMessage] = useState("")
@@ -121,6 +122,10 @@ function App() {
                 />
                 <Route path="/user/profile/address" element={<AddressList />} />
 
+                {/* Product Route */}
+                <Route path="/product" element={<Product />} />
+
+                <Route path="/product/details" element={<ProductDetail />} />
             </Routes>
 
             {location.pathname === "/login" ||
