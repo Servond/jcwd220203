@@ -13,9 +13,12 @@ const SideNavBar = () => {
       <div className="sidebar">
         {/* ID data from authselector */}
         <div className="profile">
-          <img src={Logo} alt="profile_picture" />
-          <h3>Welcome, {authSelector.username}!</h3>
-          <p>Admin Dashboard</p>
+          <img
+            src= { Logo }
+            alt="profile_picture"
+          />
+          <h3>Hello, {authSelector.username}!</h3>
+          <p>Admin : {authSelector.RoleId}</p>
         </div>
 
         {/* Dashboard */}

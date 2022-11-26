@@ -11,16 +11,18 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Warehouse.hasMany(models.User)
     }
-  }
-  Warehouse.init(
-    {
-      nama_warehouse: DataTypes.STRING,
-      address: DataTypes.STRING,
-    },
-    {
-      sequelize,
-      modelName: "Warehouse",
-    }
-  )
-  return Warehouse
+    Warehouse.init(
+        {
+            nama_warehouse: DataTypes.STRING,
+            address: DataTypes.STRING,
+            state: DataTypes.STRING,
+            latitude: DataTypes.STRING,
+            longitude: DataTypes.STRING
+        },
+        {
+            sequelize,
+            modelName: "Warehouse",
+        }
+    )
+    return Warehouse
 }
