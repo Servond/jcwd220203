@@ -6,6 +6,8 @@ const initialState = {
     email: "",
     phone_number: 0,
     profile_picture: "",
+    RoleId: 0,
+    is_verify: false
 }
 
 const authSlice = createSlice({
@@ -18,6 +20,8 @@ const authSlice = createSlice({
             state.email = action.payload.email
             state.phone_number = action.payload.phone_number
             state.profile_picture = action.payload.profile_picture
+            state.RoleId = action.payload.RoleId
+            state.is_verify = action.payload.is_verify
         },
         logout: (state) => {
             state.id = 0
@@ -25,6 +29,8 @@ const authSlice = createSlice({
             state.email = ""
             state.phone_number = 0
             state.profile_picture = ""
+            state.RoleId = 0
+            state.is_verify = false
         },
     },
 })

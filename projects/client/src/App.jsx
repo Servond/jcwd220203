@@ -8,18 +8,26 @@ import { login } from "./redux/features/authSlice"
 import GuestRoute from "./components/GuestRoute"
 import Register from "./pages/Register"
 import RegisterVerification from "./pages/RegisterVerification"
+import { Box } from "@chakra-ui/react"
+import Navbar from "./components/Navbar"
+import Footer from "./components/Footer/Footer"
+import HomePage from "./pages/Home"
 import AdminDashboard from "./components/admin/AdminDashboard"
 import "./AdminDashboard.css"
 import SideNavBar from "./components/SideNavBar"
-import { Box } from "@chakra-ui/react"
 import WarehouseManagement from "./components/admin/WarehouseManagement"
 import ChangePassword from "./pages/profile/ChangePassword"
 import Profile from "./pages/profile/Profile"
+import AdminRoute from "./components/admin/AdminRoute"
+import GuestRoute from "./components/GuestRoute"
+import AddressList from "./pages/profile/AddressList"
+import { attach } from "./redux/features/resetSlice"
+import ResetPasswordConfirmation from "./pages/ResetPasswordConfirmation"
+import RequestResetPassword from "./pages/RequestResetPassword"
 import ManageUserData from "./components/admin/ManageUserData"
 import ManageAdminData from "./components/admin/ManageAdminData"
 
 function App() {
-  const location = useLocation()
   const [message, setMessage] = useState("")
   const authSelector = useSelector((state) => state.auth)
 
@@ -35,6 +43,8 @@ function App() {
   const [authCheck, setAuthCheck] = useState(false)
 
   const dispatch = useDispatch()
+
+  const location = useLocation()
 
   const keepUserLoggedIn = async () => {
     try {
@@ -59,46 +69,108 @@ function App() {
     }
   }
 
+  const userResetData = async () => {
+    try {
+      const reset_token = localStorage.getItem("reset_token")
+
+      if (!reset_token) {
+        setAuthCheck(true)
+        return
+      }
+
+      const response = await axiosInstance.get("/auth/refresh-token")
+
+      dispatch(attach(response.data.data))
+
+      localStorage.setItem("reset_token", response.data.token)
+      setAuthCheck(true)
+    } catch (err) {
+      console.log(err)
+      setAuthCheck(true)
+    } finally {
+      setAuthCheck(true)
+    }
+  }
+
   useEffect(() => {
     keepUserLoggedIn()
+    userResetData()
   }, [])
 
   return (
     <>
-      {location.pathname === "/admin-dashboard" ||
-      location.pathname === "/manage-user-data" ||
-      location.pathname === "/manage-admin-data" ||
-      location.pathname === "/warehouse-management" ? (
+      {authSelector.RoleId === 3 || authSelector.RoleId === 2 ? (
         <SideNavBar />
       ) : null}
 
-      {authSelector.role === "admin" ? <SideNavBar /> : null}
-      <Box>
-        <Routes>
-          <Route
-            path="/login"
-            element={
-              <GuestRoute>
-                <LoginPage />
-              </GuestRoute>
-            }
-          />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/register/verification"
-            element={<RegisterVerification />}
-          />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route
-            path="/warehouse-management"
-            element={<WarehouseManagement />}
-          />
-          <Route path="/manage-user-data" element={<ManageUserData />} />
-          <Route path="/manage-admin-data" element={<ManageAdminData />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/profile/change-password" element={<ChangePassword />} />
-        </Routes>
-      </Box>
+      {location.pathname === "/login" ||
+      location.pathname === "/register" ||
+      location.pathname === "/reset-password-confirmation" ||
+      location.pathname === "/request-reset-password" ||
+      authSelector.RoleId === 3 ||
+      authSelector.RoleId === 2 ? null : (
+        <Box>
+          <Navbar />
+        </Box>
+      )}
+
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/login"
+          element={
+            <GuestRoute>
+              <LoginPage />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="/reset-password-confirmation"
+          element={<ResetPasswordConfirmation />}
+        />
+
+        <Route
+          path="/request-reset-password"
+          element={
+            <GuestRoute>
+              <RequestResetPassword />
+            </GuestRoute>
+          }
+        />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/register/verification"
+          element={<RegisterVerification />}
+        />
+        <Route
+          path="/admin-dashboard"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route path="/warehouse-management" element={<WarehouseManagement />} />
+
+        {/* Profiling Route */}
+        <Route path="/user/profile" element={<Profile />} />
+        <Route
+          path="/user/profile/change-password"
+          element={<ChangePassword />}
+        />
+        <Route path="/user/profile/address" element={<AddressList />} />
+      </Routes>
+
+      {location.pathname === "/login" ||
+      location.pathname === "/register" ||
+      location.pathname === "/reset-password-confirmation" ||
+      location.pathname === "/request-reset-password" ||
+      authSelector.RoleId === 3 ||
+      authSelector.RoleId === 2 ? null : (
+        <Box>
+          <Footer />
+        </Box>
+      )}
     </>
   )
 }

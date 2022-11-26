@@ -2,8 +2,11 @@ import { Text } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
 import "../AdminDashboard.css"
 import Logo from "../assets/Shopedia.png"
+import { useSelector } from "react-redux"
 
 const SideNavBar = () => {
+  const authSelector = useSelector((state) => state.auth)
+
   return (
     <div className="wrapper">
       {/* Leftside */}
@@ -11,8 +14,8 @@ const SideNavBar = () => {
         {/* ID data from authselector */}
         <div className="profile">
           <img src={Logo} alt="profile_picture" />
-          <h3>Bejus</h3>
-          <p>Admin</p>
+          <h3>Welcome, {authSelector.username}!</h3>
+          <p>Admin Dashboard</p>
         </div>
 
         {/* Dashboard */}
@@ -53,8 +56,8 @@ const SideNavBar = () => {
             </a>
           </li>
           <li>
-            <a href="#empty">
-              <Text>All Users Order / Confirm Payment</Text>
+            <a href="/user-data">
+              <Text>Change Role Status</Text>
             </a>
           </li>
           <li>
