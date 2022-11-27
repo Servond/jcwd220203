@@ -5,6 +5,7 @@ import LoginPage from "./pages/Login"
 import { useDispatch, useSelector } from "react-redux"
 import { axiosInstance } from "./api"
 import { login } from "./redux/features/authSlice"
+import GuestRoute from "./components/GuestRoute"
 import Register from "./pages/Register"
 import RegisterVerification from "./pages/RegisterVerification"
 import { Box } from "@chakra-ui/react"
@@ -18,13 +19,17 @@ import WarehouseManagement from "./components/admin/WarehouseManagement"
 import ChangePassword from "./pages/profile/ChangePassword"
 import Profile from "./pages/profile/Profile"
 import AdminRoute from "./components/admin/AdminRoute"
-import GuestRoute from "./components/GuestRoute"
 import AddressList from "./pages/profile/AddressList"
 import { attach } from "./redux/features/resetSlice"
 import ResetPasswordConfirmation from "./pages/ResetPasswordConfirmation"
 import RequestResetPassword from "./pages/RequestResetPassword"
 import ManageUserData from "./components/admin/ManageUserData"
 import ManageAdminData from "./components/admin/ManageAdminData"
+import AdminCategory from "./pages/AdminCategory"
+import Cart from "./pages/Cart"
+import ProtectedRoute from "./components/ProtectedRoute"
+
+
 
 function App() {
   const [message, setMessage] = useState("")
@@ -103,11 +108,11 @@ function App() {
       ) : null}
 
       {location.pathname === "/login" ||
-      location.pathname === "/register" ||
-      location.pathname === "/reset-password-confirmation" ||
-      location.pathname === "/request-reset-password" ||
-      authSelector.RoleId === 3 ||
-      authSelector.RoleId === 2 ? null : (
+        location.pathname === "/register" ||
+        location.pathname === "/reset-password-confirmation" ||
+        location.pathname === "/request-reset-password" ||
+        authSelector.RoleId === 3 ||
+        authSelector.RoleId === 2 ? null : (
         <Box>
           <Navbar />
         </Box>
@@ -127,7 +132,9 @@ function App() {
           path="/reset-password-confirmation"
           element={<ResetPasswordConfirmation />}
         />
+
         <Route path="/manage-admin-data" element={<ManageAdminData />} />
+
 
         <Route
           path="/request-reset-password"
@@ -142,6 +149,16 @@ function App() {
           path="/register/verification"
           element={<RegisterVerification />}
         />
+
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+        
         <Route
           path="/admin-dashboard"
           element={
@@ -150,27 +167,59 @@ function App() {
             </AdminRoute>
           }
         />
+
+        <Route
+          path="/admin/category"
+          element={
+            <AdminRoute>
+              <AdminCategory />
+            </AdminRoute>
+          }
+        />
+
         <Route path="/warehouse-management" element={<WarehouseManagement />} />
 
         {/* Profiling Route */}
-        <Route path="/user/profile" element={<Profile />} />
+        <Route
+          path="/user/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/user/profile/change-password"
-          element={<ChangePassword />}
+          element=
+          {
+            <ProtectedRoute>
+              <ChangePassword />
+            </ProtectedRoute>
+          }
         />
-        <Route path="/user/profile/address" element={<AddressList />} />
+        <Route
+          path="/user/profile/address"
+          element={
+            <ProtectedRoute>
+              <AddressList />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
 
-      {location.pathname === "/login" ||
-      location.pathname === "/register" ||
-      location.pathname === "/reset-password-confirmation" ||
-      location.pathname === "/request-reset-password" ||
-      authSelector.RoleId === 3 ||
-      authSelector.RoleId === 2 ? null : (
-        <Box>
-          <Footer />
-        </Box>
-      )}
+      {
+        location.pathname === "/login" ||
+          location.pathname === "/register" ||
+          location.pathname === "/reset-password-confirmation" ||
+          location.pathname === "/request-reset-password" ||
+          authSelector.RoleId === 3 ||
+          authSelector.RoleId === 2 ? null : (
+          <Box>
+            <Footer />
+          </Box>
+        )
+      }
+
     </>
   )
 }

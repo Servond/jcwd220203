@@ -37,6 +37,7 @@ import * as Yup from "yup"
 import FormAddress from "../../components/profile/FormAddress"
 
 const AddressList = () => {
+ const authSelector = useSelector((state) => state.auth)
   const [province, setProvince] = useState([])
   const [city, setCity] = useState([])
   const [districts, setDistricts] = useState([])
