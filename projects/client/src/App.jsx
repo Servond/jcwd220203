@@ -127,6 +127,7 @@ function App() {
           path="/reset-password-confirmation"
           element={<ResetPasswordConfirmation />}
         />
+        <Route path="/manage-admin-data" element={<ManageAdminData />} />
 
         <Route
           path="/request-reset-password"

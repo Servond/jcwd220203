@@ -100,7 +100,7 @@ const userDataController = {
       if (req.file) {
         req.body.profile_picture = `http://localhost:8000/public/${req.file.filename}`
       }
-
+      console.log(req.file)
       const { branch, phone_number, profile_picture, username } = req.body
 
       const { id } = req.params
