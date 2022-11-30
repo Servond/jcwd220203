@@ -53,21 +53,6 @@ const DetailBookAdmin = () => {
     }
   };
   
-  const renderImages = () => {
-    console.warn(fullImages)
-    return fullImages.map((val)=> {
-      return <img src={val.img_url || ""} alt="Product images" />
-    })
-  }
-
-    //Carousel
-    const settings = {
-      dots: true,
-      autoplay: true,
-      infinite: true,
-      slidesToShow: 3,
-      slidesToScroll: 1,
-    };
 
   const destroyProduct = async () => {
     try {
@@ -167,11 +152,11 @@ const DetailBookAdmin = () => {
             
           </Box>
         <Box>
-          <Button mt="8" mr="8"  onClick={() => setAdminUpdate(true)}>
+          <Button mt="8" mr="8" width="150px" onClick={() => setAdminUpdate(true)}>
             Edit Product Detail
           </Button>
           <br />
-          <Button mt="10" mr="8"  onClick={destroyProduct}>
+          <Button mt="10" mr="8" width="150px" onClick={destroyProduct}>
             Delete Product
             </Button>
           </Box>
