@@ -359,6 +359,7 @@ const AddressList = () => {
         onSubmit={() => doubleOnClick()}
         rightButton={"Add Address"}
         leftButton={"Change Address"}
+        color={"#F7931E"}
       />
 
       {/* modal edit address */}
@@ -382,6 +383,7 @@ const AddressList = () => {
         onSubmit={() => doubleOnClick1()}
         rightButton={"Edit Address"}
         leftButton={"Change Address"}
+        color={"#F7931E"}
       />
 
       {/* set as default alert */}
@@ -394,6 +396,7 @@ const AddressList = () => {
         onSubmit={() => doubleOnClick3()}
         leftButton={"Cancel"}
         rightButton={"Make Primary Address"}
+        color={"#F7931E"}
       />
 
       {/* Alert Delete */}
@@ -406,6 +409,7 @@ const AddressList = () => {
         onSubmit={() => doubleOnClick2()}
         leftButton={"Cancel"}
         rightButton={"Delete"}
+        color={"#F7931E"}
       />
     </Box>
   )

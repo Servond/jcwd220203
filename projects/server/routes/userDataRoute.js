@@ -5,7 +5,14 @@ const { upload } = require("../lib/uploader")
 const userDataController = require("../controllers/userDataController")
 router.get("/getAllUser", userDataController.getAllUser)
 router.get("/getAllWarehouseAdmin", userDataController.getAllWarehouseAdmin)
-router.post("/addNewAdmin", userDataController.addNewAdmin)
+router.post(
+  "/addNewAdmin",
+  upload({
+    acceptedFileTypes: ["jpg", "jpeg", "png"],
+    filePrefix: "prove",
+  }).single("profile_picture"),
+  userDataController.addNewAdmin
+)
 router.patch(
   "/editAdmin/:id",
   upload({

@@ -47,6 +47,7 @@ const userDataController = {
   },
   addNewAdmin: async (req, res) => {
     try {
+      const profile_picture = `http://localhost:8000/public/${req.file.filename}`
       const { email, password, phone_number, username } = req.body
 
       const findEmail = await db.User.findOne({
@@ -78,8 +79,8 @@ const userDataController = {
         email,
         password: hashedPassword,
         username,
+        profile_picture,
         phone_number,
-
         is_verify: true,
         RoleId: 2,
       })

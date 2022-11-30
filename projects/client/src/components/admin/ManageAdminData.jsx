@@ -1,30 +1,7 @@
 import {
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
   Avatar,
   Box,
   Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Grid,
-  GridItem,
-  Image,
-  Input,
-  InputGroup,
-  InputLeftAddon,
-  InputRightElement,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select,
   Table,
   Tbody,
   Td,
@@ -40,16 +17,12 @@ import React, { useEffect } from "react"
 import { useState } from "react"
 import { axiosInstance } from "../../api"
 import * as Yup from "yup"
-import { BiShow } from "react-icons/bi"
-import { BiHide } from "react-icons/bi"
+import AddNewAdmin from "./AddNewAdmin"
+import Alert from "../profile/Alert"
+import EditAdmin from "./EditAdmin"
 
 const ManageAdminData = () => {
   const [userData, setUserData] = useState([])
-  const [warehouseData, setWarehouseData] = useState([])
-  const [showPassword, setShowPassword] = useState(false)
-  const togglePassword = () => {
-    setShowPassword(!showPassword)
-  }
   const cancelRef = React.useRef()
 
   const toast = useToast()
@@ -69,8 +42,9 @@ const ManageAdminData = () => {
   } = useDisclosure()
 
   const [openedEdit, setOpenedEdit] = useState(null)
-  // console.log(openedEdit?.id)
-
+  const [selectedImage, setSelectedImage] = useState(null)
+  console.log(selectedImage)
+  console.log(openedEdit?.profile_picture)
   const [deleteAlert, setDeleteAlert] = useState(null)
 
   const fetchUserData = async () => {
@@ -88,7 +62,14 @@ const ManageAdminData = () => {
       return (
         <Tr key={val.id.toString()}>
           <Td>{val.id.toString()}</Td>
-          <Td>{val.profile_picture || "null"}</Td>
+          <Td>
+            <Avatar
+              size={"lg"}
+              borderRadius={"0"}
+              name={val.username}
+              src={val.profile_picture}
+            />
+          </Td>
           <Td>{val.username || "null"}</Td>
           <Td>{val.email}</Td>
           <Td>{val.phone_number || "null"}</Td>
@@ -136,16 +117,36 @@ const ManageAdminData = () => {
       email,
       password,
       phone_number,
-
+      profile_picture,
       username,
     }) => {
       try {
-        const response = await axiosInstance.post("/userData/addNewAdmin", {
-          email,
-          password,
-          phone_number,
-          username,
-        })
+        const adminData = new FormData()
+
+        if (email) {
+          adminData.append("email", email)
+        }
+
+        if (password) {
+          adminData.append("password", password)
+        }
+
+        if (phone_number) {
+          adminData.append("phone_number", phone_number)
+        }
+
+        if (profile_picture) {
+          adminData.append("profile_picture", profile_picture)
+        }
+
+        if (username) {
+          adminData.append("username", username)
+        }
+
+        const response = await axiosInstance.post(
+          "/userData/addNewAdmin",
+          adminData
+        )
         toast({
           title: "Registration Success",
           description: response.data.message,
@@ -174,19 +175,15 @@ const ManageAdminData = () => {
           "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
         ),
       phone_number: Yup.string()
-        .required(10)
+        .required(9)
         .matches(
-          /^(\+62 ((\d{3}([ -]\d{3,})([- ]\d{4,})?)|(\d+)))|(\(\d+\) \d+)|\d{3}( \d+)+|(\d+[ -]\d+)|\d+/
+          /(\+62 ((\d{3}([ -]\d{3,})([- ]\d{4,})?)|(\d+)))|(\(\d+\) \d+)|\d{3}( \d+)+|(\d+[ -]\d+)|\d+/,
+          "Phone number must be valid"
         ),
       username: Yup.string().required(6),
     }),
     validateOnChange: false,
   })
-
-  const formChangeHandler = ({ target }) => {
-    const { name, value } = target
-    formikAddNewAdmin.setFieldValue(name, value)
-  }
 
   const editFormik = useFormik({
     initialValues: {
@@ -269,31 +266,6 @@ const ManageAdminData = () => {
     }
   }
 
-  const editFormChangeHandler = ({ target }) => {
-    const { name, value } = target
-    editFormik.setFieldValue(name, value)
-  }
-
-  const fetchAllWarehouse = async () => {
-    try {
-      const response = await axiosInstance.get("/userData/findAllWarehouse")
-
-      setWarehouseData(response.data.data)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const renderWarehouse = () => {
-    return warehouseData.map((val) => {
-      return (
-        <option key={val.id.toString()} value={val.id}>
-          {val.nama_warehouse}
-        </option>
-      )
-    })
-  }
-
   const doubleOnClick = () => {
     onClose()
     onCloseAddNewAdmin()
@@ -303,6 +275,7 @@ const ManageAdminData = () => {
   const doubleOnClick1 = () => {
     editFormik.handleSubmit()
     onCloseAlert()
+    setSelectedImage(null)
   }
 
   const doubleOnClick2 = () => {
@@ -312,11 +285,7 @@ const ManageAdminData = () => {
 
   useEffect(() => {
     fetchUserData()
-  }, [openedEdit, deleteAlert])
-
-  useEffect(() => {
-    fetchAllWarehouse()
-  }, [])
+  }, [openedEdit, deleteAlert, selectedImage])
 
   useEffect(() => {
     if (openedEdit) {
@@ -359,420 +328,64 @@ const ManageAdminData = () => {
       </Table>
 
       {/* Alert Delete */}
-      <AlertDialog
+      <Alert
+        body={`Areyou sure to delete "${deleteAlert?.username}"`}
+        cancelRef={cancelRef}
+        color={"#0095DA"}
+        header={"Delete Admin"}
         isOpen={deleteAlert}
-        leastDestructiveRef={cancelRef}
+        leftButton={"Cancel"}
         onClose={() => setDeleteAlert(null)}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent
-            p={"32px 32px 24px"}
-            my="auto"
-            boxSize={"-moz-fit-content"}
-            maxW="600px"
-          >
-            <AlertDialogHeader p="0"></AlertDialogHeader>
-            <AlertDialogBody textAlign={"center"} p="0">
-              <Text fontSize={"16px"} m="0px 16px 16px">
-                Is the data you entered correct??
-              </Text>
-            </AlertDialogBody>
-
-            <AlertDialogFooter p="0" alignSelf="center">
-              <Button
-                ref={cancelRef}
-                onClick={() => setDeleteAlert(null)}
-                w="164px"
-                h="48px"
-                mr={"6px"}
-                borderRadius="8px"
-                fontWeight={"bold"}
-                bgColor="white"
-                border="1px solid #F7931E"
-                color={" #F7931E"}
-                _hover={false}
-              >
-                Change
-              </Button>
-              <Button
-                fontWeight={"bold"}
-                bgColor="#F7931E"
-                color={"white"}
-                type="submit"
-                onClick={() => doubleOnClick2()}
-                w="164px"
-                h="48px"
-                borderRadius="8px"
-                _hover={false}
-              >
-                Sure
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+        onSubmit={() => doubleOnClick2()}
+        rightButton={"Delete"}
+      />
 
       {/* Modal Add New Admin */}
-      <Modal
-        isOpen={isOpenAddNewAdmin}
-        onClose={onCloseAddNewAdmin}
-        motionPreset="slideInBottom"
-        size={"md"}
-      >
-        <form onSubmit={formikAddNewAdmin.handleSubmit}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader fontSize={"2xl"} fontWeight="bold">
-              New Admin
-            </ModalHeader>
-
-            <ModalBody>
-              <FormLabel>Username</FormLabel>
-              <FormControl isInvalid={formikAddNewAdmin.errors.username}>
-                <Input
-                  value={formikAddNewAdmin.values.username}
-                  name="username"
-                  type="text"
-                  onChange={formChangeHandler}
-                />
-                <FormErrorMessage>
-                  {formikAddNewAdmin.errors.username}
-                </FormErrorMessage>
-              </FormControl>
-
-              <FormLabel mt={"15px"}>Email</FormLabel>
-              <FormControl isInvalid={formikAddNewAdmin.errors.email}>
-                <Input
-                  value={formikAddNewAdmin.values.email}
-                  name="email"
-                  type="email"
-                  onChange={formChangeHandler}
-                  //
-                />
-                <FormErrorMessage>
-                  {formikAddNewAdmin.errors.email}
-                </FormErrorMessage>
-              </FormControl>
-
-              <FormLabel mt={"15px"}>Password</FormLabel>
-              <FormControl isInvalid={formikAddNewAdmin.errors.password}>
-                <InputGroup>
-                  <Input
-                    value={formikAddNewAdmin.values.password}
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    onChange={formChangeHandler}
-                  />
-                  <InputRightElement width="3rem">
-                    <Button
-                      size="sm"
-                      _active={false}
-                      _hover={false}
-                      onClick={togglePassword}
-                      color={"#0095DA"}
-                      bgColor="transparent"
-                    >
-                      {showPassword ? <BiShow /> : <BiHide />}
-                    </Button>
-                  </InputRightElement>
-                </InputGroup>
-                <FormErrorMessage>
-                  {formikAddNewAdmin.errors.password}
-                </FormErrorMessage>
-              </FormControl>
-
-              <FormLabel mt={"15px"}>Warehouse</FormLabel>
-              <FormControl
-              // isInvalid={formikAddNewAdmin.errors.WarehouseId}
-              >
-                <Select
-                  isDisabled
-                  // onChange={formChangeHandler}
-                  placeholder="Select warehouse"
-                >
-                  {renderWarehouse()}
-                </Select>
-                <FormErrorMessage>
-                  {/* {formikAddNewAdmin.errors.WarehouseId} */}
-                </FormErrorMessage>
-              </FormControl>
-
-              <FormLabel mt={"15px"}>Phone Number</FormLabel>
-              <FormControl isInvalid={formikAddNewAdmin.errors.phone_number}>
-                <InputGroup>
-                  <InputLeftAddon children="+62" />
-                  <Input
-                    value={formikAddNewAdmin.values.phone_number}
-                    name="phone_number"
-                    type="tel"
-                    onChange={formChangeHandler}
-                  />
-                </InputGroup>
-                <FormErrorMessage>
-                  {formikAddNewAdmin.errors.phone_number}
-                </FormErrorMessage>
-              </FormControl>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button colorScheme="red" mr={3} onClick={onCloseAddNewAdmin}>
-                Cancel
-              </Button>
-              <Button colorScheme="green" mr={3} onClick={onOpen}>
-                Add New Admin
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </form>
-      </Modal>
+      <AddNewAdmin
+        formikAddNewAdmin={formikAddNewAdmin}
+        isOpenAddNewAdmin={isOpenAddNewAdmin}
+        onCloseAddNewAdmin={onCloseAddNewAdmin}
+        header="Add New Addmin"
+        onOpen={onOpen}
+        color="#0095DA"
+      />
 
       {/* Alert Add New Admin */}
-      <AlertDialog
+      <Alert
+        header={"Add New Admin"}
+        body={"Is data that you entered is correct"}
+        cancelRef={cancelRef}
         isOpen={isOpen}
-        leastDestructiveRef={cancelRef}
+        leftButton={"Cancel"}
         onClose={onClose}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent
-            p={"32px 32px 24px"}
-            my="auto"
-            boxSize={"-moz-fit-content"}
-            maxW="600px"
-          >
-            <AlertDialogHeader p="0"></AlertDialogHeader>
-            <AlertDialogBody textAlign={"center"} p="0">
-              <Text fontSize={"16px"} m="0px 16px 16px">
-                Is the data you entered correct?
-              </Text>
-            </AlertDialogBody>
-
-            <AlertDialogFooter p="0" alignSelf="center">
-              <Button
-                ref={cancelRef}
-                onClick={onClose}
-                w="164px"
-                h="48px"
-                mr={"6px"}
-                borderRadius="8px"
-                fontWeight={"bold"}
-                bgColor="white"
-                border="1px solid #F7931E"
-                color={" #F7931E"}
-                _hover={false}
-              >
-                Change
-              </Button>
-              <Button
-                fontWeight={"bold"}
-                bgColor="#F7931E"
-                color={"white"}
-                type="submit"
-                onClick={() => doubleOnClick()}
-                w="164px"
-                h="48px"
-                borderRadius="8px"
-                _hover={false}
-              >
-                Yes, right
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+        rightButton={"Add New Admin"}
+        onSubmit={() => doubleOnClick()}
+        color={"#0095DA"}
+      />
 
       {/* Modal Edit Admin */}
-      <Modal
+      <EditAdmin
+        editFormik={editFormik}
         isOpen={openedEdit}
+        header={"Edit Admin"}
         onClose={() => setOpenedEdit(null)}
-        motionPreset="slideInBottom"
-        size={"2xl"}
-      >
-        <form onSubmit={editFormik.handleSubmit}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader fontSize={"2xl"} fontWeight="bold">
-              Edit Admin
-            </ModalHeader>
-
-            <ModalBody>
-              <Grid templateColumns={"2fr 3fr 3fr"} gap="4">
-                <GridItem>
-                  <FormLabel>Profile Picture</FormLabel>
-                  <FormControl isInvalid={editFormik.errors.profile_picture}>
-                    <Image w={"150px"} h="150px" borderRadius={"0"} />
-                    <Input
-                      w="100%"
-                      _hover={false}
-                      fontWeight="bold"
-                      bgColor={"white"}
-                      onChange={(e) =>
-                        editFormik.setFieldValue(
-                          "profile_picture",
-                          e.target.files[0]
-                        )
-                      }
-                      accept="image/*"
-                      name="profile_picture"
-                      type="file"
-                      color="transparent"
-                      border="0"
-                    />
-                    <FormErrorMessage>
-                      {editFormik.errors.profile_picture}
-                    </FormErrorMessage>
-                  </FormControl>
-                </GridItem>
-
-                <GridItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl isInvalid={editFormik.errors.username}>
-                    <Input
-                      value={editFormik.values.username}
-                      name="username"
-                      type="text"
-                      onChange={editFormChangeHandler}
-                    />
-                    <FormErrorMessage>
-                      {editFormik.errors.username}
-                    </FormErrorMessage>
-                  </FormControl>
-
-                  <FormLabel mt="15px">Email</FormLabel>
-                  <FormControl
-                  // isInvalid={editFormik.errors.email}
-                  >
-                    <Input
-                      disabled
-                      // value={editFormik.values.email}
-                      name="email"
-                      type="text"
-                      onChange={editFormChangeHandler}
-                      //
-                    />
-                    <FormErrorMessage>
-                      {/* {editFormik.errors.email} */}
-                    </FormErrorMessage>
-                  </FormControl>
-                </GridItem>
-
-                <GridItem>
-                  <FormLabel>Warehouse</FormLabel>
-                  <FormControl
-                  // isInvalid={editFormik.errors.WarehouseId}
-                  >
-                    <Select
-                      isDisabled
-                      // value={editFormik.values.WarehouseId}
-                      onChange={editFormChangeHandler}
-                      placeholder="Select Warehouse"
-                    >
-                      {renderWarehouse()}
-                    </Select>
-                    <FormErrorMessage>
-                      {/* {editFormik.errors.WarehouseId} */}
-                    </FormErrorMessage>
-                  </FormControl>
-
-                  <FormLabel mt="15px">Phone Number</FormLabel>
-                  <FormControl isInvalid={editFormik.errors.phone_number}>
-                    <InputGroup>
-                      <InputLeftAddon children="+62" />
-                      <Input
-                        value={editFormik.values.phone_number}
-                        name="phone_number"
-                        type="tel"
-                        onChange={editFormChangeHandler}
-                      />
-                    </InputGroup>
-                    <FormErrorMessage>
-                      {editFormik.errors.phone_number}
-                    </FormErrorMessage>
-                  </FormControl>
-                </GridItem>
-              </Grid>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button bgColor="#0095DA" color={"white"} mr={3} _hover={false}>
-                Change Password
-              </Button>
-              <Button
-                bgColor="white"
-                border={"1px solid #F7931E"}
-                _hover={false}
-                color="#F7931E"
-                mr={3}
-                onClick={() => setOpenedEdit(null)}
-              >
-                Cancel
-              </Button>
-              <Button
-                bgColor="#F7931E"
-                color={"white"}
-                _hover={false}
-                mr={3}
-                onClick={onOpenAlert}
-              >
-                Save
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </form>
-      </Modal>
+        color={"#0095DA"}
+        onOpen={onOpenAlert}
+        onCloseMod={() => setOpenedEdit(null)}
+      />
 
       {/* Alert Edit admin */}
-      <AlertDialog
+      <Alert
+        body={"Is data that you entered correct?"}
+        cancelRef={cancelRef}
+        color={"#0095DA"}
+        header={"Edit Admin"}
         isOpen={isOpenAlert}
-        leastDestructiveRef={cancelRef}
+        leftButton={"Cancel"}
         onClose={onCloseAlert}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent
-            p={"32px 32px 24px"}
-            my="auto"
-            boxSize={"-moz-fit-content"}
-            maxW="600px"
-          >
-            <AlertDialogHeader p="0"></AlertDialogHeader>
-            <AlertDialogBody textAlign={"center"} p="0">
-              <Text fontSize={"16px"} m="0px 16px 16px">
-                Is the data you entered correct?
-              </Text>
-            </AlertDialogBody>
-
-            <AlertDialogFooter p="0" alignSelf="center">
-              <Button
-                ref={cancelRef}
-                onClick={onCloseAlert}
-                w="164px"
-                h="48px"
-                mr={"6px"}
-                borderRadius="8px"
-                fontWeight={"bold"}
-                bgColor="white"
-                border="1px solid #F7931E"
-                color={" #F7931E"}
-                _hover={false}
-              >
-                Change
-              </Button>
-              <Button
-                fontWeight={"bold"}
-                bgColor="#F7931E"
-                color={"white"}
-                type="submit"
-                onClick={doubleOnClick1}
-                w="164px"
-                h="48px"
-                borderRadius="8px"
-                _hover={false}
-              >
-                Yes, right
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+        onSubmit={doubleOnClick1}
+        rightButton={"Edit Admin"}
+      />
     </Box>
   )
 }
