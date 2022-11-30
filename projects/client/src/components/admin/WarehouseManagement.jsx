@@ -44,10 +44,10 @@ const WarehouseManagement = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [openedEdit, setOpenedEdit] = useState(null);
   const [openedAdd, setOpenedAdd] = useState(null);
+  
+  
   const [rows, setRows] = useState(0)
-
-
-  const [book, setBook] = useState([])
+  const [admin, setAdmin] = useState([])
   const [pages, setPages] = useState(0)
   const [maxPage, setMaxPage] = useState(0)
   const [page, setPage] = useState(1)
@@ -71,7 +71,7 @@ const WarehouseManagement = () => {
       setRows(fetchingWH.data.totalRows - maxItemsPage)
       setMaxPage(Math.ceil((fetchingWH.data.totalRows) / maxItemsPage))
       // console.log(fetchingWH.data.totalRows)
-      setBook(fetchingWH.data.data)
+      setAdmin(fetchingWH.data.data)
     } catch (error) {
       console.log(error);
     }
@@ -213,7 +213,7 @@ const WarehouseManagement = () => {
   console.warn({pages})
   useEffect(() => {
     fetchWarehouse();
-  }, [fetchWarehouse, openedEdit, page, setPages, pages, keyword, setBook]);
+  }, [fetchWarehouse, openedEdit, page, setPages, pages, keyword, setAdmin]);
 
   useEffect(() => {
     if (openedEdit) {
@@ -266,7 +266,7 @@ const WarehouseManagement = () => {
         <GridItem />
         <GridItem />
         <GridItem>
-          {!book.length ? (
+          {!admin.length ? (
             <Alert status="warning">
               <AlertIcon />
               <AlertTitle>No post found</AlertTitle>

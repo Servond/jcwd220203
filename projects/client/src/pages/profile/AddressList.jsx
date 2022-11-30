@@ -33,8 +33,7 @@ const AddressList = () => {
   const [address, setAddress] = useState([])
   const [deleteAlert, setDeleteAlert] = useState(null)
   const [defaultAlert, setDefaultAlert] = useState(null)
-  const [selectedProvince, setSelectedProvince] = useState(0)
-  const [selectedCity, setSelectedCity] = useState(0)
+
   const {
     onOpen: onOpenAlert,
     isOpen: isOpenAlert,

@@ -1,15 +1,44 @@
 const db = require("../models");
+const { Op } = require("sequelize");
 
 const Product = db.Product;
 
 const productController = {
   getProduct: async (req, res) => {
     try {
-      const data = await Product.findAll();
+      const page = parseInt(req.query._page) || 0
+      const limit = parseInt(req.query._limit) || 5
+      const search = req.query._keywordHandler || ""
+      const offset = limit * page
+      
+      const totalRows = await Product.count({
+        where: {
+          [Op.or]: [
+            { nama: { [Op.like]: "%" + search + "%" } },
+            { deskripsi: { [Op.like]: "%" + search + "%" } },
+          ],
+        },
+      });
+      
+      const totalPage = Math.ceil(totalRows / limit);
+
+      const data = await Product.findAll({
+        where: {
+          [Op.or]: [
+            { nama: { [Op.like]: "%" + search + "%" } },
+            { deskripsi: { [Op.like]: "%" + search + "%" } },
+          ],
+        },
+        offset: offset,
+        limit: limit,
+      });;
 
       return res.status(200).json({
         message: "Successfully getting product data",
         data: data,
+        limit: limit,
+        totalRows: totalRows,
+        totalPage: totalPage,
       });
     } catch (error) {
       console.log(error);

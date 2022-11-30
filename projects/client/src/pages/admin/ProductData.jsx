@@ -24,7 +24,11 @@ import {
   useDisclosure,
   FormErrorMessage,
   ModalOverlay,
-
+  Grid,
+  GridItem,
+  Alert,
+  AlertIcon,
+  AlertTitle,
 } from "@chakra-ui/react";
 import { axiosInstance } from "../../api/index";
 import { useEffect, useState } from "react";
@@ -35,26 +39,57 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router-dom";
+import { CgChevronLeft, CgChevronRight } from "react-icons/cg"
+
 
 const ProductData = () => {
   const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
-
   const [openedEdit, setOpenedEdit] = useState(null);
   const [images, setImages] = useState({});
 
+  const [rows, setRows] = useState(0)
+  const [admin, setAdmin] = useState([])
+  const [pages, setPages] = useState(0)
+  const [maxPage, setMaxPage] = useState(0)
+  const [page, setPage] = useState(1)
+  const [keyword, setKeyword] = useState("")
+  const [keywordHandler, setKeywordHandler] = useState("")
+  const maxItemsPage = 5
+
   const fetchProductData = async () => {
     try {
-      const productData = await axiosInstance.get("/product");
+      const productData = await axiosInstance.get("/product", {
+        params: {
+          _keywordHandler: keyword,
+          _page: pages,
+          _limit: maxItemsPage,
+  
+        },
+      });;
       setData(productData.data.data);
-      // console.log(data)
-      // console.warn("test")
-      // console.warn(productData.data.data)
+      setAdmin(productData.data.data);
+      setRows(productData.data.totalRows - maxItemsPage);
+      setMaxPage(Math.ceil(productData.data.totalRows / maxItemsPage));
+      console.warn(pages)
       setIsLoading(true);
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const nextPage = () => {
+    setPages(pages + 1);
+  };
+
+  const prevPage = () => {
+    setPages(pages - 1);
+  };
+
+  const searchKey = () => {
+    setPages(0);
+    setKeyword(keywordHandler);
   };
 
   // const fetchImages = async (id) => {
@@ -88,20 +123,25 @@ const ProductData = () => {
           <Td>{val.id.toString()}</Td>
           <Td>{val.nama || "null"}</Td>
           <Td>{val.deskripsi || "null"}</Td>
-          <Td>{val.harga.toLocaleString("in-ID", { style: "currency", currency: "IDR"}) || "null"}</Td>
+          <Td>
+            {val.harga.toLocaleString("in-ID", {
+              style: "currency",
+              currency: "IDR",
+            }) || "null"}
+          </Td>
           <Td>
             <Box>
               <Box mb={"2"}>
-                <Link to={`/product/detail/${val.id}`} >
-                <Button
-                  width={"100px"}
-                  bgColor={"#0095DA"}
-                  _hover={false}
-                  color="white"
-                  onClick={() => {}}
-                >
-                  Edit
-                </Button>
+                <Link to={`/product/detail/${val.id}`}>
+                  <Button
+                    width={"100px"}
+                    bgColor={"#0095DA"}
+                    _hover={false}
+                    color="white"
+                    onClick={() => {}}
+                  >
+                    Edit
+                  </Button>
                 </Link>
               </Box>
               <Box>
@@ -117,17 +157,16 @@ const ProductData = () => {
               </Box>
             </Box>
           </Td>
-          </Tr>
-      )
-    })
-  }
+        </Tr>
+      );
+    });
+  };
 
   const {
     isOpen: isOpenAddNewProduct,
     onOpen: onOpenAddNewProduct,
     onClose: onCloseAddNewProduct,
-  } = useDisclosure()
-
+  } = useDisclosure();
 
   const formikAddProduct = useFormik({
     initialValues: {
@@ -135,33 +174,29 @@ const ProductData = () => {
       deskripsi: "",
       harga: "",
     },
-    onSubmit: async ({
-      nama,
-      deskripsi,
-      harga,
-    }) => {
+    onSubmit: async ({ nama, deskripsi, harga }) => {
       try {
         const response = await axiosInstance.post("/product/", {
           nama,
           deskripsi,
           harga,
-        })
+        });
         toast({
           title: "Registration Success",
           description: response.data.message,
           status: "success",
-        })
-        formikAddProduct.setFieldValue("nama", "")
-        formikAddProduct.setFieldValue("deskripsi", "")
-        formikAddProduct.setFieldValue("harga", "")
-        fetchProductData()
+        });
+        formikAddProduct.setFieldValue("nama", "");
+        formikAddProduct.setFieldValue("deskripsi", "");
+        formikAddProduct.setFieldValue("harga", "");
+        fetchProductData();
       } catch (error) {
-        console.log(error.response)
+        console.log(error.response);
         toast({
           title: "Registration Failed",
           description: error.response.data.message,
           status: "error",
-        })
+        });
       }
     },
     validationSchema: Yup.object({
@@ -170,13 +205,12 @@ const ProductData = () => {
       harga: Yup.number().required().min(3),
     }),
     validateOnChange: false,
-  })
+  });
 
   const formChangeHandler = ({ target }) => {
-    const { name, value } = target
-    formikAddProduct.setFieldValue(name, value)
-  }
-
+    const { name, value } = target;
+    formikAddProduct.setFieldValue(name, value);
+  };
 
   const editFormik = useFormik({
     initialValues: {
@@ -189,7 +223,7 @@ const ProductData = () => {
         let editedWarehouse = {
           nama: values.nama,
           deskripsi: values.deskripsi,
-          harga: values.harga
+          harga: values.harga,
           // UserId: values.UserId,
         };
 
@@ -234,7 +268,7 @@ const ProductData = () => {
 
   useEffect(() => {
     fetchProductData();
-  }, [openedEdit, images, data]);
+  }, [openedEdit, images, pages, setPages, keyword]);
 
   useEffect(() => {
     // console.log(openedEdit.id)
@@ -251,33 +285,71 @@ const ProductData = () => {
     <>
       <Box marginLeft="250px" marginTop="65px">
         <HStack justifyContent="space-between">
-        <Text fontSize={"2xl"} fontWeight="bold" color={"#F7931E"}>
-          Product Data
-        </Text>
+          <Text fontSize={"2xl"} fontWeight="bold" color={"#F7931E"}>
+            Product Data
+          </Text>
+          <FormControl>
+            <Input
+              name="input"
+              value={keywordHandler}
+              onChange={(event) => setKeywordHandler(event.target.value)}
+            />
 
-        <Button
-          bgColor={"#0095DA"}
-          color="white"
-          _hover={false}
-          onClick={onOpenAddNewProduct}
-        >
-          Add New Product
-        </Button>
+            <Button onClick={searchKey} mr={0}>
+              Search
+            </Button>
+          </FormControl>
+          <Button
+            bgColor={"#0095DA"}
+            color="white"
+            _hover={false}
+            onClick={onOpenAddNewProduct}
+          >
+            Add New Product
+          </Button>
         </HStack>
-      
-      <Table>
-        <Thead>
-          <Tr>
-            <Th w="10px">ID</Th>
-            {/* <Th w="100px">Photo Profile</Th> */}
-            <Th w="150px">Name</Th>
-            <Th w="450px">Description</Th>
-            <Th>Price</Th>
-          </Tr>
-        </Thead>
-        <Tbody>{isLoading && renderProductData()}</Tbody>
-      </Table>
+
+        <Table>
+          <Thead>
+            <Tr>
+              <Th w="10px">ID</Th>
+              {/* <Th w="100px">Photo Profile</Th> */}
+              <Th w="150px">Name</Th>
+              <Th w="450px">Description</Th>
+              <Th>Price</Th>
+            </Tr>
+          </Thead>
+          <Tbody>{isLoading && renderProductData()}</Tbody>
+        </Table>
       </Box>
+      <Text>
+        Page: {pages + 1} of {maxPage}
+      </Text>
+      <Grid templateColumns={"repeat(3, 1fr"} mt={15}>
+        <GridItem />
+        <GridItem />
+        <GridItem>
+          {!admin.length ? (
+            <Alert status="warning" ml="275px">
+              <AlertIcon />
+              <AlertTitle>No post found</AlertTitle>
+            </Alert>
+          ) : null}
+          <HStack justifyContent={"end"} gap={"2px"}>
+            {pages + 1 === 1 ? null : (
+              <CgChevronLeft onClick={prevPage} color={"#9E7676"}>
+                {""}
+              </CgChevronLeft>
+            )}
+            <Text fontSize={"md"}>{pages + 1}</Text>
+            {pages + 1 >= maxPage ? null : (
+              <CgChevronRight onClick={nextPage} color={"#9E7676"}>
+                Next
+              </CgChevronRight>
+            )}
+          </HStack>
+        </GridItem>
+      </Grid>
 
       {/* Modal Add New Admin */}
       <Modal
@@ -351,14 +423,17 @@ const ProductData = () => {
               <Button colorScheme="red" mr={3} onClick={onCloseAddNewProduct}>
                 Cancel
               </Button>
-              <Button colorScheme="green" mr={3} onClick={formikAddProduct.handleSubmit}>
+              <Button
+                colorScheme="green"
+                mr={3}
+                onClick={formikAddProduct.handleSubmit}
+              >
                 Add New Product
               </Button>
             </ModalFooter>
           </ModalContent>
         </form>
       </Modal>
-
 
       {/* Modal edit */}
       <Modal isOpen={openedEdit} onClose={() => setOpenedEdit(null)}>
