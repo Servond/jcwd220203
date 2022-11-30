@@ -46,7 +46,6 @@ const AddressList = () => {
   const [selectedCity, setSelectedCity] = useState(0)
   const [selectedDistricts, setSelectedDistricts] = useState(0)
   const [openedEdit, setOpenedEdit] = useState(null)
-  const authSelector = useSelector((state) => state.auth)
   const [address, setAddress] = useState([])
   const [deleteAlert, setDeleteAlert] = useState(null)
   const {

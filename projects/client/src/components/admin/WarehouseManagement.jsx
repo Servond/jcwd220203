@@ -28,7 +28,7 @@ import {
 } from "@chakra-ui/react";
 // import { useSelector } from "react-redux";
 import { axiosInstance } from "../../api";
-import Warehouse from "./Warehouse";
+import Warehouse from "../../components/admin/Warehouse";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useCallback } from "react";
@@ -293,6 +293,7 @@ const WarehouseManagement = () => {
           marginLeft="64%"
           marginTop={"5%"}
           onClick={() => addWarehouse()}
+          w="100px"
         >
           Add
         </Button>
@@ -333,7 +334,7 @@ const WarehouseManagement = () => {
                   <Button
                     onClick={backWarehouse}
                     colorScheme="orange"
-                    width="15%"
+                    w="100px"
                     mr="5px"
                   >
                     Back
@@ -341,7 +342,7 @@ const WarehouseManagement = () => {
                   <Button
                     onClick={formik.handleSubmit}
                     colorScheme="green"
-                    width="15%"
+                    w="100px"
                     type="submit"
                   >
                     Save
@@ -381,6 +382,7 @@ const WarehouseManagement = () => {
           <ModalFooter>
             <Button
               colorScheme="red"
+              w="100px"
               mr={3}
               onClick={() => setOpenedEdit(null)}
             >
@@ -388,6 +390,7 @@ const WarehouseManagement = () => {
             </Button>
             <Button
               colorScheme="green"
+              w="100px"
               mr={3}
               onClick={() => editFormik.handleSubmit()}
               type="submit"
