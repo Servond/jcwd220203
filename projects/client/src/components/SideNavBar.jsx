@@ -55,9 +55,9 @@ const SideNavBar = () => {
             </Link>
           </li>
           <li>
-            <Link>
+            <a href="/product-data">
               <Text>Manage Product Data</Text>
-            </Link>
+            </a>
           </li>
           <li>
             <Link to="/admin/category">
