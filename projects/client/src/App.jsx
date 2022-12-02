@@ -28,13 +28,15 @@ import ManageAdminData from "./components/admin/ManageAdminData"
 import AdminCategory from "./pages/AdminCategory"
 import Cart from "./pages/Cart"
 import ProtectedRoute from "./components/ProtectedRoute"
+import ProductData from "./pages/admin/ProductData"
+import ProductDataDetail from "./pages/admin/ProductDataDetail"
 
 function App() {
   const [message, setMessage] = useState("")
   const authSelector = useSelector((state) => state.auth)
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       const { data } = await axios.get(
         `${process.env.REACT_APP_API_BASE_URL}/greetings`
       )
@@ -216,20 +218,24 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/product-data" element={<ProductData />} />
+        <Route path="/product/detail/:id" element={<ProductDataDetail />} />
       </Routes>
 
-      {location.pathname === "/login" ||
-      location.pathname === "/register" ||
-      location.pathname === "/reset-password-confirmation" ||
-      location.pathname === "/request-reset-password" ||
-      authSelector.RoleId === 3 ||
-      authSelector.RoleId === 2 ? null : (
-        <Box>
-          <Footer />
-        </Box>
-      )}
+      {
+        location.pathname === "/login" ||
+          location.pathname === "/register" ||
+          location.pathname === "/reset-password-confirmation" ||
+          location.pathname === "/request-reset-password" ||
+          authSelector.RoleId === 3 ||
+          authSelector.RoleId === 2 ? null : (
+          <Box>
+            <Footer />
+          </Box>
+        )
+      }
     </>
   )
 }
 
-export default App
+export default App;

@@ -157,6 +157,7 @@ const ManageAdminData = () => {
       email,
       password,
       phone_number,
+
       profile_picture,
       username,
       WarehouseId,
@@ -192,6 +193,7 @@ const ManageAdminData = () => {
           "/userData/addNewAdmin",
           adminData
         )
+
         toast({
           title: "Registration Success",
           description: response.data.message,
@@ -259,6 +261,7 @@ const ManageAdminData = () => {
         if (username) {
           adminData.append("username", username)
         }
+
         if (WarehouseId) {
           adminData.append("WarehouseId", WarehouseId)
         }
@@ -338,6 +341,25 @@ const ManageAdminData = () => {
 
     setSortBy(value.split(" ")[0])
     setSortDir(value.split(" ")[1])
+
+  const fetchAllWarehouse = async () => {
+    try {
+      const response = await axiosInstance.get("/userData/findAllWarehouse")
+
+      setWarehouseData(response.data.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const renderWarehouse = () => {
+    return warehouseData.map((val) => {
+      return (
+        <option key={val.id.toString()} value={val.id.toString()}>
+          {val.nama_warehouse}
+        </option>
+      )
+    })
   }
 
   const doubleOnClick = () => {
@@ -470,6 +492,7 @@ const ManageAdminData = () => {
       />
 
       {/* Modal Add New Admin */}
+
       <AddNewAdmin
         formikAddNewAdmin={formikAddNewAdmin}
         isOpenAddNewAdmin={isOpenAddNewAdmin}

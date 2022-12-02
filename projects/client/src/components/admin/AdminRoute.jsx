@@ -6,10 +6,11 @@ const AdminRoute = ({ children }) => {
 
   const navigate = useNavigate()
 
-  if (authSelector.RoleId === 1) {
-    navigate("/")
-  }
-  return children
+    if (authSelector.RoleId === 1) {
+        navigate("/")
+    }
+    return children
+
 }
 
 export default AdminRoute

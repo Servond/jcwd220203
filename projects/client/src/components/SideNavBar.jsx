@@ -1,25 +1,27 @@
-import { Button, Text, useToast } from "@chakra-ui/react"
-import { Link, Navigate, useNavigate } from "react-router-dom"
-import "../AdminDashboard.css"
-import Logo from "../assets/Shopedia.png"
-import { useDispatch, useSelector } from "react-redux"
-import { logout } from "../redux/features/authSlice"
+import { Button, Text, useToast } from "@chakra-ui/react";
+import { Link, useNavigate } from "react-router-dom";
+import "../AdminDashboard.css";
+import Logo from "../assets/Shopedia.png";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/features/authSlice";
 
 const SideNavBar = () => {
-  const authSelector = useSelector((state) => state.auth)
+  const authSelector = useSelector((state) => state.auth);
 
-  const dispatch = useDispatch()
-  const toast = useToast()
+  const navigate = useNavigate()
+
+  const dispatch = useDispatch();
+  const toast = useToast();
 
   const logoutBtnHandler = () => {
-    localStorage.removeItem("auth_token")
-    dispatch(logout())
+    localStorage.removeItem("auth_token");
+    dispatch(logout());
     toast({
       title: "User Logout",
       status: "info",
-    })
-    Navigate("/")
-  }
+    });
+    navigate("/");
+  };
 
   return (
     <div className="wrapper">
@@ -27,16 +29,13 @@ const SideNavBar = () => {
       <div className="sidebar">
         {/* ID data from authselector */}
         <div className="profile">
-          <img
-            src={Logo}
-            alt="profile_picture"
-          />
+          <img src={Logo} alt="profile_picture" />
           <h3>Hello, {authSelector.username}!</h3>
           <p>Admin : {authSelector.RoleId}</p>
-        </div>
+        </div >
 
         {/* Dashboard */}
-        <ul>
+        < ul >
           <li>
             <Link to="/admin-dashboard">
               <Text>Dashboard Homepage</Text>
@@ -58,9 +57,9 @@ const SideNavBar = () => {
             </Link>
           </li>
           <li>
-            <Link>
+            <a href="/product-data">
               <Text>Manage Product Data</Text>
-            </Link>
+            </a>
           </li>
           <li>
             <Link to="/admin/category">
@@ -78,17 +77,29 @@ const SideNavBar = () => {
             </a>
           </li>
           <li>
+            <a href="/user-data">
+              <Text>Change Role Status</Text>
+            </a>
+          </li>
+          <li>
             <a href="#empty">
               <Text>Sales Report</Text>
             </a>
           </li>
           <li>
-            <Button ml={'75px'} size={'sm'} mt={'10px'} onClick={logoutBtnHandler}>Logout</Button>
+            <Button
+              ml={"75px"}
+              size={"sm"}
+              mt={"10px"}
+              onClick={logoutBtnHandler}
+            >
+              Logout
+            </Button>
           </li>
         </ul>
       </div>
-    </div >
-  )
-}
+    </div>
+  );
+};
 
-export default SideNavBar
+export default SideNavBar;

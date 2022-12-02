@@ -180,12 +180,14 @@ const userDataController = {
 
       const hashedPassword = bcrypt.hashSync(password, 5)
 
+      
       const newUser = await db.User.create({
         email,
         password: hashedPassword,
         username,
         profile_picture,
         phone_number,
+        WarehouseId,
         is_verify: true,
         RoleId: 2,
         WarehouseId,
