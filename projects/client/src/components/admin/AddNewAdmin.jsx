@@ -7,6 +7,7 @@ import {
   Image,
   Input,
   InputGroup,
+  InputLeftAddon,
   InputRightElement,
   Modal,
   ModalBody,
@@ -57,7 +58,7 @@ const AddNewAdmin = ({
   const renderWarehouse = () => {
     return warehouseData.map((val) => {
       return (
-        <option key={val.id.toString()} value={val.id}>
+        <option key={val.id.toString()} value={val.id.toString()}>
           {val.nama_warehouse}
         </option>
       )
@@ -224,7 +225,7 @@ const AddNewAdmin = ({
               <FormLabel mb="8px">Warehouse</FormLabel>
               <FormControl isInvalid={formikAddNewAdmin.errors.WarehouseId}>
                 <Select
-                  isDisabled
+                  name="WarehouseId"
                   onChange={formChangeHandler}
                   placeholder="Select warehouse"
                 >
@@ -239,14 +240,17 @@ const AddNewAdmin = ({
             <Box mt="12px">
               <FormLabel mt={"15px"}>Phone Number</FormLabel>
               <FormControl isInvalid={formikAddNewAdmin.errors.phone_number}>
-                <Input
-                  value={formikAddNewAdmin.values.phone_number}
-                  name="phone_number"
-                  type="tel"
-                  maxLength={15}
-                  // minLength={9}
-                  onChange={formChangeHandler}
-                />
+                <InputGroup>
+                  <InputLeftAddon children="+62" />
+                  <Input
+                    value={formikAddNewAdmin.values.phone_number}
+                    name="phone_number"
+                    type="number"
+                    onWheel={(e) => e.target.blur()}
+                    maxLength={15}
+                    onChange={formChangeHandler}
+                  />
+                </InputGroup>
 
                 <FormErrorMessage>
                   {formikAddNewAdmin.errors.phone_number}
@@ -279,7 +283,8 @@ const AddNewAdmin = ({
                   !formikAddNewAdmin.values.username ||
                   !formikAddNewAdmin.values.phone_number ||
                   !formikAddNewAdmin.values.email ||
-                  !formikAddNewAdmin.values.password
+                  !formikAddNewAdmin.values.password ||
+                  !formikAddNewAdmin.values.profile_picture
                 }
               >
                 Save

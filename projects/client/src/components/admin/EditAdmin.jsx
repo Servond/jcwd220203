@@ -7,6 +7,8 @@ import {
   Grid,
   Image,
   Input,
+  InputGroup,
+  InputLeftAddon,
   Modal,
   ModalBody,
   ModalContent,
@@ -21,6 +23,8 @@ import React, { useState } from "react"
 import { CgClose } from "react-icons/cg"
 import { TbCameraPlus } from "react-icons/tb"
 import Alert from "../profile/Alert"
+import { axiosInstance } from "../../api"
+import { useEffect } from "react"
 
 const EditAdmin = ({
   isOpen,
@@ -32,6 +36,7 @@ const EditAdmin = ({
   onCloseMod,
 }) => {
   const [selectedImage, setSelectedImage] = useState(null)
+  const [warehouseData, setWarehouseData] = useState([])
   const inputFileRef = useRef()
   const cancelRef = React.useRef()
   const doubleOnClick = () => {
@@ -47,6 +52,30 @@ const EditAdmin = ({
     const { name, value } = target
     editFormik.setFieldValue(name, value)
   }
+
+  const fetchAllWarehouse = async () => {
+    try {
+      const response = await axiosInstance.get("/userData/findAllWarehouse")
+
+      setWarehouseData(response.data.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const renderWarehouse = () => {
+    return warehouseData.map((val) => {
+      return (
+        <option key={val.id.toString()} value={val.id.toString()}>
+          {val.nama_warehouse}
+        </option>
+      )
+    })
+  }
+
+  useEffect(() => {
+    fetchAllWarehouse()
+  }, [])
   return (
     <>
       <Modal
@@ -123,7 +152,6 @@ const EditAdmin = ({
                     color={"#F7931E"}
                     _hover={false}
                     ml="392px"
-                    //   bgColor={color}
                     size={"xs"}
                     mt="-33px"
                   >
@@ -174,12 +202,16 @@ const EditAdmin = ({
               <Box mt="34px" mb="4px">
                 <FormLabel mt="15px">Phone Number</FormLabel>
                 <FormControl isInvalid={editFormik.errors.phone_number}>
-                  <Input
-                    value={editFormik.values.phone_number}
-                    name="phone_number"
-                    type="tel"
-                    onChange={editFormChangeHandler}
-                  />
+                  <InputGroup>
+                    <InputLeftAddon children="+62" />
+                    <Input
+                      value={editFormik.values.phone_number}
+                      name="phone_number"
+                      type="number"
+                      onWheel={(e) => e.target.blur()}
+                      onChange={editFormChangeHandler}
+                    />
+                  </InputGroup>
                   <FormErrorMessage>
                     {editFormik.errors.phone_number}
                   </FormErrorMessage>
@@ -209,12 +241,12 @@ const EditAdmin = ({
                 <FormLabel mb="8px">Warehouse</FormLabel>
                 <FormControl isInvalid={editFormik.errors.WarehouseId}>
                   <Select
-                    isDisabled
+                    name="WarehouseId"
                     value={editFormik.values.WarehouseId}
                     onChange={editFormChangeHandler}
                     placeholder="Select Warehouse"
                   >
-                    {/* {renderWarehouse()} */}
+                    {renderWarehouse()}
                   </Select>
                   <FormErrorMessage>
                     {editFormik.errors.WarehouseId}

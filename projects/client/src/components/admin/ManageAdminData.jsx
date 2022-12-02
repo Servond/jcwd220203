@@ -2,6 +2,10 @@ import {
   Avatar,
   Box,
   Button,
+  FormControl,
+  Input,
+  InputGroup,
+  Select,
   Table,
   Tbody,
   Td,
@@ -20,10 +24,17 @@ import * as Yup from "yup"
 import AddNewAdmin from "./AddNewAdmin"
 import Alert from "../profile/Alert"
 import EditAdmin from "./EditAdmin"
+import { TbSearch } from "react-icons/tb"
 
 const ManageAdminData = () => {
   const [userData, setUserData] = useState([])
   const cancelRef = React.useRef()
+  const [currentSearch, setCurrentSearch] = useState("")
+  const [totalCount, setTotalCount] = useState(0)
+  const [sortBy, setSortBy] = useState("username")
+  const [sortDir, setSortDir] = useState("ASC")
+  const [page, setPage] = useState(1)
+  const [maxPage, setMaxPage] = useState(1)
 
   const toast = useToast()
 
@@ -43,15 +54,32 @@ const ManageAdminData = () => {
 
   const [openedEdit, setOpenedEdit] = useState(null)
   const [selectedImage, setSelectedImage] = useState(null)
-  console.log(selectedImage)
-  console.log(openedEdit?.profile_picture)
   const [deleteAlert, setDeleteAlert] = useState(null)
 
-  const fetchUserData = async () => {
+  const fetchAdminData = async () => {
+    const maxItemsPerPage = 6
     try {
-      const response = await axiosInstance.get("/userData/getAllWarehouseAdmin")
+      const response = await axiosInstance.get(
+        "/userData/getAllWarehouseAdmin",
+        {
+          params: {
+            _page: page,
+            _limit: maxItemsPerPage,
+            username: currentSearch,
+            _sortBy: sortBy,
+            _sortDir: sortDir,
+          },
+        }
+      )
 
-      setUserData(response.data.data)
+      setTotalCount(response.data.dataCount)
+      setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
+
+      if (page === 1) {
+        setUserData(response.data.data)
+      } else {
+        setUserData(response.data.data)
+      }
     } catch (error) {
       console.log(error)
     }
@@ -61,8 +89,7 @@ const ManageAdminData = () => {
     return userData.map((val) => {
       return (
         <Tr key={val.id.toString()}>
-          <Td>{val.id.toString()}</Td>
-          <Td>
+          <Td p="5px" w="100px">
             <Avatar
               size={"lg"}
               borderRadius={"0"}
@@ -70,12 +97,16 @@ const ManageAdminData = () => {
               src={val.profile_picture}
             />
           </Td>
-          <Td>{val.username || "null"}</Td>
-          <Td>{val.email}</Td>
-          <Td>{val.phone_number || "null"}</Td>
-          <Td>{val.Role.role_name || "null"}</Td>
-          <Td>{val.Warehouse?.nama_warehouse || "null "}</Td>
-          <Td>
+          <Td p="5px">{val.username}</Td>
+          <Td p="5px" w="240px">
+            {val.email}
+          </Td>
+          <Td p="5px" w="160px">
+            {val.phone_number || "null"}
+          </Td>
+          <Td p="5px">{val.Role.role_name || "null"}</Td>
+          <Td p="5px">{val.Warehouse?.nama_warehouse || "null "}</Td>
+          <Td p="5px">
             <Box>
               <Box mb={"2"}>
                 <Button
@@ -106,12 +137,21 @@ const ManageAdminData = () => {
     })
   }
 
+  const nextPage = () => {
+    setPage(page + 1)
+  }
+
+  const previousPage = () => {
+    setPage(page - 1)
+  }
+
   const formikAddNewAdmin = useFormik({
     initialValues: {
       email: "",
       password: "",
       phone_number: "",
       username: "",
+      WarehouseId: "",
     },
     onSubmit: async ({
       email,
@@ -119,6 +159,7 @@ const ManageAdminData = () => {
       phone_number,
       profile_picture,
       username,
+      WarehouseId,
     }) => {
       try {
         const adminData = new FormData()
@@ -143,6 +184,10 @@ const ManageAdminData = () => {
           adminData.append("username", username)
         }
 
+        if (WarehouseId) {
+          adminData.append("WarehouseId", WarehouseId)
+        }
+
         const response = await axiosInstance.post(
           "/userData/addNewAdmin",
           adminData
@@ -156,7 +201,8 @@ const ManageAdminData = () => {
         formikAddNewAdmin.setFieldValue("password", "")
         formikAddNewAdmin.setFieldValue("phone_number", "")
         formikAddNewAdmin.setFieldValue("username", "")
-        fetchUserData()
+        formikAddNewAdmin.setFieldValue("WarehouseId", "")
+        fetchAdminData()
       } catch (error) {
         console.log(error.response)
         toast({
@@ -174,12 +220,8 @@ const ManageAdminData = () => {
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
           "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
         ),
-      phone_number: Yup.string()
-        .required(9)
-        .matches(
-          /(\+62 ((\d{3}([ -]\d{3,})([- ]\d{4,})?)|(\d+)))|(\(\d+\) \d+)|\d{3}( \d+)+|(\d+[ -]\d+)|\d+/,
-          "Phone number must be valid"
-        ),
+      phone_number: Yup.number().required(9),
+      profile_picture: Yup.string().required(),
       username: Yup.string().required(6),
     }),
     validateOnChange: false,
@@ -190,8 +232,15 @@ const ManageAdminData = () => {
       phone_number: "",
       profile_picture: "",
       username: "",
+      WarehouseId: "",
     },
-    onSubmit: async ({ email, phone_number, profile_picture, username }) => {
+    onSubmit: async ({
+      email,
+      phone_number,
+      profile_picture,
+      username,
+      WarehouseId,
+    }) => {
       try {
         const adminData = new FormData()
 
@@ -210,6 +259,9 @@ const ManageAdminData = () => {
         if (username) {
           adminData.append("username", username)
         }
+        if (WarehouseId) {
+          adminData.append("WarehouseId", WarehouseId)
+        }
 
         const response = await axiosInstance.patch(
           `/userData/editAdmin/${openedEdit.id}`,
@@ -224,7 +276,8 @@ const ManageAdminData = () => {
         editFormik.setFieldValue("phone_number", "")
         editFormik.setFieldValue("profile_picture", "")
         editFormik.setFieldValue("username", "")
-        fetchUserData()
+        editFormik.setFieldValue("WarehouseId", "")
+        fetchAdminData()
         setOpenedEdit(null)
       } catch (error) {
         console.log(error)
@@ -250,7 +303,7 @@ const ManageAdminData = () => {
     try {
       await axiosInstance.delete(`/userData/deleteAdmin/${id}`)
 
-      fetchUserData()
+      fetchAdminData()
 
       toast({
         title: "Admin Deleted",
@@ -264,6 +317,27 @@ const ManageAdminData = () => {
         status: "error",
       })
     }
+  }
+
+  const formikSearch = useFormik({
+    initialValues: {
+      search: "",
+    },
+    onSubmit: ({ search }) => {
+      setCurrentSearch(search)
+      setPage(1)
+    },
+  })
+
+  const searchAdminHandler = ({ target }) => {
+    const { name, value } = target
+    formikSearch.setFieldValue(name, value)
+  }
+  const sortCategoryHandler = ({ target }) => {
+    const { value } = target
+
+    setSortBy(value.split(" ")[0])
+    setSortDir(value.split(" ")[1])
   }
 
   const doubleOnClick = () => {
@@ -284,8 +358,16 @@ const ManageAdminData = () => {
   }
 
   useEffect(() => {
-    fetchUserData()
-  }, [openedEdit, deleteAlert, selectedImage])
+    fetchAdminData()
+  }, [
+    openedEdit,
+    deleteAlert,
+    selectedImage,
+    currentSearch,
+    page,
+    sortDir,
+    sortBy,
+  ])
 
   useEffect(() => {
     if (openedEdit) {
@@ -293,35 +375,82 @@ const ManageAdminData = () => {
       editFormik.setFieldValue("phone_number", openedEdit.phone_number)
       editFormik.setFieldValue("profile_picture", openedEdit.profile_picture)
       editFormik.setFieldValue("username", openedEdit.username)
+      editFormik.setFieldValue("WarehouseId", openedEdit.WarehouseId)
     }
   }, [openedEdit])
   return (
     <Box marginLeft={"230px"}>
       <Box p="20px 0" display={"flex"} justifyContent="space-between" mr="2">
-        <Text fontSize={"2xl"} fontWeight="bold" color={"#F7931E"}>
-          Admin Data
-        </Text>
+        <Box display={"flex"} gap="4" my={"auto"}>
+          <Text fontSize={"2xl"} fontWeight="bold" color={"#F7931E"}>
+            Admin Data
+          </Text>
+          <Text fontSize={"2xl"} fontWeight="bold" color={"#0095DA"}>
+            Total Admin:{totalCount}
+          </Text>
+        </Box>
 
-        <Button
-          bgColor={"#0095DA"}
-          color="white"
-          _hover={false}
-          onClick={onOpenAddNewAdmin}
-        >
-          Add New Admin
-        </Button>
+        <Box gap="4" display={"flex"}>
+          <Text my="auto">Sort</Text>
+          <Select
+            onChange={sortCategoryHandler}
+            fontSize={"15px"}
+            fontWeight="normal"
+            fontFamily="serif"
+            width={"137px"}
+            color={"#6D6D6F"}
+            _placeholder="Sort By"
+          >
+            <option value="username ASC" selected>
+              Name A-Z
+            </option>
+            <option value="username DESC">Name Z-A</option>
+            <option value="createdAt DESC">Latest</option>
+            <option value="createdAt ASC">Old</option>
+          </Select>
+
+          <form onSubmit={formikSearch.handleSubmit}>
+            <FormControl>
+              <InputGroup textAlign={"right"}>
+                <Input
+                  type={"text"}
+                  placeholder="Search by username"
+                  name="search"
+                  w="200px"
+                  onChange={searchAdminHandler}
+                  _placeholder={"halo"}
+                  borderRightRadius="0"
+                  value={formikSearch.values.search}
+                />
+
+                <Button borderLeftRadius={"0"} type="submit">
+                  <TbSearch />
+                </Button>
+              </InputGroup>
+            </FormControl>
+          </form>
+
+          <Button
+            w={"200px"}
+            bgColor={"#0095DA"}
+            color="white"
+            _hover={false}
+            onClick={onOpenAddNewAdmin}
+          >
+            Add New Admin
+          </Button>
+        </Box>
       </Box>
       <Table>
         <Thead>
           <Tr>
-            <Th w="10px">ID</Th>
-            <Th w="100px">Photo Profile</Th>
-            <Th>Username</Th>
-            <Th>Email</Th>
-            <Th>Phone Number</Th>
-            <Th>Role</Th>
-            <Th>Warehouse</Th>
-            <Th>Option</Th>
+            <Th p="5px">Photo Profile</Th>
+            <Th p="5px">Username</Th>
+            <Th p="5px">Email</Th>
+            <Th p="5px">Phone Number</Th>
+            <Th p="5px">Role</Th>
+            <Th p="5px">Warehouse</Th>
+            <Th p="5px">Option</Th>
           </Tr>
         </Thead>
         <Tbody>{renderUser()}</Tbody>
@@ -345,7 +474,7 @@ const ManageAdminData = () => {
         formikAddNewAdmin={formikAddNewAdmin}
         isOpenAddNewAdmin={isOpenAddNewAdmin}
         onCloseAddNewAdmin={onCloseAddNewAdmin}
-        header="Add New Addmin"
+        header="Add New Admin"
         onOpen={onOpen}
         color="#0095DA"
       />
@@ -386,6 +515,25 @@ const ManageAdminData = () => {
         onSubmit={doubleOnClick1}
         rightButton={"Edit Admin"}
       />
+
+      <Box p="20px">
+        <Box textAlign={"center"}>
+          {page === 1 ? null : (
+            <Button onClick={previousPage} disabled={page === 1 ? true : null}>
+              {"<"}
+            </Button>
+          )}
+          {page >= maxPage ? null : (
+            <Button
+              onClick={nextPage}
+              ml="10px"
+              disabled={page >= maxPage ? true : null}
+            >
+              {">"}
+            </Button>
+          )}
+        </Box>
+      </Box>
     </Box>
   )
 }
