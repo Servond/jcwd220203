@@ -130,6 +130,7 @@ const FormAddress = ({
             >
               Complete the address details
             </Text>
+
             <Box mt="34px" mb="4px">
               <FormLabel mb="8px">Recipient's Name</FormLabel>
               <FormControl isInvalid={formik.errors.recipients_name}>

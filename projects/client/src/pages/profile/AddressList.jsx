@@ -20,15 +20,20 @@ import Alert from "../../components/profile/Alert"
 import EditForm from "../../components/profile/EditForm"
 
 const AddressList = () => {
-  const authSelector = useSelector((state) => state.auth)
+ const authSelector = useSelector((state) => state.auth)
   const [province, setProvince] = useState([])
   const [city, setCity] = useState([])
+  const [districts, setDistricts] = useState([])
+  const [ward, setWard] = useState([])
   const [selectedProvince, setSelectedProvince] = useState(0)
   const [selectedCity, setSelectedCity] = useState(0)
+  const [selectedDistricts, setSelectedDistricts] = useState(0)
+
   const [openedEdit, setOpenedEdit] = useState(null)
   const [address, setAddress] = useState([])
   const [deleteAlert, setDeleteAlert] = useState(null)
   const [defaultAlert, setDefaultAlert] = useState(null)
+
   const {
     onOpen: onOpenAlert,
     isOpen: isOpenAlert,
@@ -359,7 +364,6 @@ const AddressList = () => {
         onSubmit={() => doubleOnClick()}
         rightButton={"Add Address"}
         leftButton={"Change Address"}
-        color={"#F7931E"}
       />
 
       {/* modal edit address */}
@@ -383,7 +387,6 @@ const AddressList = () => {
         onSubmit={() => doubleOnClick1()}
         rightButton={"Edit Address"}
         leftButton={"Change Address"}
-        color={"#F7931E"}
       />
 
       {/* set as default alert */}
@@ -396,7 +399,6 @@ const AddressList = () => {
         onSubmit={() => doubleOnClick3()}
         leftButton={"Cancel"}
         rightButton={"Make Primary Address"}
-        color={"#F7931E"}
       />
 
       {/* Alert Delete */}
@@ -409,7 +411,6 @@ const AddressList = () => {
         onSubmit={() => doubleOnClick2()}
         leftButton={"Cancel"}
         rightButton={"Delete"}
-        color={"#F7931E"}
       />
     </Box>
   )

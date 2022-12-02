@@ -31,6 +31,7 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import ProductData from "./pages/admin/ProductData"
 import ProductDataDetail from "./pages/admin/ProductDataDetail"
 
+
 function App() {
   const [message, setMessage] = useState("")
   const authSelector = useSelector((state) => state.auth)
@@ -108,11 +109,11 @@ function App() {
       ) : null}
 
       {location.pathname === "/login" ||
-      location.pathname === "/register" ||
-      location.pathname === "/reset-password-confirmation" ||
-      location.pathname === "/request-reset-password" ||
-      authSelector.RoleId === 3 ||
-      authSelector.RoleId === 2 ? null : (
+        location.pathname === "/register" ||
+        location.pathname === "/reset-password-confirmation" ||
+        location.pathname === "/request-reset-password" ||
+        authSelector.RoleId === 3 ||
+        authSelector.RoleId === 2 ? null : (
         <Box>
           <Navbar />
         </Box>
@@ -133,22 +134,8 @@ function App() {
           element={<ResetPasswordConfirmation />}
         />
 
-        <Route
-          path="/manage-admin-data"
-          element={
-            <AdminRoute>
-              <ManageAdminData />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/manage-user-data"
-          element={
-            <AdminRoute>
-              <ManageUserData />
-            </AdminRoute>
-          }
-        />
+        <Route path="/manage-admin-data" element={<ManageAdminData />} />
+
 
         <Route
           path="/request-reset-password"
@@ -204,7 +191,8 @@ function App() {
         />
         <Route
           path="/user/profile/change-password"
-          element={
+          element=
+          {
             <ProtectedRoute>
               <ChangePassword />
             </ProtectedRoute>
