@@ -26,6 +26,10 @@ import RequestResetPassword from "./pages/RequestResetPassword"
 import ManageUserData from "./components/admin/ManageUserData"
 import ManageAdminData from "./components/admin/ManageAdminData"
 import AdminCategory from "./pages/AdminCategory"
+import Cart from "./pages/Cart"
+import ProtectedRoute from "./components/ProtectedRoute"
+import ProductData from "./pages/admin/ProductData"
+import ProductDataDetail from "./pages/admin/ProductDataDetail"
 
 
 function App() {
@@ -130,6 +134,9 @@ function App() {
           element={<ResetPasswordConfirmation />}
         />
 
+        <Route path="/manage-admin-data" element={<ManageAdminData />} />
+
+
         <Route
           path="/request-reset-password"
           element={
@@ -143,6 +150,16 @@ function App() {
           path="/register/verification"
           element={<RegisterVerification />}
         />
+
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/admin-dashboard"
           element={
@@ -164,12 +181,33 @@ function App() {
         <Route path="/warehouse-management" element={<WarehouseManagement />} />
 
         {/* Profiling Route */}
-        <Route path="/user/profile" element={<Profile />} />
+        <Route
+          path="/user/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/user/profile/change-password"
-          element={<ChangePassword />}
+          element=
+          {
+            <ProtectedRoute>
+              <ChangePassword />
+            </ProtectedRoute>
+          }
         />
-        <Route path="/user/profile/address" element={<AddressList />} />
+        <Route
+          path="/user/profile/address"
+          element={
+            <ProtectedRoute>
+              <AddressList />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/product-data" element={<ProductData />} />
+        <Route path="/product/detail/:id" element={<ProductDataDetail />} />
       </Routes>
 
       {
@@ -188,4 +226,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
