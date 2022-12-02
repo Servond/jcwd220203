@@ -125,7 +125,10 @@ function App() {
                 {/* Product Route */}
                 <Route path="/product" element={<Product />} />
 
-                <Route path="/product/details" element={<ProductDetail />} />
+                <Route
+                    path="/product/:product_name"
+                    element={<ProductDetail />}
+                />
             </Routes>
 
             {location.pathname === "/login" ||

@@ -16,7 +16,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { axiosInstance } from "../../api"
 
-const ProductItem = ({ product_name, price, id }) => {
+const ProductItem = ({ product_name, price, id, category_name }) => {
     const [productData, setProductData] = useState({
         product_name: "",
         price: 0,
@@ -31,7 +31,7 @@ const ProductItem = ({ product_name, price, id }) => {
 
     const fetchProductById = async () => {
         try {
-            const response = await axiosInstance.get(`/product/${productId}`)
+            const response = await axiosInstance.get(`/product/${id}`)
             setProductData(response.data.data)
         } catch (err) {
             console.log(err)
@@ -47,12 +47,11 @@ const ProductItem = ({ product_name, price, id }) => {
         }
     }
 
-    const productBtnHandler = async () => {
+    const productBtnHandler = () => {
         setProductId(id)
-        navigate(`/product/${productId}/${product_name}`)
-        // navigate("/product/details")
+        navigate(`/product/${product_name}`)
     }
-
+    console.log(imageProduct)
     useEffect(() => {
         fetchProductById()
         fetchProductImage()
@@ -66,6 +65,7 @@ const ProductItem = ({ product_name, price, id }) => {
                     bgColor="white"
                     borderRadius="12px"
                     boxShadow="1px 1px 6px 1px #e0e0e0"
+                    cursor="pointer"
                     // px="8px"
                     // pb="16px"
                 >
@@ -75,20 +75,27 @@ const ProductItem = ({ product_name, price, id }) => {
                         w="100%"
                         objectFit="fill"
                         borderTopRadius="12px"
-                        src={imageProduct.image_url}
+                        src={imageProduct?.image_url}
                     />
 
                     {/* Product Name */}
                     <Box h="70px">
                         <Text p="2" fontSize="14px">
-                            {product_name}
+                            {productData?.product_name}
                         </Text>
                     </Box>
 
                     {/* Price */}
                     <Text pl="2" fontWeight="bold" fontSize="14px">
-                        Rp
-                        {price}
+                        {new Intl.NumberFormat("id-ID", {
+                            style: "currency",
+                            currency: "IDR",
+                        }).format(productData?.price)}
+                    </Text>
+
+                    {/* Price */}
+                    <Text pl="2" fontWeight="bold" fontSize="14px">
+                        {productData?.category_name}
                     </Text>
                 </Box>
             </Box>

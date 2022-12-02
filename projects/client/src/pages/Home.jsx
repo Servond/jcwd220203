@@ -4,7 +4,7 @@ import HomeProduct from "../components/product/HomeProduct"
 
 const HomePage = () => {
     return (
-        <Box height={"1000px"}>
+        <Box height={"1060px"}>
             <Box w="1208px" marginX={"auto"}>
                 <Box
                     paddingBottom="24px"

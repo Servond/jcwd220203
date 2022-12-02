@@ -1,7 +1,8 @@
 const { Op } = require("sequelize")
+const { sequelize } = require("../models")
 const db = require("../models")
 const Product = db.Product
-const Image = db.Image
+const Image_Url = db.Image_Url
 const Category = db.Category
 
 const productController = {
@@ -10,7 +11,7 @@ const productController = {
             const {
                 product_name = "",
                 description = "",
-                price = "",
+                // price = "",
                 CategoryId = "",
                 _sortBy = "id",
                 _sortDir = "ASC",
@@ -19,61 +20,58 @@ const productController = {
             } = req.query
 
             if (
-                _sortBy === "product_name" ||
-                _sortBy === "description" ||
-                _sortBy === "price" ||
-                _sortBy === "CategoryId" ||
-                product_name ||
-                price ||
-                description ||
+                // _sortBy === "product_name" ||
+                // _sortBy === "description" ||
+                // _sortBy === "price" ||
+                // _sortBy === "CategoryId" ||
+                // product_name ||
+                // // price ||
+                // description ||
                 CategoryId
             ) {
                 if (!Number(CategoryId)) {
-                    const getAllProducts = await Product.findAndCountAll({
+                    const getAllProducts1 = await Product.findAndCountAll({
                         limit: Number(_limit),
                         offset: (_page - 1) * _limit,
-                        include: [{ model: Category, required: true }],
+                        include: [{ model: Category }],
                         order: [[_sortBy, _sortDir]],
                         where: {
-                            [Op.or]: {
-                                product_name: {
-                                    [Op.like]: `%${product_name}%`,
-                                },
+                            product_name: {
+                                [Op.like]: `%${product_name}%`,
                             },
                         },
                     })
                     return res.status(200).json({
                         message: "Get all products",
-                        data: getAllProducts.rows,
-                        dataCount: getAllProducts.count,
+                        data: getAllProducts1.rows,
+                        dataCount: getAllProducts1.count,
                     })
                 }
 
-                const getAllProduct = await Product.findAndCountAll({
+                const getAllProducts2 = await Product.findAndCountAll({
                     limit: Number(_limit),
                     offset: (_page - 1) * _limit,
-                    include: [{ model: Category, required: true }],
+                    include: [{ model: Category }],
                     order: [[_sortBy, _sortDir]],
                     where: {
-                        [Op.or]: {
-                            product_name: {
-                                [Op.like]: `%${product_name}%`,
-                            },
+                        product_name: {
+                            [Op.like]: `%${product_name}%`,
                         },
+
                         CategoryId,
                     },
                 })
 
                 return res.status(200).json({
                     message: "Get all books",
-                    data: getAllProduct.rows,
-                    dataCount: getAllProduct.count,
+                    data: getAllProducts2.rows,
+                    dataCount: getAllProducts2.count,
                 })
             }
-            const getAll = await Product.findAndCountAll({
+            const getAllProducts3 = await Product.findAndCountAll({
                 limit: Number(_limit),
                 offset: (_page - 1) * _limit,
-                include: [{ model: Category, required: true }],
+                include: [{ model: Category }],
                 order: [
                     [_sortBy, _sortDir],
                     ["price", "DESC"],
@@ -81,8 +79,8 @@ const productController = {
             })
             return res.status(200).json({
                 message: "Get all",
-                data: getAll.rows,
-                dataCount: getAll.count,
+                data: getAllProducts3.rows,
+                dataCount: getAllProducts3.count,
             })
         } catch (err) {
             console.log(err)
@@ -96,11 +94,7 @@ const productController = {
         try {
             const { id } = req.params
             const findProductByPk = await Product.findByPk(id, {
-                // include: [
-                //     { model: db.Category },
-                //     { model: db.Total_Stock },
-                //     { model: db.Image },
-                // ],
+                include: [{ model: db.Category }],
             })
 
             return res.status(200).json({
@@ -117,7 +111,7 @@ const productController = {
     getImage: async (req, res) => {
         try {
             const { id } = req.params
-            const findImageById = await Image.findByPk(id)
+            const findImageById = await Image_Url.findByPk(id)
 
             return res.status(200).json({
                 message: "Get image by id",
@@ -133,18 +127,16 @@ const productController = {
 
     getCategory: async (req, res) => {
         try {
-            const { _limit = 10, _page = 1, _sortBy = "id" } = req.query
+            const { _limit = 5, _page = 1 } = req.query
             const findCategory = await Category.findAll({
                 limit: Number(_limit),
                 offset: (_page - 1) * _limit,
-                order: [
-                    ["category_name", "ASC"],
-                    [_sortBy, "ASC"],
-                ],
+                order: [["category_name", "ASC"]],
             })
             return res.status(200).json({
                 message: "Get category",
                 data: findCategory,
+                dataCount: findCategory.count,
             })
         } catch (err) {
             console.log(err)
