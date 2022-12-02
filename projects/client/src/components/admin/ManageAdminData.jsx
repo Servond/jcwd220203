@@ -331,7 +331,7 @@ const ManageAdminData = () => {
       setPage(1)
     },
   })
-
+  
   const searchAdminHandler = ({ target }) => {
     const { name, value } = target
     formikSearch.setFieldValue(name, value)
