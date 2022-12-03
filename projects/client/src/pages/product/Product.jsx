@@ -32,24 +32,15 @@ const Product = () => {
     const [sortBy, setSortBy] = useState("product_name")
     const [sortDir, setSortDir] = useState("ASC")
     const [filter, setFilter] = useState("All")
-
+    const [searchProduct, setSearchProduct] = useState()
     const [searchValue, setSearchValue] = useState("")
-    const [searchParam, setSearchParam] = useSearchParams("")
+    const [searchParam, setSearchParam] = useSearchParams()
 
     const [catPage, setCatPage] = useState(1)
     const [catTotalCount, setCatTotalCount] = useState(0)
 
-    // const fetchProduct = async () => {
-    //     try {
-    //         const response = await axiosInstance.get(`/product`)
-    //         setProducts(response.data.data)
-    //     } catch (err) {
-    //         console.log(err)
-    //     }
-    // }
-
     const fetchProduct = async () => {
-        const maxItemsPerPage = 5
+        const maxItemsPerPage = 10
 
         try {
             const response = await axiosInstance.get(`/product`, {
@@ -60,6 +51,7 @@ const Product = () => {
                     _sortDir: sortDir,
                     CategoryId: filter,
                     product_name: searchValue,
+                    category_name: searchValue,
                 },
             })
             setTotalCount(response.data.dataCount)
@@ -123,22 +115,19 @@ const Product = () => {
         })
     }
 
-    const useQuery = () => {
-        const { search } = useLocation()
-        return useMemo(() => new URLSearchParams(search), [search])
-    }
-    let query = useQuery()
-    const [searchProduct, setSearchProduct] = useState(query.get("search"))
-    console.log(query)
     // Button Handler
     const sortBtnHandler = ({ target }) => {
         const { value } = target
         setSortBy(value.split(" ")[0])
         setSortDir(value.split(" ")[1])
 
-        localStorage.setItem("sort", value)
+        const params = {}
+        if (searchParam.get("name")) {
+            params["name"] = searchParam.get("name")
+        }
+        params[value.split(" ")[0]] = value.split(" ")[1]
+        setSearchParam(params)
     }
-
     const filterBtnHandler = ({ target }) => {
         const { value } = target
         setFilter(value)
@@ -154,8 +143,11 @@ const Product = () => {
 
     const searchBtnHandler = () => {
         setSearchValue(searchProduct)
-    }
 
+        const params = {}
+        params["name"] = searchProduct
+        setSearchParam(params)
+    }
     const handleKeyEnter = (e) => {
         if (e.key === "Enter") {
             setSearchValue(searchProduct)
@@ -167,6 +159,15 @@ const Product = () => {
     }
 
     useEffect(() => {
+        for (let entry of searchParam.entries()) {
+            if (entry[0] === "name") {
+                setSearchValue(entry[1])
+            }
+            if (entry[0] === "product_name" || entry[0] === "price") {
+                setSortBy(entry[0])
+                setSortDir(entry[1])
+            }
+        }
         fetchProduct()
         fetchCategory()
     }, [page, sortBy, sortDir, filter, searchValue, catPage])

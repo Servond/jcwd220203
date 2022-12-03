@@ -21,11 +21,12 @@ const productController = {
 
             if (
                 // _sortBy === "product_name" ||
+
                 // _sortBy === "description" ||
                 // _sortBy === "price" ||
                 // _sortBy === "CategoryId" ||
                 // product_name ||
-                // // price ||
+                // price ||
                 // description ||
                 CategoryId
             ) {

@@ -18,15 +18,13 @@ import {
     Text,
     useToast,
 } from "@chakra-ui/react"
-
 import { IoMdCart } from "react-icons/io"
 import { BiLogOutCircle } from "react-icons/bi"
 import {
     Link,
-    Navigate,
     useNavigate,
-    useLocation,
     createSearchParams,
+    useSearchParams,
 } from "react-router-dom"
 import logo from "../assets/logo.png"
 import { BiSearch } from "react-icons/bi"
@@ -35,14 +33,13 @@ import { logout } from "../redux/features/authSlice"
 import { IoIosNotifications } from "react-icons/io"
 import { IoIosAlert } from "react-icons/io"
 import { useState } from "react"
+import { useEffect } from "react"
 
 const Navbar = ({ onChange, onClick, onKeyDown }) => {
     const authSelector = useSelector((state) => state.auth)
     const [searchValue, setSearchValue] = useState("")
-
-    const location = useLocation()
+    const [searchParam, setSearchParam] = useSearchParams()
     const navigate = useNavigate()
-
     const dispatch = useDispatch()
     const toast = useToast()
 
@@ -53,31 +50,26 @@ const Navbar = ({ onChange, onClick, onKeyDown }) => {
             title: "User Logout",
             status: "info",
         })
-        Navigate("/")
+        navigate("/")
     }
-
-    const handleChange = (e) => {
-        if (location.pathname === "/") {
-            setSearchValue(e.target.value)
-        } else {
-            onChange(e)
-        }
+    const changeBtnHandler = (e) => {
+        setSearchValue(e.target.value)
+        onChange(e)
     }
-
-    const handleKeyDown = (e) => {
-        if (location.pathname === "/") {
-            if (e.key === "Enter") {
-                navigate({
-                    pathname: "/product",
-                    search: createSearchParams({
-                        search: searchValue,
-                    }).toString(),
-                })
-            }
-        } else {
+    const keyDownBtnHandler = (e) => {
+        if (e.key === "Enter") {
+            navigate({
+                pathname: "/product",
+                search: createSearchParams({
+                    name: searchValue,
+                }).toString(),
+            })
             onKeyDown(e)
         }
     }
+    useEffect(() => {
+        setSearchValue(searchParam.get("name"))
+    }, [])
     return (
         <>
             <Box
@@ -207,8 +199,9 @@ const Navbar = ({ onChange, onClick, onKeyDown }) => {
                                     bgColor={"#fff"}
                                     border={"2px solid #FFD7B1"}
                                     borderRadius={"8px"}
-                                    onChange={handleChange}
-                                    onKeyDown={handleKeyDown}
+                                    onChange={changeBtnHandler}
+                                    onKeyDown={keyDownBtnHandler}
+                                    value={searchValue}
                                 />
                                 <InputRightElement>
                                     <Button

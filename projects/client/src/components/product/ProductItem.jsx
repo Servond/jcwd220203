@@ -16,7 +16,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { axiosInstance } from "../../api"
 
-const ProductItem = ({ product_name, price, id, category_name }) => {
+const ProductItem = ({ product_name, id }) => {
     const [productData, setProductData] = useState({
         product_name: "",
         price: 0,
@@ -51,7 +51,6 @@ const ProductItem = ({ product_name, price, id, category_name }) => {
         setProductId(id)
         navigate(`/product/${product_name}`)
     }
-    console.log(imageProduct)
     useEffect(() => {
         fetchProductById()
         fetchProductImage()
@@ -91,11 +90,6 @@ const ProductItem = ({ product_name, price, id, category_name }) => {
                             style: "currency",
                             currency: "IDR",
                         }).format(productData?.price)}
-                    </Text>
-
-                    {/* Price */}
-                    <Text pl="2" fontWeight="bold" fontSize="14px">
-                        {productData?.category_name}
                     </Text>
                 </Box>
             </Box>
