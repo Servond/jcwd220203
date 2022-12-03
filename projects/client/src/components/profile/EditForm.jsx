@@ -51,6 +51,7 @@ const EditForm = ({
   const fetchProvince = async () => {
     try {
       const response = await axiosInstance.get("/address/province")
+      console.log(response.data)
       setProvince(response.data.rajaongkir.results)
     } catch (error) {
       console.log(error)
@@ -100,7 +101,7 @@ const EditForm = ({
 
   useEffect(() => {
     fetchProvince()
-  })
+  }, [])
   useEffect(() => {
     fetchCity()
   }, [selectedProvince])
