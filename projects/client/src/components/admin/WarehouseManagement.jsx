@@ -38,6 +38,7 @@ import { CgChevronLeft, CgChevronRight } from "react-icons/cg";
 import WarehouseAddress from "./WarehouseAddress";
 import WarehouseAddressEdit from "./WarehouseAddressEdit";
 
+
 const WarehouseManagement = () => {
   const [data, setData] = useState([]);
   const toast = useToast();
@@ -69,6 +70,15 @@ const WarehouseManagement = () => {
     onClose: onCloseEditWarehouseAddress,
   } = useDisclosure();
 
+
+  const { onOpen, isOpen, onClose } = useDisclosure()
+
+  const {
+    isOpen: isOpenAddNewWarehouseAddress,
+    onOpen: onOpenAddNewWarehouseAddress,
+    onClose: onCloseAddNewWarehouseAddress,
+  } = useDisclosure()
+  
   const fetchWarehouse = useCallback(async () => {
     try {
       const fetchingWH = await axiosInstance.get(`/warehouse`, {
@@ -149,6 +159,7 @@ const WarehouseManagement = () => {
         addFormik.setFieldValue("city", "");
         addFormik.setFieldValue("districts", "");
         addFormik.setFieldValue("full_address", "");
+
       } catch (err) {
         console.log(err);
         toast({ title: "Server error while adding", status: "error" });
@@ -350,6 +361,7 @@ const WarehouseManagement = () => {
         selectProvince={setSelectedProvince}
         selectCity={setSelectedCity}
       />
+
 
       {/* Modal untuk Editing data */}
       <WarehouseAddressEdit

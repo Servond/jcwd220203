@@ -18,6 +18,7 @@ import SideNavBar from "./components/SideNavBar"
 import WarehouseManagement from "./components/admin/WarehouseManagement"
 import ChangePassword from "./pages/profile/ChangePassword"
 import Profile from "./pages/profile/Profile"
+import AdminRoute from "./components/admin/AdminRoute"
 import AddressList from "./pages/profile/AddressList"
 import { attach } from "./redux/features/resetSlice"
 import ResetPasswordConfirmation from "./pages/ResetPasswordConfirmation"
@@ -27,17 +28,15 @@ import ManageAdminData from "./components/admin/ManageAdminData"
 import AdminCategory from "./pages/AdminCategory"
 import Cart from "./pages/Cart"
 import ProtectedRoute from "./components/ProtectedRoute"
-import AdminRoute from "./components/admin/AdminRoute"
 import ProductData from "./pages/admin/ProductData"
 import ProductDataDetail from "./pages/admin/ProductDataDetail"
-
 
 function App() {
   const [message, setMessage] = useState("")
   const authSelector = useSelector((state) => state.auth)
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       const { data } = await axios.get(
         `${process.env.REACT_APP_API_BASE_URL}/greetings`
       )
@@ -109,11 +108,11 @@ function App() {
       ) : null}
 
       {location.pathname === "/login" ||
-        location.pathname === "/register" ||
-        location.pathname === "/reset-password-confirmation" ||
-        location.pathname === "/request-reset-password" ||
-        authSelector.RoleId === 3 ||
-        authSelector.RoleId === 2 ? null : (
+      location.pathname === "/register" ||
+      location.pathname === "/reset-password-confirmation" ||
+      location.pathname === "/request-reset-password" ||
+      authSelector.RoleId === 3 ||
+      authSelector.RoleId === 2 ? null : (
         <Box>
           <Navbar />
         </Box>
@@ -134,8 +133,22 @@ function App() {
           element={<ResetPasswordConfirmation />}
         />
 
-        <Route path="/manage-admin-data" element={<ManageAdminData />} />
-
+        <Route
+          path="/manage-admin-data"
+          element={
+            <AdminRoute>
+              <ManageAdminData />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/manage-user-data"
+          element={
+            <AdminRoute>
+              <ManageUserData />
+            </AdminRoute>
+          }
+        />
 
         <Route
           path="/request-reset-password"
@@ -159,7 +172,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/admin-dashboard"
           element={
@@ -191,8 +204,7 @@ function App() {
         />
         <Route
           path="/user/profile/change-password"
-          element=
-          {
+          element={
             <ProtectedRoute>
               <ChangePassword />
             </ProtectedRoute>
@@ -222,7 +234,6 @@ function App() {
           </Box>
         )
       }
-
     </>
   )
 }
