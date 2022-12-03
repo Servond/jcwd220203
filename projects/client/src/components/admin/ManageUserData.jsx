@@ -31,7 +31,7 @@ const ManageUserData = () => {
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
   const [openedAddress, setOpenedAddress] = useState(false)
-  console.log(openedAddress)
+
   const nextPage = () => {
     setPage(page + 1)
   }

@@ -22,9 +22,7 @@ import EditForm from "../../components/profile/EditForm"
 const AddressList = () => {
   const authSelector = useSelector((state) => state.auth)
   const [selectedProvince, setSelectedProvince] = useState(0)
-  console.log(selectedProvince)
   const [selectedCity, setSelectedCity] = useState(0)
-  console.log(selectedCity)
   const [openedEdit, setOpenedEdit] = useState(null)
   const [address, setAddress] = useState([])
   const [deleteAlert, setDeleteAlert] = useState(null)
