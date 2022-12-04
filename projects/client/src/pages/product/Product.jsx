@@ -4,26 +4,22 @@ import {
     AlertTitle,
     Box,
     Button,
-    Center,
-    Checkbox,
-    Flex,
     Grid,
     GridItem,
-    Heading,
     HStack,
     Select,
     Spacer,
     Text,
 } from "@chakra-ui/react"
-import { useEffect, useState, useMemo } from "react"
-import { useLocation, useSearchParams } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { CgChevronLeft, CgChevronRight } from "react-icons/cg"
 import { axiosInstance } from "../../api"
 import CategoryList from "../../components/product/CategoryList"
 import ProductItem from "../../components/product/ProductItem"
 import Navbar from "../../components/Navbar"
 
-const Product = () => {
+const Product = ({ id, product_name }) => {
     const [products, setProducts] = useState([])
     const [category, setCategory] = useState([])
     const [totalCount, setTotalCount] = useState(0)
@@ -35,13 +31,11 @@ const Product = () => {
     const [searchProduct, setSearchProduct] = useState()
     const [searchValue, setSearchValue] = useState("")
     const [searchParam, setSearchParam] = useSearchParams()
-
     const [catPage, setCatPage] = useState(1)
     const [catTotalCount, setCatTotalCount] = useState(0)
 
     const fetchProduct = async () => {
         const maxItemsPerPage = 10
-
         try {
             const response = await axiosInstance.get(`/product`, {
                 params: {
@@ -76,7 +70,6 @@ const Product = () => {
                 },
             })
             setCatTotalCount(response.data.dataCount)
-
             if (catPage === 1) {
                 setCategory(response.data.data)
             } else {
@@ -92,23 +85,7 @@ const Product = () => {
                 <ProductItem
                     key={val.id.toString()}
                     product_name={val.product_name}
-                    // description={val.description}
                     price={val.price}
-                    // category_name={val.category_name}
-                    // stock={val.stock}
-                    // image_url={val.image_url}
-                    id={val.id}
-                />
-            )
-        })
-    }
-
-    const renderCategory = () => {
-        return category.map((val) => {
-            return (
-                <CategoryList
-                    key={val.id.toString()}
-                    category_name={val.category_name}
                     id={val.id}
                 />
             )
@@ -132,18 +109,14 @@ const Product = () => {
         const { value } = target
         setFilter(value)
     }
-
     const nextPageBtnHandler = () => {
         setPage(page + 1)
     }
-
     const prevPageBtnHandler = () => {
         setPage(page - 1)
     }
-
     const searchBtnHandler = () => {
         setSearchValue(searchProduct)
-
         const params = {}
         params["name"] = searchProduct
         setSearchParam(params)
@@ -153,11 +126,9 @@ const Product = () => {
             setSearchValue(searchProduct)
         }
     }
-
     const seeMoreBtnHandler = () => {
         setCatPage(catPage + 1)
     }
-
     useEffect(() => {
         for (let entry of searchParam.entries()) {
             if (entry[0] === "name") {

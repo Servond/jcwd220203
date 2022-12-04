@@ -13,25 +13,19 @@ import {
 } from "@chakra-ui/react"
 import { useEffect } from "react"
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
+import { createSearchParams, useNavigate } from "react-router-dom"
 import { axiosInstance } from "../../api"
 
-const ProductItem = ({ product_name, id }) => {
-    const [productData, setProductData] = useState({
-        product_name: "",
-        price: 0,
-        category_name: "",
-        stock: 0,
-        id: "",
-    })
-    const [productId, setProductId] = useState(0)
+const ProductItem = ({ product_name, id, price, description }) => {
+    const [productData, setProductData] = useState([])
     const [imageProduct, setImageProduct] = useState([])
 
     const navigate = useNavigate()
 
     const fetchProductById = async () => {
         try {
-            const response = await axiosInstance.get(`/product/${id}`)
+            const response = await axiosInstance.get(`/product`)
             setProductData(response.data.data)
         } catch (err) {
             console.log(err)
@@ -48,13 +42,26 @@ const ProductItem = ({ product_name, id }) => {
     }
 
     const productBtnHandler = () => {
-        setProductId(id)
-        navigate(`/product/${product_name}`)
+        // navigate({
+        //     pathname: `/product/${id}`,
+        //     state: {
+        //         product_name,
+        //         description,
+        //         price,
+        //     },
+        // })
+        // navigate({
+        //     pathname: "/product",
+        //     search: createSearchParams({
+        //         product: `${id}/${product_name}`,
+        //     }).toString(),
+        // })
+        navigate(`/product/${id}/${product_name}}`)
     }
     useEffect(() => {
         fetchProductById()
         fetchProductImage()
-    }, [productId])
+    }, [])
     return (
         <>
             <Box onClick={() => productBtnHandler()}>
@@ -76,20 +83,22 @@ const ProductItem = ({ product_name, id }) => {
                         borderTopRadius="12px"
                         src={imageProduct?.image_url}
                     />
-
                     {/* Product Name */}
                     <Box h="70px">
                         <Text p="2" fontSize="14px">
-                            {productData?.product_name}
+                            {product_name}
                         </Text>
                     </Box>
-
                     {/* Price */}
                     <Text pl="2" fontWeight="bold" fontSize="14px">
                         {new Intl.NumberFormat("id-ID", {
                             style: "currency",
                             currency: "IDR",
-                        }).format(productData?.price)}
+                        }).format(price)}
+                    </Text>
+                    {/* Description */}
+                    <Text p="2" fontSize="14px">
+                        {description}
                     </Text>
                 </Box>
             </Box>
