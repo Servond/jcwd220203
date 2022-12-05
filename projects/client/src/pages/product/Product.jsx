@@ -10,6 +10,7 @@ import {
     Select,
     Spacer,
     Text,
+    Flex,
 } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
@@ -131,9 +132,14 @@ const Product = () => {
             setSearchValue(searchProduct)
         }
     }
-
     const seeMoreBtnHandler = () => {
         setCatPage(catPage + 1)
+    }
+    const resetBtnHandler = () => {
+        setSearchParam(false)
+        setSortBy(false)
+        setFilter(false)
+        window.location.reload(false)
     }
 
     useEffect(() => {
@@ -157,7 +163,7 @@ const Product = () => {
                 onKeyDown={handleKeyEnter}
             />
             <Box
-                border="1px solid red"
+                // border="1px solid red"
                 mx="auto"
                 mt="90px"
                 w="1100px"
@@ -166,7 +172,7 @@ const Product = () => {
                 // borderBottom="1px solid #dfe1e3"
             >
                 {/* Path history */}
-                <Box
+                {/* <Box
                     // border="1px solid green"
                     position="relative"
                     display="flex"
@@ -177,7 +183,7 @@ const Product = () => {
                     fontSize="14px"
                 >
                     <Text>Product</Text>
-                </Box>
+                </Box> */}
 
                 {/* Filter and Search */}
                 <Box
@@ -205,7 +211,7 @@ const Product = () => {
 
                 {/* Content */}
                 <Box
-                    border="1px solid brown"
+                    // border="1px solid brown"
                     display="flex"
                     gap="4px"
                     // borderBottom="1px solid #dfe1e3"
@@ -216,13 +222,28 @@ const Product = () => {
                         borderRadius="12px"
                         boxShadow="1px 1px 6px 1px #e0e0e0"
                         display="block"
-                        w="234px"
+                        w="auto"
                         h="800px"
                         p="12px"
                     >
-                        <HStack>
-                            <Text fontSize="20px">Filter</Text>
-                        </HStack>
+                        <Flex gap="1" borderBottom="1px solid #dfe1e3">
+                            <HStack>
+                                <Text fontSize="20px">Filter</Text>
+                            </HStack>
+
+                            <Button onClick={resetBtnHandler} variant="link">
+                                <Text
+                                    fontSize="10px"
+                                    mt="2"
+                                    _hover={{
+                                        color: "#F7931E",
+                                    }}
+                                >
+                                    reset
+                                </Text>
+                            </Button>
+                        </Flex>
+
                         <Box mt="20px" display="grid" h="auto">
                             <Text fontWeight="bold" fontSize="14px" mb="10px">
                                 Categories
@@ -261,7 +282,7 @@ const Product = () => {
 
                     {/* Product */}
                     <Box
-                        border="1px solid green"
+                        // border="1px solid green"
                         borderRadius="12px"
                         w="912px"
                         h="1000px"
@@ -287,33 +308,32 @@ const Product = () => {
                             >
                                 {renderProduct()}
                             </Grid>
+                            <HStack justifyContent="end" gap="2px">
+                                {page === 1 ? null : (
+                                    <CgChevronLeft
+                                        bgColor="#0095DA"
+                                        onClick={prevPageBtnHandler}
+                                        color="#0095DA"
+                                        cursor="pointer"
+                                        size={20}
+                                    />
+                                )}
+
+                                {page >= maxPage ? null : (
+                                    <CgChevronRight
+                                        bgColor="#0095DA"
+                                        color="#0095DA"
+                                        onClick={nextPageBtnHandler}
+                                        cursor="pointer"
+                                        size={20}
+                                    />
+                                )}
+                            </HStack>
                         </GridItem>
                     </Box>
                 </Box>
                 {/* Page */}
-                <GridItem>
-                    <HStack justifyContent="end" gap="2px">
-                        {page === 1 ? null : (
-                            <CgChevronLeft
-                                bgColor="#0095DA"
-                                onClick={prevPageBtnHandler}
-                                color="#0095DA"
-                                cursor="pointer"
-                                size={20}
-                            />
-                        )}
-
-                        {page >= maxPage ? null : (
-                            <CgChevronRight
-                                bgColor="#0095DA"
-                                color="#0095DA"
-                                onClick={nextPageBtnHandler}
-                                cursor="pointer"
-                                size={20}
-                            />
-                        )}
-                    </HStack>
-                </GridItem>
+                <GridItem></GridItem>
             </Box>
         </>
     )
