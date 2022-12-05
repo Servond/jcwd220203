@@ -7,23 +7,10 @@ import {
     Button,
     useNumberInput,
     Input,
-    Center,
-    useDisclosure,
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalCloseButton,
-    ModalFooter,
-    Flex,
 } from "@chakra-ui/react"
-import { isDisabled } from "@testing-library/user-event/dist/utils"
 import { useEffect } from "react"
 import { useState } from "react"
-import { useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
-import { Link } from "react-router-dom"
-import { useSearchParams } from "react-router-dom"
 import { axiosInstance } from "../../api"
 
 const ProductDetail = ({ product_name, id }) => {
@@ -37,22 +24,11 @@ const ProductDetail = ({ product_name, id }) => {
     const inc = getIncrementButtonProps()
     const dec = getDecrementButtonProps()
     const input = getInputProps()
-    const authSelector = useSelector((state) => state.auth)
-    const { isOpen, onOpen, onClose } = useDisclosure()
-    const { productId } = useParams()
-    const OverlayOne = () => (
-        <ModalOverlay
-            bg="blackAlpha.300"
-            backdropFilter="blur(10px) hue-rotate(90deg)"
-        />
-    )
-
-    const [overlay, setOverlay] = useState(<OverlayOne />)
-
     const [productDetail, setProductDetail] = useState([])
     const [image, setImage] = useState([])
     const [stock, setStock] = useState([])
     const params = useParams()
+
     const fetchProductDetail = async () => {
         try {
             const response = await axiosInstance.get(`/product/${params.id}`)
