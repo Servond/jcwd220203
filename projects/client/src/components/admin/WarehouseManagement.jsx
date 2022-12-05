@@ -188,8 +188,8 @@ const WarehouseManagement = () => {
         let editedWarehouse = {
           warehouse_name: values.warehouse_name,
           address_labels: values.address_labels,
-          province: values.province,
-          city: values.city,
+          province: selectedProvince,
+          city: selectedCity,
           districts: values.districts,
           full_address: values.full_address,
         };
@@ -233,7 +233,7 @@ const WarehouseManagement = () => {
         <Warehouse
           key={val.id.toString()}
           id={val.id.toString()}
-          warehouse_name={val?.warehouse_name}
+          warehouse_name={val.warehouse_name}
           full_address={val.full_address}
           address_labels={val.address_labels}
           province={val.province}
