@@ -1,16 +1,4 @@
-import {
-    Box,
-    Center,
-    Flex,
-    Grid,
-    GridItem,
-    Heading,
-    HStack,
-    Image,
-    Select,
-    Spacer,
-    Text,
-} from "@chakra-ui/react"
+import { Box, Image, Text } from "@chakra-ui/react"
 import { useEffect } from "react"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -49,7 +37,7 @@ const ProductItem = ({ product_name, id }) => {
 
     const productBtnHandler = () => {
         setProductId(id)
-        navigate(`/product/${product_name}`)
+        navigate(`/product/${id}/${product_name}`)
     }
     useEffect(() => {
         fetchProductById()

@@ -126,7 +126,7 @@ function App() {
                 <Route path="/product" element={<Product />} />
 
                 <Route
-                    path="/product/:product_name"
+                    path="/product/:id/:product_name"
                     element={<ProductDetail />}
                 />
             </Routes>

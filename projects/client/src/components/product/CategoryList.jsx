@@ -1,11 +1,9 @@
-import { Box, Button, Stack } from "@chakra-ui/react"
-import { useEffect } from "react"
+import { Box, Stack } from "@chakra-ui/react"
 
 import { useState } from "react"
-import { axiosInstance } from "../../api"
 
 const CategoryList = ({ category_name, id }) => {
-    const [category, setCategory] = useState({ category_name: "", id: "" })
+    // const [category, setCategory] = useState({ category_name: "", id: "" })
 
     // const fetchCategory = async () => {
     //     try {

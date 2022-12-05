@@ -4,22 +4,17 @@ import {
     AlertTitle,
     Box,
     Button,
-    Center,
-    Checkbox,
-    Flex,
     Grid,
     GridItem,
-    Heading,
     HStack,
     Select,
     Spacer,
     Text,
 } from "@chakra-ui/react"
-import { useEffect, useState, useMemo } from "react"
-import { useLocation, useSearchParams } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { useSearchParams } from "react-router-dom"
 import { CgChevronLeft, CgChevronRight } from "react-icons/cg"
 import { axiosInstance } from "../../api"
-import CategoryList from "../../components/product/CategoryList"
 import ProductItem from "../../components/product/ProductItem"
 import Navbar from "../../components/Navbar"
 
@@ -35,7 +30,6 @@ const Product = () => {
     const [searchProduct, setSearchProduct] = useState()
     const [searchValue, setSearchValue] = useState("")
     const [searchParam, setSearchParam] = useSearchParams()
-
     const [catPage, setCatPage] = useState(1)
     const [catTotalCount, setCatTotalCount] = useState(0)
 
@@ -92,23 +86,7 @@ const Product = () => {
                 <ProductItem
                     key={val.id.toString()}
                     product_name={val.product_name}
-                    // description={val.description}
                     price={val.price}
-                    // category_name={val.category_name}
-                    // stock={val.stock}
-                    // image_url={val.image_url}
-                    id={val.id}
-                />
-            )
-        })
-    }
-
-    const renderCategory = () => {
-        return category.map((val) => {
-            return (
-                <CategoryList
-                    key={val.id.toString()}
-                    category_name={val.category_name}
                     id={val.id}
                 />
             )
@@ -179,12 +157,11 @@ const Product = () => {
                 onKeyDown={handleKeyEnter}
             />
             <Box
-                // border="1px solid red"
+                border="1px solid red"
                 mx="auto"
                 mt="90px"
                 w="1100px"
                 h="1600px"
-                // p="10px 24px"
                 display="block"
                 // borderBottom="1px solid #dfe1e3"
             >
@@ -228,7 +205,7 @@ const Product = () => {
 
                 {/* Content */}
                 <Box
-                    // border="1px solid brown"
+                    border="1px solid brown"
                     display="flex"
                     gap="4px"
                     // borderBottom="1px solid #dfe1e3"
@@ -243,19 +220,13 @@ const Product = () => {
                         h="800px"
                         p="12px"
                     >
-                        <Text fontSize="20px">Filter</Text>
+                        <HStack>
+                            <Text fontSize="20px">Filter</Text>
+                        </HStack>
                         <Box mt="20px" display="grid" h="auto">
                             <Text fontWeight="bold" fontSize="14px" mb="10px">
                                 Categories
                             </Text>
-                            {/* <Box>{renderCategory()}</Box> */}
-                            {/* <Select onChange={filterBtnHandler}>
-                                {category.map((val) => (
-                                    <option value={val.id}>
-                                        {val.category_name}
-                                    </option>
-                                ))}
-                            </Select> */}
                             <Grid gap="5px">
                                 {category.map((val) => (
                                     <Button
@@ -290,7 +261,7 @@ const Product = () => {
 
                     {/* Product */}
                     <Box
-                        // border="1px solid green"
+                        border="1px solid green"
                         borderRadius="12px"
                         w="912px"
                         h="1000px"
