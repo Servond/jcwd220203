@@ -212,7 +212,7 @@ const Product = () => {
                         h="800px"
                         p="12px"
                     >
-                        <Flex gap="1" borderBottom="1px solid #dfe1e3">
+                        <Flex borderBottom="1px solid #dfe1e3">
                             <HStack>
                                 <Text fontSize="20px">Filter</Text>
                             </HStack>
