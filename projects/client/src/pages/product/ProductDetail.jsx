@@ -69,7 +69,7 @@ const ProductDetail = ({ product_name, id }) => {
                         w="348px"
                         h="420px"
                     >
-                        <Carousel>
+                        <Carousel showStatus={false} showArrows={true}>
                             {image.map((val) => (
                                 <Stack>
                                     <Box

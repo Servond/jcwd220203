@@ -12,10 +12,9 @@ import {
     Text,
 } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
-import { useNavigate, useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router-dom"
 import { CgChevronLeft, CgChevronRight } from "react-icons/cg"
 import { axiosInstance } from "../../api"
-import CategoryList from "../../components/product/CategoryList"
 import ProductItem from "../../components/product/ProductItem"
 import Navbar from "../../components/Navbar"
 
@@ -159,23 +158,9 @@ const Product = ({ id, product_name }) => {
                 display="block"
                 // borderBottom="1px solid #dfe1e3"
             >
-                {/* Path history */}
-                {/* <Box
-                    border="1px solid green"
-                    position="relative"
-                    display="flex"
-                    alignItems="center"
-                    boxShadow="1px 1px 6px 1px #e0e0e0"
-                    borderRadius="6px"
-                    p="10px 0"
-                    fontSize="14px"
-                >
-                    <Text>Product</Text>
-                </Box> */}
-
                 {/* Filter and Search */}
                 <Box
-                    border="1px solid blue"
+                    // border="1px solid blue"
                     marginBlockEnd="16px"
                     marginBlockStart="18px"
                     display="flex"
@@ -199,7 +184,7 @@ const Product = ({ id, product_name }) => {
 
                 {/* Content */}
                 <Box
-                    border="1px solid brown"
+                    // border="1px solid brown"
                     display="flex"
                     gap="4px"
                     // borderBottom="1px solid #dfe1e3"
@@ -219,14 +204,6 @@ const Product = ({ id, product_name }) => {
                             <Text fontWeight="bold" fontSize="14px" mb="10px">
                                 Categories
                             </Text>
-                            {/* <Box>{renderCategory()}</Box> */}
-                            {/* <Select onChange={filterBtnHandler}>
-                                {category.map((val) => (
-                                    <option value={val.id}>
-                                        {val.category_name}
-                                    </option>
-                                ))}
-                            </Select> */}
                             <Grid gap="5px">
                                 {category.map((val) => (
                                     <Button
