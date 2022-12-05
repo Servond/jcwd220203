@@ -171,20 +171,6 @@ const Product = () => {
                 display="block"
                 // borderBottom="1px solid #dfe1e3"
             >
-                {/* Path history */}
-                {/* <Box
-                    // border="1px solid green"
-                    position="relative"
-                    display="flex"
-                    alignItems="center"
-                    boxShadow="1px 1px 6px 1px #e0e0e0"
-                    borderRadius="6px"
-                    p="10px 0"
-                    fontSize="14px"
-                >
-                    <Text>Product</Text>
-                </Box> */}
-
                 {/* Filter and Search */}
                 <Box
                     // border="1px solid blue"
@@ -332,8 +318,6 @@ const Product = () => {
                         </GridItem>
                     </Box>
                 </Box>
-                {/* Page */}
-                <GridItem></GridItem>
             </Box>
         </>
     )
