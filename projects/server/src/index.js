@@ -46,6 +46,10 @@ app.use("/product", productRoute)
 
 app.use("/product", productRoute)
 
+app.use("/product", productRoute)
+
+app.use("/product", productRoute)
+
 app.get("/api", (req, res) => {
     res.send(`Hello, this is my API`)
 })
