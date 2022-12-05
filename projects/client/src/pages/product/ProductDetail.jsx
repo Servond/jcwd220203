@@ -12,6 +12,8 @@ import { useEffect } from "react"
 import { useState } from "react"
 import { useParams } from "react-router-dom"
 import { axiosInstance } from "../../api"
+import { Carousel } from "react-responsive-carousel"
+import "react-responsive-carousel/lib/styles/carousel.min.css"
 
 const ProductDetail = ({ product_name, id }) => {
     // Increment decrement stock
@@ -39,7 +41,6 @@ const ProductDetail = ({ product_name, id }) => {
             console.log(err)
         }
     }
-    console.log(image)
     useEffect(() => {
         fetchProductDetail()
     }, [])
@@ -68,58 +69,60 @@ const ProductDetail = ({ product_name, id }) => {
                         w="348px"
                         h="420px"
                     >
-                        {image.map((val) => (
-                            <Stack>
-                                <Box
-                                    // border="1px solid brown"
-                                    w="348px"
-                                    h="348px"
-                                    borderRadius="12px"
-                                    display="block"
-                                >
-                                    <Image
-                                        src={val.image_url}
+                        <Carousel>
+                            {image.map((val) => (
+                                <Stack>
+                                    <Box
+                                        // border="1px solid brown"
                                         w="348px"
                                         h="348px"
-                                        objectFit="fill"
                                         borderRadius="12px"
-                                        // border="1px solid red"
-                                    />
-                                </Box>
+                                        display="block"
+                                    >
+                                        <Image
+                                            src={val.image_url}
+                                            w="348px"
+                                            h="348px"
+                                            objectFit="cover"
+                                            borderRadius="12px"
+                                            // border="1px solid red"
+                                        />
+                                    </Box>
 
-                                <Box
-                                    // border="1px solid red"
-                                    w="348px"
-                                    h="60px"
-                                    borderRadius="12px"
-                                    display="flex"
-                                    justifyItems="flex-start"
-                                    gap="20px"
-                                >
-                                    <Image
-                                        src={val.image_url}
-                                        objectFit="fill"
+                                    {/* <Box
+                                        // border="1px solid red"
+                                        w="348px"
+                                        h="60px"
                                         borderRadius="12px"
-                                        w="58px"
-                                        h="58px"
-                                    />
-                                    <Image
-                                        src="https://img.freepik.com/premium-vector/cute-shark-cartoon-design_274619-2128.jpg?w=2000"
-                                        objectFit="fill"
-                                        borderRadius="12px"
-                                        w="58px"
-                                        h="58px"
-                                    />
-                                    <Image
-                                        src="https://static.vecteezy.com/system/resources/previews/004/260/996/original/cute-shark-inflatable-ring-icon-vector.jpg"
-                                        objectFit="fill"
-                                        borderRadius="12px"
-                                        w="58px"
-                                        h="58px"
-                                    />
-                                </Box>
-                            </Stack>
-                        ))}
+                                        display="flex"
+                                        justifyItems="flex-start"
+                                        gap="20px"
+                                    >
+                                        <Image
+                                            src={val.image_url}
+                                            objectFit="fill"
+                                            borderRadius="12px"
+                                            w="58px"
+                                            h="58px"
+                                        />
+                                        <Image
+                                            src="https://img.freepik.com/premium-vector/cute-shark-cartoon-design_274619-2128.jpg?w=2000"
+                                            objectFit="fill"
+                                            borderRadius="12px"
+                                            w="58px"
+                                            h="58px"
+                                        />
+                                        <Image
+                                            src="https://static.vecteezy.com/system/resources/previews/004/260/996/original/cute-shark-inflatable-ring-icon-vector.jpg"
+                                            objectFit="fill"
+                                            borderRadius="12px"
+                                            w="58px"
+                                            h="58px"
+                                        />
+                                    </Box> */}
+                                </Stack>
+                            ))}
+                        </Carousel>
                     </Box>
 
                     {/* Product */}

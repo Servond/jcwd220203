@@ -154,14 +154,14 @@ const Product = ({ id, product_name }) => {
                 mx="auto"
                 mt="90px"
                 w="1100px"
-                h="1600px"
+                h="auto"
                 // p="10px 24px"
                 display="block"
                 // borderBottom="1px solid #dfe1e3"
             >
                 {/* Path history */}
-                <Box
-                    // border="1px solid green"
+                {/* <Box
+                    border="1px solid green"
                     position="relative"
                     display="flex"
                     alignItems="center"
@@ -171,11 +171,11 @@ const Product = ({ id, product_name }) => {
                     fontSize="14px"
                 >
                     <Text>Product</Text>
-                </Box>
+                </Box> */}
 
                 {/* Filter and Search */}
                 <Box
-                    // border="1px solid blue"
+                    border="1px solid blue"
                     marginBlockEnd="16px"
                     marginBlockStart="18px"
                     display="flex"
@@ -199,7 +199,7 @@ const Product = ({ id, product_name }) => {
 
                 {/* Content */}
                 <Box
-                    // border="1px solid brown"
+                    border="1px solid brown"
                     display="flex"
                     gap="4px"
                     // borderBottom="1px solid #dfe1e3"
@@ -207,10 +207,10 @@ const Product = ({ id, product_name }) => {
                     {/* Fitler */}
                     <Box
                         border="1px solid #dfe1e3"
-                        borderRadius="12px"
+                        // borderRadius="12px"
                         boxShadow="1px 1px 6px 1px #e0e0e0"
                         display="block"
-                        w="234px"
+                        w="auto"
                         h="800px"
                         p="12px"
                     >
@@ -287,33 +287,32 @@ const Product = ({ id, product_name }) => {
                             >
                                 {renderProduct()}
                             </Grid>
+                            <HStack justifyContent="end" gap="2px">
+                                {page === 1 ? null : (
+                                    <CgChevronLeft
+                                        bgColor="#0095DA"
+                                        onClick={prevPageBtnHandler}
+                                        color="#0095DA"
+                                        cursor="pointer"
+                                        size={20}
+                                    />
+                                )}
+
+                                {page >= maxPage ? null : (
+                                    <CgChevronRight
+                                        bgColor="#0095DA"
+                                        color="#0095DA"
+                                        onClick={nextPageBtnHandler}
+                                        cursor="pointer"
+                                        size={20}
+                                    />
+                                )}
+                            </HStack>
                         </GridItem>
                     </Box>
                 </Box>
                 {/* Page */}
-                <GridItem>
-                    <HStack justifyContent="end" gap="2px">
-                        {page === 1 ? null : (
-                            <CgChevronLeft
-                                bgColor="#0095DA"
-                                onClick={prevPageBtnHandler}
-                                color="#0095DA"
-                                cursor="pointer"
-                                size={20}
-                            />
-                        )}
-
-                        {page >= maxPage ? null : (
-                            <CgChevronRight
-                                bgColor="#0095DA"
-                                color="#0095DA"
-                                onClick={nextPageBtnHandler}
-                                cursor="pointer"
-                                size={20}
-                            />
-                        )}
-                    </HStack>
-                </GridItem>
+                <GridItem></GridItem>
             </Box>
         </>
     )
