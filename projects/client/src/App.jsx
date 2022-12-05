@@ -22,7 +22,6 @@ import GuestRoute from "./components/GuestRoute"
 import AddressList from "./pages/profile/AddressList"
 import Product from "./pages/product/Product"
 import ProductDetail from "./pages/product/ProductDetail"
-
 function App() {
     const [message, setMessage] = useState("")
     const authSelector = useSelector((state) => state.auth)
