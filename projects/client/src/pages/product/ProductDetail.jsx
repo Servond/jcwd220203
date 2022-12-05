@@ -30,7 +30,6 @@ const ProductDetail = ({ product_name, id }) => {
     const [image, setImage] = useState([])
     const [stock, setStock] = useState([])
     const params = useParams()
-
     const fetchProductDetail = async () => {
         try {
             const response = await axiosInstance.get(`/product/${params.id}`)
