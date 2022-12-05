@@ -10,6 +10,7 @@ import {
     Select,
     Spacer,
     Text,
+    Flex,
 } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
@@ -18,7 +19,7 @@ import { axiosInstance } from "../../api"
 import ProductItem from "../../components/product/ProductItem"
 import Navbar from "../../components/Navbar"
 
-const Product = ({ id, product_name }) => {
+const Product = () => {
     const [products, setProducts] = useState([])
     const [category, setCategory] = useState([])
     const [totalCount, setTotalCount] = useState(0)
@@ -111,9 +112,11 @@ const Product = ({ id, product_name }) => {
     const nextPageBtnHandler = () => {
         setPage(page + 1)
     }
+
     const prevPageBtnHandler = () => {
         setPage(page - 1)
     }
+
     const searchBtnHandler = () => {
         setSearchValue(searchProduct)
         const params = {}
@@ -128,6 +131,13 @@ const Product = ({ id, product_name }) => {
     const seeMoreBtnHandler = () => {
         setCatPage(catPage + 1)
     }
+    const resetBtnHandler = () => {
+        setSearchParam(false)
+        setSortBy(false)
+        setFilter(false)
+        window.location.reload(false)
+    }
+
     useEffect(() => {
         for (let entry of searchParam.entries()) {
             if (entry[0] === "name") {
@@ -153,8 +163,7 @@ const Product = ({ id, product_name }) => {
                 mx="auto"
                 mt="90px"
                 w="1100px"
-                h="auto"
-                // p="10px 24px"
+                h="1600px"
                 display="block"
                 // borderBottom="1px solid #dfe1e3"
             >
@@ -192,14 +201,30 @@ const Product = ({ id, product_name }) => {
                     {/* Fitler */}
                     <Box
                         border="1px solid #dfe1e3"
-                        // borderRadius="12px"
+                        borderRadius="12px"
                         boxShadow="1px 1px 6px 1px #e0e0e0"
                         display="block"
                         w="auto"
                         h="800px"
                         p="12px"
                     >
-                        <Text fontSize="20px">Filter</Text>
+                        <Flex borderBottom="1px solid #dfe1e3">
+                            <HStack>
+                                <Text fontSize="20px">Filter</Text>
+                            </HStack>
+
+                            <Button onClick={resetBtnHandler} variant="link">
+                                <Text
+                                    fontSize="10px"
+                                    mt="2"
+                                    _hover={{
+                                        color: "#F7931E",
+                                    }}
+                                >
+                                    reset
+                                </Text>
+                            </Button>
+                        </Flex>
                         <Box mt="20px" display="grid" h="auto">
                             <Text fontWeight="bold" fontSize="14px" mb="10px">
                                 Categories
@@ -288,8 +313,6 @@ const Product = ({ id, product_name }) => {
                         </GridItem>
                     </Box>
                 </Box>
-                {/* Page */}
-                <GridItem></GridItem>
             </Box>
         </>
     )

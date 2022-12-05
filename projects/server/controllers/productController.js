@@ -114,7 +114,6 @@ const productController = {
             })
         }
     },
-
     getImage: async (req, res) => {
         try {
             const { id } = req.params
