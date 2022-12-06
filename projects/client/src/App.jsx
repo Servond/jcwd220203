@@ -102,78 +102,78 @@ function App() {
     userResetData();
   }, []);
 
-  return (
-    <>
-      {authSelector.RoleId === 3 || authSelector.RoleId === 2 ? (
-        <SideNavBar />
-      ) : null}
+    return (
+        <>
+            {authSelector.RoleId === 3 || authSelector.RoleId === 2 ? (
+                <SideNavBar />
+            ) : null}
 
-      {location.pathname === "/login" ||
-      location.pathname === "/register" ||
-      location.pathname === "/reset-password-confirmation" ||
-      location.pathname === "/request-reset-password" ||
-      authSelector.RoleId === 3 ||
-      authSelector.RoleId === 2 ? null : (
-        <Box>
-          <Navbar />
-        </Box>
-      )}
+            {location.pathname === "/login" ||
+            location.pathname === "/register" ||
+            location.pathname === "/reset-password-confirmation" ||
+            location.pathname === "/request-reset-password" ||
+            authSelector.RoleId === 3 ||
+            authSelector.RoleId === 2 ? null : (
+                <Box>
+                    <Navbar />
+                </Box>
+            )}
 
-      <Routes>
-        <Route path="/*" element={<NotFound />} />
-        <Route path="/" element={<HomePage />} />
-        <Route
-          path="/login"
-          element={
-            <GuestRoute>
-              <LoginPage />
-            </GuestRoute>
-          }
-        />
-        <Route
-          path="/reset-password-confirmation"
-          element={<ResetPasswordConfirmation />}
-        />
+            <Routes>
+                <Route path="/*" element={<NotFound />} />
+                <Route path="/" element={<HomePage />} />
+                <Route
+                    path="/login"
+                    element={
+                        <GuestRoute>
+                            <LoginPage />
+                        </GuestRoute>
+                    }
+                />
+                <Route
+                    path="/reset-password-confirmation"
+                    element={<ResetPasswordConfirmation />}
+                />
 
-        <Route
-          path="/manage-admin-data"
-          element={
-            <AdminRoute>
-              <ManageAdminData />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/manage-user-data"
-          element={
-            <AdminRoute>
-              <ManageUserData />
-            </AdminRoute>
-          }
-        />
+                <Route
+                    path="/manage-admin-data"
+                    element={
+                        <AdminRoute>
+                            <ManageAdminData />
+                        </AdminRoute>
+                    }
+                />
+                <Route
+                    path="/manage-user-data"
+                    element={
+                        <AdminRoute>
+                            <ManageUserData />
+                        </AdminRoute>
+                    }
+                />
 
-        <Route
-          path="/request-reset-password"
-          element={
-            <GuestRoute>
-              <RequestResetPassword />
-            </GuestRoute>
-          }
-        />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/register/verification"
-          element={<RegisterVerification />}
-        />
+                <Route
+                    path="/request-reset-password"
+                    element={
+                        <GuestRoute>
+                            <RequestResetPassword />
+                        </GuestRoute>
+                    }
+                />
+                <Route path="/register" element={<Register />} />
+                <Route
+                    path="/register/verification"
+                    element={<RegisterVerification />}
+                />
 
-        <Route
-          path="/cart"
-          element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-          }
-        />
+                <Route
+                    path="/cart"
+                    element={
+                        <ProtectedRoute>
+                            <Cart />
+                        </ProtectedRoute>
+                    }
+                />
 
         <Route
           path="/admin/dashboard"
@@ -184,14 +184,14 @@ function App() {
           }
         />
 
-        <Route
-          path="/admin/category"
-          element={
-            <AdminRoute>
-              <AdminCategory />
-            </AdminRoute>
-          }
-        />
+                <Route
+                    path="/admin/category"
+                    element={
+                        <AdminRoute>
+                            <AdminCategory />
+                        </AdminRoute>
+                    }
+                />
 
         <Route
           path="/admin/warehouse-management"
