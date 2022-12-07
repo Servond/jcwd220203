@@ -33,6 +33,7 @@ import Cart from "./pages/Cart"
 import ProtectedRoute from "./components/ProtectedRoute"
 import ProductData from "./pages/admin/ProductData"
 import ProductDataDetail from "./pages/admin/ProductDataDetail"
+import AdminTransactionList from "./pages/admin/AdminTransactionList"
 
 function App() {
     const [message, setMessage] = useState("")
@@ -197,6 +198,15 @@ function App() {
                 <Route
                     path="/warehouse-management"
                     element={<WarehouseManagement />}
+                />
+
+                <Route
+                    path="/admin/transaction-list"
+                    element={
+                        <AdminRoute>
+                            <AdminTransactionList />
+                        </AdminRoute>
+                    }
                 />
 
                 {/* Profiling Route */}
