@@ -20,20 +20,15 @@ import Alert from "../../components/profile/Alert"
 import EditForm from "../../components/profile/EditForm"
 
 const AddressList = () => {
- const authSelector = useSelector((state) => state.auth)
-  const [province, setProvince] = useState([])
-  const [city, setCity] = useState([])
-  const [districts, setDistricts] = useState([])
-  const [ward, setWard] = useState([])
-  const [selectedProvince, setSelectedProvince] = useState(0)
-  const [selectedCity, setSelectedCity] = useState(0)
-  const [selectedDistricts, setSelectedDistricts] = useState(0)
-
+  const authSelector = useSelector((state) => state.auth)
+  const [selectedNewProvince, setSelectedNewProvince] = useState(0)
+  const [selectedNewCity, setSelectedNewCity] = useState(0)
+  const [selectedEditProvince, setSelectedEditProvince] = useState(0)
+  const [selectedEditCity, setSelectedEditCity] = useState(0)
   const [openedEdit, setOpenedEdit] = useState(null)
   const [address, setAddress] = useState([])
   const [deleteAlert, setDeleteAlert] = useState(null)
   const [defaultAlert, setDefaultAlert] = useState(null)
-
   const {
     onOpen: onOpenAlert,
     isOpen: isOpenAlert,
@@ -47,6 +42,8 @@ const AddressList = () => {
 
   const doubleOnClick1 = () => {
     editFormik.handleSubmit()
+    setSelectedEditProvince(0)
+    setSelectedEditCity(0)
     onCloseAlert()
   }
 
@@ -66,6 +63,8 @@ const AddressList = () => {
   const doubleOnClick = () => {
     onClose()
     onCloseAddNewAddress()
+    setSelectedNewProvince(0)
+    setSelectedNewCity(0)
     formikAddNewAddress.handleSubmit()
   }
 
@@ -121,8 +120,8 @@ const AddressList = () => {
           recipients_name,
           phone_number,
           address_labels,
-          province: selectedProvince,
-          city: selectedCity,
+          province: selectedNewProvince,
+          city: selectedNewCity,
           districts,
           full_address,
         })
@@ -131,6 +130,14 @@ const AddressList = () => {
           description: response.data.message,
           status: "success",
         })
+
+        formikAddNewAddress.setFieldValue("recipients_name", "")
+        formikAddNewAddress.setFieldValue("phone_number", "")
+        formikAddNewAddress.setFieldValue("address_labels", "")
+        formikAddNewAddress.setFieldValue("province", "")
+        formikAddNewAddress.setFieldValue("city", "")
+        formikAddNewAddress.setFieldValue("districts", "")
+        formikAddNewAddress.setFieldValue("full_address", "")
         fetchAddres()
       } catch (error) {
         console.log(error.response)
@@ -184,8 +191,8 @@ const AddressList = () => {
             recipients_name,
             phone_number,
             address_labels,
-            province: selectedProvince,
-            city: selectedCity,
+            province: selectedEditProvince,
+            city: selectedEditCity,
             districts,
             full_address,
           }
@@ -337,7 +344,23 @@ const AddressList = () => {
                 Add A New Address
               </Button>
             </Box>
-            {renderAddress()}
+            {address.length ? (
+              renderAddress()
+            ) : (
+              <Box
+                fontSize={"22px"}
+                fontWeight="semibold"
+                textAlign={"center"}
+                p="40px"
+                color={"#F7931E"}
+              >
+                <Link>
+                  <Text onClick={onOpenAddNewAddress}>
+                    Click Here To Add Your First Address
+                  </Text>
+                </Link>
+              </Box>
+            )}
           </Box>
         </Box>
       </Box>
@@ -350,8 +373,8 @@ const AddressList = () => {
         formChangeHandler={formChangeHandler}
         formik={formikAddNewAddress}
         header={"Add Address"}
-        selectProvince={setSelectedProvince}
-        selectCity={setSelectedCity}
+        selectProvince={setSelectedNewProvince}
+        selectCity={setSelectedNewCity}
       />
 
       {/* Alert Add New Address */}
@@ -364,6 +387,7 @@ const AddressList = () => {
         onSubmit={() => doubleOnClick()}
         rightButton={"Add Address"}
         leftButton={"Change Address"}
+        color={"#F7931E"}
       />
 
       {/* modal edit address */}
@@ -373,8 +397,8 @@ const AddressList = () => {
         isOpenMod={openedEdit}
         onSubmit={onOpenAlert}
         onCloseMod={() => setOpenedEdit(null)}
-        selectProvince={setSelectedProvince}
-        selectCity={setSelectedCity}
+        selectProvince={setSelectedEditProvince}
+        selectCity={setSelectedEditCity}
       />
 
       {/* Alert Edit address */}
@@ -387,6 +411,7 @@ const AddressList = () => {
         onSubmit={() => doubleOnClick1()}
         rightButton={"Edit Address"}
         leftButton={"Change Address"}
+        color={"#F7931E"}
       />
 
       {/* set as default alert */}
@@ -399,6 +424,7 @@ const AddressList = () => {
         onSubmit={() => doubleOnClick3()}
         leftButton={"Cancel"}
         rightButton={"Make Primary Address"}
+        color={"#F7931E"}
       />
 
       {/* Alert Delete */}
@@ -411,6 +437,7 @@ const AddressList = () => {
         onSubmit={() => doubleOnClick2()}
         leftButton={"Cancel"}
         rightButton={"Delete"}
+        color={"#F7931E"}
       />
     </Box>
   )

@@ -130,7 +130,6 @@ const FormAddress = ({
             >
               Complete the address details
             </Text>
-
             <Box mt="34px" mb="4px">
               <FormLabel mb="8px">Recipient's Name</FormLabel>
               <FormControl isInvalid={formik.errors.recipients_name}>
@@ -197,9 +196,15 @@ const FormAddress = ({
                 </Box>
                 <Box>
                   <FormLabel mb="8px">City</FormLabel>
-                  <Select placeholder="--Select City--" onChange={cityHandler}>
-                    {renderCity()}
-                  </Select>
+                  <FormControl isInvalid={formik.errors.city}>
+                    <Select
+                      placeholder="--Select City--"
+                      onChange={cityHandler}
+                    >
+                      {renderCity()}
+                    </Select>
+                    <FormErrorMessage>{formik.errors.city}</FormErrorMessage>
+                  </FormControl>
                 </Box>
               </Grid>
             </Box>

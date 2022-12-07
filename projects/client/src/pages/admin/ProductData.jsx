@@ -60,7 +60,7 @@ const ProductData = () => {
 
   const fetchProductData = async () => {
     try {
-      const productData = await axiosInstance.get("/product", {
+      const productData = await axiosInstance.get("/admin/product", {
         params: {
           _keywordHandler: keyword,
           _page: pages,
@@ -121,10 +121,10 @@ const ProductData = () => {
       return (
         <Tr key={val.id.toString()}>
           <Td>{val.id.toString()}</Td>
-          <Td>{val.nama || "null"}</Td>
-          <Td>{val.deskripsi || "null"}</Td>
+          <Td>{val.product_name || "null"}</Td>
+          <Td>{val.description || "null"}</Td>
           <Td>
-            {val.harga.toLocaleString("in-ID", {
+            {val.price.toLocaleString("in-ID", {
               style: "currency",
               currency: "IDR",
             }) || "null"}
@@ -170,25 +170,25 @@ const ProductData = () => {
 
   const formikAddProduct = useFormik({
     initialValues: {
-      nama: "",
-      deskripsi: "",
-      harga: "",
+      product_name: "",
+      description: "",
+      price: "",
     },
-    onSubmit: async ({ nama, deskripsi, harga }) => {
+    onSubmit: async ({ product_name, description, price }) => {
       try {
-        const response = await axiosInstance.post("/product/", {
-          nama,
-          deskripsi,
-          harga,
+        const response = await axiosInstance.post("/admin/product/", {
+          product_name,
+          description,
+          price,
         });
         toast({
           title: "Registration Success",
           description: response.data.message,
           status: "success",
         });
-        formikAddProduct.setFieldValue("nama", "");
-        formikAddProduct.setFieldValue("deskripsi", "");
-        formikAddProduct.setFieldValue("harga", "");
+        formikAddProduct.setFieldValue("product_name", "");
+        formikAddProduct.setFieldValue("description", "");
+        formikAddProduct.setFieldValue("price", "");
         fetchProductData();
       } catch (error) {
         console.log(error.response);
@@ -200,9 +200,9 @@ const ProductData = () => {
       }
     },
     validationSchema: Yup.object({
-      nama: Yup.string().required().min(3),
-      deskripsi: Yup.string().required().min(3),
-      harga: Yup.number().required().min(3),
+      product_name: Yup.string().required().min(3),
+      description: Yup.string().required().min(3),
+      price: Yup.number().required().min(3),
     }),
     validateOnChange: false,
   });
@@ -214,16 +214,16 @@ const ProductData = () => {
 
   const editFormik = useFormik({
     initialValues: {
-      nama: "",
-      deskripsi: "",
-      harga: "",
+      product_name: "",
+      description: "",
+      price: "",
     },
     onSubmit: async (values) => {
       try {
         let editedWarehouse = {
-          nama: values.nama,
-          deskripsi: values.deskripsi,
-          harga: values.harga,
+          product_name: values.product_name,
+          description: values.description,
+          price: values.price,
           // UserId: values.UserId,
         };
 
@@ -233,9 +233,9 @@ const ProductData = () => {
         );
 
         toast({ title: "Warehouse edited", status: "success" });
-        editFormik.setFieldValue("nama", "");
-        editFormik.setFieldValue("deskripsi", "");
-        editFormik.setFieldValue("harga", "");
+        editFormik.setFieldValue("product_name", "");
+        editFormik.setFieldValue("description", "");
+        editFormik.setFieldValue("price", "");
         fetchProductData();
         setOpenedEdit(null);
       } catch (err) {
@@ -244,9 +244,9 @@ const ProductData = () => {
       }
     },
     validationSchema: Yup.object({
-      nama: Yup.string().required().min(3),
-      deskripsi: Yup.string().required().min(3),
-      harga: Yup.number().required().min(3),
+      product_name: Yup.string().required().min(3),
+      description: Yup.string().required().min(3),
+      price: Yup.number().required().min(3),
       // UserId: Yup.number().required(),
     }),
     validateOnChange: false,
@@ -275,9 +275,9 @@ const ProductData = () => {
     if (openedEdit) {
       // fetchImages(openedEdit.id);
       console.log(openedEdit.id);
-      editFormik.setFieldValue("nama", openedEdit.nama);
-      editFormik.setFieldValue("deskripsi", openedEdit.deskripsi);
-      editFormik.setFieldValue("harga", openedEdit.harga);
+      editFormik.setFieldValue("product_name", openedEdit.product_name);
+      editFormik.setFieldValue("description", openedEdit.description);
+      editFormik.setFieldValue("price", openedEdit.price);
     }
   }, [openedEdit]);
 
@@ -285,9 +285,19 @@ const ProductData = () => {
     <>
       <Box marginLeft="250px" marginTop="65px">
         <HStack justifyContent="space-between">
-          <Text fontSize={"2xl"} fontWeight="bold" color={"#F7931E"}>
+          <Text fontSize={"2xl"} fontWeight="bold" color={"#0095DA"}>
             Product Data
           </Text>
+          <br/>
+          <Button
+            bgColor={"#F7931E"}
+            color="white"
+            _hover={false}
+            onClick={onOpenAddNewProduct}
+          >
+            Add New Product
+          </Button>
+        </HStack>
           <FormControl>
             <Input
               name="input"
@@ -299,15 +309,6 @@ const ProductData = () => {
               Search
             </Button>
           </FormControl>
-          <Button
-            bgColor={"#0095DA"}
-            color="white"
-            _hover={false}
-            onClick={onOpenAddNewProduct}
-          >
-            Add New Product
-          </Button>
-        </HStack>
 
         <Table>
           <Thead>
@@ -367,54 +368,54 @@ const ProductData = () => {
 
             <ModalBody>
               <FormLabel>Name</FormLabel>
-              <FormControl isInvalid={formikAddProduct.errors.nama}>
+              <FormControl isInvalid={formikAddProduct.errors.product_name}>
                 <Input
-                  value={formikAddProduct.values.nama}
-                  name="nama"
+                  value={formikAddProduct.values.product_name}
+                  name="product_name"
                   type="text"
                   onChange={formChangeHandler}
                 />
                 <FormErrorMessage>
-                  {formikAddProduct.errors.nama}
+                  {formikAddProduct.errors.product_name}
                 </FormErrorMessage>
               </FormControl>
 
               <FormLabel mt={"15px"}>Description</FormLabel>
-              <FormControl isInvalid={formikAddProduct.errors.deskripsi}>
+              <FormControl isInvalid={formikAddProduct.errors.description}>
                 <Input
-                  value={formikAddProduct.values.deskripsi}
-                  name="deskripsi"
+                  value={formikAddProduct.values.description}
+                  name="description"
                   onChange={formChangeHandler}
                   //
                 />
                 <FormErrorMessage>
-                  {formikAddProduct.errors.deskripsi}
+                  {formikAddProduct.errors.description}
                 </FormErrorMessage>
               </FormControl>
 
               <FormLabel mt={"15px"}>Price</FormLabel>
-              <FormControl isInvalid={formikAddProduct.errors.harga}>
+              <FormControl isInvalid={formikAddProduct.errors.price}>
                 <Input
-                  value={formikAddProduct.values.harga}
-                  name="harga"
+                  value={formikAddProduct.values.price}
+                  name="price"
                   onChange={formChangeHandler}
                   //
                 />
                 <FormErrorMessage>
-                  {formikAddProduct.errors.harga}
+                  {formikAddProduct.errors.price}
                 </FormErrorMessage>
               </FormControl>
 
               {/* <FormLabel mt={"15px"}>Product Picture</FormLabel>
-              <FormControl isInvalid={formikAddNewAdmin.errors.img_url}>
+              <FormControl isInvalid={formikAddNewAdmin.errors.image_url}>
                   <Input
-                    value={formikAddNewAdmin.values.img_url}
-                    name="img_url"
+                    value={formikAddNewAdmin.values.image_url}
+                    name="image_url"
                     type="tel"
                     onChange={formChangeHandler}
                   />
                 <FormErrorMessage>
-                  {formikAddNewAdmin.errors.img_url}
+                  {formikAddNewAdmin.errors.image_url}
                 </FormErrorMessage>
               </FormControl> */}
             </ModalBody>
@@ -451,31 +452,31 @@ const ProductData = () => {
                 </div>
               </Box>
               <Box>
-                <FormControl isInvalid={editFormik.errors.nama}>
+                <FormControl isInvalid={editFormik.errors.product_name}>
                   <FormLabel>Product Name</FormLabel>
                   <Input
-                    name="nama"
+                    name="product_name"
                     type={"text"}
                     onChange={editFormChangeHandler}
-                    value={editFormik.values.nama}
+                    value={editFormik.values.product_name}
                   />
                 </FormControl>
-                <FormControl isInvalid={editFormik.errors.deskripsi}>
+                <FormControl isInvalid={editFormik.errors.description}>
                   <FormLabel>Description</FormLabel>
                   <Input
-                    name="deskripsi"
+                    name="description"
                     type={"text"}
                     onChange={editFormChangeHandler}
-                    value={editFormik.values.deskripsi}
+                    value={editFormik.values.description}
                   />
                 </FormControl>
-                <FormControl isInvalid={editFormik.errors.harga}>
+                <FormControl isInvalid={editFormik.errors.price}>
                   <FormLabel>Price</FormLabel>
                   <Input
-                    name="harga"
+                    name="price"
                     type={"text"}
                     onChange={editFormChangeHandler}
-                    value={editFormik.values.harga}
+                    value={editFormik.values.price}
                   />
                 </FormControl>
               </Box>

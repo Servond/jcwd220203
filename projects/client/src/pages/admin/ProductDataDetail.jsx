@@ -27,7 +27,7 @@ import CarouselProductSlider from "../../components/CarouselProduct";
 
 const DetailBookAdmin = () => {
   const authSelector = useSelector((state) => state.auth);
-  const [dataImages, setDataImages] = useState({});
+  const [dataDetail, setDataDetail] = useState({});
   const toast = useToast();
   const params = useParams();
   const [adminUpdate, setAdminUpdate] = useState(false)
@@ -39,13 +39,13 @@ const DetailBookAdmin = () => {
     try {
       const response = await axiosInstance.get(`/product/detail/${params.id}`);
 
-      setDataImages(response.data.data);
-      // console.warn(dataImages.ImageURLs)
-      setFullImages(response.data.data.ImageURLs)
+      setDataDetail(response.data.data);
+      console.warn(dataDetail.Image_Urls)
+      setFullImages(response.data.data.Image_Urls)
       // console.log(fullImages)
-      editDetailFormik.setFieldValue("nama", response.data.data.nama)
-      editDetailFormik.setFieldValue("deskripsi", response.data.data.deskripsi)
-      editDetailFormik.setFieldValue("harga", response.data.data.harga)
+      editDetailFormik.setFieldValue("product_name", response.data.data.product_name)
+      editDetailFormik.setFieldValue("description", response.data.data.description)
+      editDetailFormik.setFieldValue("price", response.data.data.price)
       setIsLoading(true);
 
     } catch (err) {
@@ -67,17 +67,17 @@ const DetailBookAdmin = () => {
 
   const editDetailFormik = useFormik({
     initialValues: {
-      nama: "",
-      deskripsi: "",
-      harga: "",
+      product_name: "",
+      description: "",
+      price: "",
     },
     onSubmit: async (values) => {
       try {
 
         let updateBook = {
-          nama: values.nama,
-          deskripsi: values.deskripsi,
-          harga: values.harga,
+          product_name: values.product_name,
+          description: values.description,
+          price: values.price,
           }
 
           await axiosInstance.patch(`/book/${authSelector.id}`, updateBook)
@@ -114,7 +114,7 @@ const DetailBookAdmin = () => {
 
 
   return (
-    <Box p={"40px"} pt={"5px"} bgColor="#0095DA">
+    <Box ml="250px" p={"40px"} pt={"5px"}>
       <Grid templateColumns="repeat(2, 1fr)">
         <GridItem w="100%">
           <Heading p={5}>PRODUCT DETAILS</Heading>
@@ -129,7 +129,7 @@ const DetailBookAdmin = () => {
           <Box flex={"1"}>
           <CarouselProductSlider />
                     {/* {isLoading && renderImages()} */}
-            {/* <Image h={"100%"} src={dataImages.ImageURLs[1].img_url || ""} alt="book image" /> */}
+            {/* <Image h={"100%"} src={dataDetail.ImageURLs[1].image_url || ""} alt="book image" /> */}
           </Box>
           <Box
             flex={"1"}
@@ -140,14 +140,17 @@ const DetailBookAdmin = () => {
             alignItems={"flex-start"}
           >
             <Heading size={"lg"}>Name</Heading>
-            <Text fontSize={"2xl"}>{dataImages.nama}</Text>
+            <Text fontSize={"2xl"}>{dataDetail.product_name}</Text>
             <br />
             <Heading size={"lg"}>Description</Heading>
-            <Text fontSize={"2xl"}>{dataImages.deskripsi}</Text>
+            <Text fontSize={"2xl"}>{dataDetail.description}</Text>
             <br />
+            {/* <Heading size={"lg"}>Image</Heading>
+            <Image src={dataDetail.Image_Urls[0].image_url} />
+            <br /> */}
             <Heading size={"lg"}>Price</Heading>
-            <Text fontSize={"2xl"}>{dataImages.harga
-            // .toLocaleString("in-ID", {style: "currency", currency: "IDR"})
+            <Text fontSize={"2xl"}>{(dataDetail?.price) ? 
+            dataDetail.price.toLocaleString("in-ID", {style: "currency", currency: "IDR"}) : ""
             }</Text>
             
           </Box>
@@ -164,33 +167,33 @@ const DetailBookAdmin = () => {
       ) : (
         <form onSubmit={editDetailFormik.handleSubmit}>
           <Stack>
-            <FormControl isInvalid={editDetailFormik.errors.nama}>
-              <FormLabel>Nama</FormLabel>
+            <FormControl isInvalid={editDetailFormik.errors.product_name}>
+              <FormLabel>product_name</FormLabel>
               <Input
-                value={editDetailFormik.values.nama}
+                value={editDetailFormik.values.product_name}
                 defaultValue={"Otw"}
-                name="nama"
+                name="product_name"
                 onChange={formChangeHandler}
               />
-              <FormErrorMessage>{editDetailFormik.errors.nama}</FormErrorMessage>
+              <FormErrorMessage>{editDetailFormik.errors.product_name}</FormErrorMessage>
             </FormControl>
-            <FormControl isInvalid={editDetailFormik.errors.deskripsi}>
+            <FormControl isInvalid={editDetailFormik.errors.description}>
               <FormLabel>Description</FormLabel>
               <Input
-                value={editDetailFormik.values.deskripsi}
-                name="deskripsi"
+                value={editDetailFormik.values.description}
+                name="description"
                 onChange={formChangeHandler}
               />
-              <FormErrorMessage>{editDetailFormik.errors.deskripsi}</FormErrorMessage>
+              <FormErrorMessage>{editDetailFormik.errors.description}</FormErrorMessage>
             </FormControl>
-            <FormControl isInvalid={editDetailFormik.errors.harga}>
+            <FormControl isInvalid={editDetailFormik.errors.price}>
               <FormLabel>Price</FormLabel>
               <Input
-                value={editDetailFormik.values.harga}
-                name="harga"
+                value={editDetailFormik.values.price}
+                name="price"
                 onChange={formChangeHandler}
               />
-              <FormErrorMessage>{editDetailFormik.errors.harga}</FormErrorMessage>
+              <FormErrorMessage>{editDetailFormik.errors.price}</FormErrorMessage>
             </FormControl>
             <Box>
             <Button 

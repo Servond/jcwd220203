@@ -2,6 +2,9 @@ const axios = require("axios")
 const db = require("../models")
 const Address = db.Address
 
+const RajaOngkirKey = "b846db1d8b8034b8c1d64c373ac4f5c7"
+const OpenCageKey = "6833b88f6e234551a37c6dcb7f4de083"
+
 const addressController = {
   getAddressById: async (req, res) => {
     try {
@@ -35,7 +38,6 @@ const addressController = {
         full_address,
       } = req.body
 
-      const RajaOngkirKey = "e216ad3d4659076abbc64528fa8a712d"
       const provinceAndCity = await axios.get(
         `https://api.rajaongkir.com/starter/city?id=${city}&province=${province}&key=${RajaOngkirKey}`
       )
@@ -45,9 +47,8 @@ const addressController = {
       const cityType = provinceAndCity.data.rajaongkir.results.type
       const cityNameAndType = `${cityType} ${cityName}`
 
-      const key = "6833b88f6e234551a37c6dcb7f4de083"
       const location = await axios.get(
-        `https://api.opencagedata.com/geocode/v1/json?key=${key}&q=${districts},${cityNameAndType},${provinceName}`
+        `https://api.opencagedata.com/geocode/v1/json?key=${OpenCageKey}&q=${districts},${cityNameAndType},${provinceName}`
       )
 
       const latitude = location.data.results[0].geometry.lat
@@ -57,7 +58,9 @@ const addressController = {
         recipients_name,
         phone_number,
         address_labels,
+        provinceId: province,
         province: provinceName,
+        cityId: city,
         city: cityNameAndType,
         districts,
         full_address,
@@ -90,8 +93,6 @@ const addressController = {
       } = req.body
 
       const { id } = req.params
-
-      const RajaOngkirKey = "e216ad3d4659076abbc64528fa8a712d"
       const provinceAndCity = await axios.get(
         `https://api.rajaongkir.com/starter/city?id=${city}&province=${province}&key=${RajaOngkirKey}`
       )
@@ -101,9 +102,8 @@ const addressController = {
       const cityType = provinceAndCity.data.rajaongkir.results.type
       const cityNameAndType = `${cityType} ${cityName}`
 
-      const key = "6833b88f6e234551a37c6dcb7f4de083"
       const location = await axios.get(
-        `https://api.opencagedata.com/geocode/v1/json?key=${key}&q=${districts},${cityNameAndType},${provinceName}`
+        `https://api.opencagedata.com/geocode/v1/json?key=${OpenCageKey}&q=${districts},${cityNameAndType},${provinceName}`
       )
 
       const latitude = location.data.results[0].geometry.lat
@@ -114,8 +114,10 @@ const addressController = {
           recipients_name,
           phone_number,
           address_labels,
-          province,
-          city,
+          provinceId: province,
+          province: provinceName,
+          cityId: city,
+          city: cityNameAndType,
           districts,
           full_address,
           longitude,

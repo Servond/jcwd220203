@@ -12,25 +12,30 @@ import { Box } from "@chakra-ui/react"
 import Navbar from "./components/Navbar"
 import Footer from "./components/Footer/Footer"
 import HomePage from "./pages/Home"
-import AdminDashboard from "./components/admin/AdminDashboard"
+import AdminDashboard from "./pages/admin/AdminDashboard"
 import "./AdminDashboard.css"
 import SideNavBar from "./components/SideNavBar"
-import WarehouseManagement from "./components/admin/WarehouseManagement"
+import WarehouseManagement from "./pages/admin/AdminWarehouseManagement"
 import ChangePassword from "./pages/profile/ChangePassword"
 import Profile from "./pages/profile/Profile"
+import AdminRoute from "./components/admin/AdminRoute"
 import AddressList from "./pages/profile/AddressList"
+import Product from "./pages/product/Product"
+import ProductDetail from "./pages/product/ProductDetail"
 import { attach } from "./redux/features/resetSlice"
 import ResetPasswordConfirmation from "./pages/ResetPasswordConfirmation"
 import RequestResetPassword from "./pages/RequestResetPassword"
 import ManageUserData from "./components/admin/ManageUserData"
 import ManageAdminData from "./components/admin/ManageAdminData"
 import AdminCategory from "./pages/AdminCategory"
+import NotFound from "./components/404Page"
 import Cart from "./pages/Cart"
 import ProtectedRoute from "./components/ProtectedRoute"
-import AdminRoute from "./components/admin/AdminRoute"
 import ProductData from "./pages/admin/ProductData"
 import ProductDataDetail from "./pages/admin/ProductDataDetail"
-
+import Shipment from "./pages/shipment/Shipment"
+import UpdateStock from "./pages/admin/UpdateStock"
+import WarehouseStock from "./components/admin/WarehouseStock"
 
 function App() {
   const [message, setMessage] = useState("")
@@ -109,17 +114,18 @@ function App() {
       ) : null}
 
       {location.pathname === "/login" ||
-        location.pathname === "/register" ||
-        location.pathname === "/reset-password-confirmation" ||
-        location.pathname === "/request-reset-password" ||
-        authSelector.RoleId === 3 ||
-        authSelector.RoleId === 2 ? null : (
+      location.pathname === "/register" ||
+      location.pathname === "/reset-password-confirmation" ||
+      location.pathname === "/request-reset-password" ||
+      authSelector.RoleId === 3 ||
+      authSelector.RoleId === 2 ? null : (
         <Box>
           <Navbar />
         </Box>
       )}
 
       <Routes>
+        <Route path="/*" element={<NotFound />} />
         <Route path="/" element={<HomePage />} />
         <Route
           path="/login"
@@ -133,10 +139,44 @@ function App() {
           path="/reset-password-confirmation"
           element={<ResetPasswordConfirmation />}
         />
-
-        <Route path="/manage-admin-data" element={<ManageAdminData />} />
-
-
+        
+                <Route
+                    path="/admin/manage-admin-data"
+                    element={
+                      <AdminRoute>
+                        <ManageAdminData />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/manage-user-data"
+                    element={
+                      <AdminRoute>
+                        <ManageUserData />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path={authSelector.RoleId === 3 ? "/admin/update-stock" : null}
+                    element={
+                      <AdminRoute>
+                        <UpdateStock />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path={
+                      authSelector.RoleId === 2
+                        ? "/admin/update-stock"
+                        : "/admin/update-stock/:id"
+                    }
+                    element={
+                      <AdminRoute>
+                        <WarehouseStock />
+                      </AdminRoute>
+                    }
+                  />
+                  
         <Route
           path="/request-reset-password"
           element={
@@ -159,9 +199,9 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
-          path="/admin-dashboard"
+          path="/admin/dashboard"
           element={
             <AdminRoute>
               <AdminDashboard />
@@ -178,7 +218,14 @@ function App() {
           }
         />
 
-        <Route path="/warehouse-management" element={<WarehouseManagement />} />
+        <Route
+          path="/admin/warehouse-management"
+          element={
+            <AdminRoute>
+              <WarehouseManagement />
+            </AdminRoute>
+          }
+        />
 
         {/* Profiling Route */}
         <Route
@@ -191,8 +238,7 @@ function App() {
         />
         <Route
           path="/user/profile/change-password"
-          element=
-          {
+          element={
             <ProtectedRoute>
               <ChangePassword />
             </ProtectedRoute>
@@ -206,23 +252,47 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/shipment"
+          element={
+            <ProtectedRoute>
+              <Shipment />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/product"
+          element={
+            <AdminRoute>
+              <ProductData />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/product/detail/:id"
+          element={
+            <AdminRoute>
+              <ProductDataDetail />
+            </AdminRoute>
+          }
+        />
         <Route path="/product-data" element={<ProductData />} />
         <Route path="/product/detail/:id" element={<ProductDataDetail />} />
+        {/* Product Route */}
+        <Route path="/product" element={<Product />} />
+        <Route path="/product/:id/:product_name" element={<ProductDetail />} />
       </Routes>
 
-      {
-        location.pathname === "/login" ||
-          location.pathname === "/register" ||
-          location.pathname === "/reset-password-confirmation" ||
-          location.pathname === "/request-reset-password" ||
-          authSelector.RoleId === 3 ||
-          authSelector.RoleId === 2 ? null : (
-          <Box>
-            <Footer />
-          </Box>
-        )
-      }
-
+      {location.pathname === "/login" ||
+      location.pathname === "/register" ||
+      location.pathname === "/reset-password-confirmation" ||
+      location.pathname === "/request-reset-password" ||
+      authSelector.RoleId === 3 ||
+      authSelector.RoleId === 2 ? null : (
+        <Box>
+          <Footer />
+        </Box>
+      )}
     </>
   )
 }
