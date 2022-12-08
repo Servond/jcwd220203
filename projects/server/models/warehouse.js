@@ -12,22 +12,23 @@ module.exports = (sequelize, DataTypes) => {
             Warehouse.hasOne(models.User)
         }
     }
-  }
-  Warehouse.init(
-    {
-      warehouse_name: DataTypes.STRING,
-      address_labels: DataTypes.STRING,
-      province: DataTypes.STRING,
-      city: DataTypes.STRING,
-      districts: DataTypes.STRING,
-      latitude: DataTypes.STRING,
-      longitude: DataTypes.STRING,
-      full_address: DataTypes.STRING,
-    },
-    {
-      sequelize,
-      modelName: "Warehouse",
-    }
-  )
-  return Warehouse
+    Warehouse.init(
+        {
+            warehouse_name: DataTypes.STRING,
+            address_labels: DataTypes.STRING,
+            province: DataTypes.STRING,
+            provinceId: DataTypes.INTEGER,
+            city: DataTypes.STRING,
+            cityId: DataTypes.INTEGER,
+            districts: DataTypes.STRING,
+            latitude: DataTypes.STRING,
+            longitude: DataTypes.STRING,
+            full_address: DataTypes.STRING,
+        },
+        {
+            sequelize,
+            modelName: "Warehouse",
+        }
+    )
+    return Warehouse
 }
