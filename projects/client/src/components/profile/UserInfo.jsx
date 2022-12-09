@@ -67,7 +67,12 @@ const UserInfo = () => {
         },
         validationSchema: Yup.object({
             username: Yup.string().min(3),
-            phone_number: Yup.string().min(3),
+            phone_number: Yup.string()
+                .min(10)
+                .matches(
+                    /\+?([ -]?\d+)+|\(\d+\)([ -]\d+)/,
+                    "Phone number is not valid"
+                ),
         }),
         validateOnChange: false,
     })
@@ -91,8 +96,7 @@ const UserInfo = () => {
                     borderRadius="8px"
                 >
                     <Image
-                        src={imgUrl}
-                        alt="Jane Doe"
+                        src={`http://localhost:8000/public/${imgUrl}`}
                         w={"258px"}
                         mb="16px"
                         borderRadius={"3px"}
@@ -130,7 +134,7 @@ const UserInfo = () => {
                     />
 
                     <Text m="12px 0" fontSize={"12px"}>
-                        File size: maximum 1,000,000 bytes (1 Megabytes).
+                        File size: maximum 2,000,000 bytes (2 Megabytes).
                         Allowed file extensions: .JPG .JPEG .PNG
                     </Text>
                 </Box>
