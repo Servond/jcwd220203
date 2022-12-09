@@ -34,6 +34,9 @@ const Product = () => {
     const [catPage, setCatPage] = useState(1)
     const [catTotalCount, setCatTotalCount] = useState(0)
 
+    const catPerRow = 5
+    const [next, setNext] = useState(catPerRow)
+
     const fetchProduct = async () => {
         const maxItemsPerPage = 10
 
@@ -133,7 +136,10 @@ const Product = () => {
         }
     }
     const seeMoreBtnHandler = () => {
-        setCatPage(catPage + 1)
+        setNext(next + category.length)
+    }
+    const seeLessBtnHandler = () => {
+        setNext(catPerRow)
     }
     const resetBtnHandler = () => {
         setSearchParam(false)
@@ -235,7 +241,7 @@ const Product = () => {
                                 Categories
                             </Text>
                             <Grid gap="5px">
-                                {category.map((val) => (
+                                {category.slice(0, next).map((val, i) => (
                                     <Button
                                         onClick={filterBtnHandler}
                                         value={val.id}
@@ -247,22 +253,45 @@ const Product = () => {
                                             borderRadius: "10px",
                                             color: "#0095DA",
                                         }}
+                                        key={i}
                                     >
                                         {val.category_name}
                                     </Button>
                                 ))}
                             </Grid>
-
-                            {/* {category.length >= catTotalCount ? null : (
+                            {next < category.length ? (
                                 <Button
-                                    onClick={seeMoreBtnHandler}
+                                    onClick={() => seeMoreBtnHandler()}
                                     mt="6"
                                     colorScheme="linkedin"
-                                    w="100%"
+                                    variant="link"
+                                    justifyContent="flex-start"
                                 >
-                                    See More
+                                    <Text
+                                        fontSize="12px"
+                                        w="110px"
+                                        textAlign="start"
+                                    >
+                                        See More
+                                    </Text>
                                 </Button>
-                            )} */}
+                            ) : (
+                                <Button
+                                    onClick={() => seeLessBtnHandler()}
+                                    mt="6"
+                                    colorScheme="linkedin"
+                                    variant="link"
+                                    justifyContent="flex-start"
+                                >
+                                    <Text
+                                        fontSize="12px"
+                                        w="110px"
+                                        textAlign="start"
+                                    >
+                                        See Less
+                                    </Text>
+                                </Button>
+                            )}
                         </Box>
                     </Box>
 

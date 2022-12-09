@@ -67,7 +67,14 @@ const ProductItem = ({ product_name, id }) => {
 
                     {/* Product Name */}
                     <Box h="70px">
-                        <Text p="2" fontSize="14px">
+                        <Text
+                            p="2"
+                            h="70px"
+                            fontSize="14px"
+                            overflow="hidden"
+                            textOverflow="ellipsis"
+                            noOfLines={[1, 3]}
+                        >
                             {productData?.product_name}
                         </Text>
                     </Box>
