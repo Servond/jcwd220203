@@ -44,7 +44,7 @@ function App() {
   useEffect(() => {
     ;(async () => {
       const { data } = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/greetings`
+        `${process.env.REACT_APP_API_BASE_URL}/api/greetings`
       )
       setMessage(data?.message || "")
     })()
@@ -139,44 +139,44 @@ function App() {
           path="/reset-password-confirmation"
           element={<ResetPasswordConfirmation />}
         />
-        
-                <Route
-                    path="/admin/manage-admin-data"
-                    element={
-                      <AdminRoute>
-                        <ManageAdminData />
-                      </AdminRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/manage-user-data"
-                    element={
-                      <AdminRoute>
-                        <ManageUserData />
-                      </AdminRoute>
-                    }
-                  />
-                  <Route
-                    path={authSelector.RoleId === 3 ? "/admin/update-stock" : null}
-                    element={
-                      <AdminRoute>
-                        <UpdateStock />
-                      </AdminRoute>
-                    }
-                  />
-                  <Route
-                    path={
-                      authSelector.RoleId === 2
-                        ? "/admin/update-stock"
-                        : "/admin/update-stock/:id"
-                    }
-                    element={
-                      <AdminRoute>
-                        <WarehouseStock />
-                      </AdminRoute>
-                    }
-                  />
-                  
+
+        <Route
+          path="/admin/manage-admin-data"
+          element={
+            <AdminRoute>
+              <ManageAdminData />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-user-data"
+          element={
+            <AdminRoute>
+              <ManageUserData />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path={authSelector.RoleId === 3 ? "/admin/update-stock" : null}
+          element={
+            <AdminRoute>
+              <UpdateStock />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path={
+            authSelector.RoleId === 2
+              ? "/admin/update-stock"
+              : "/admin/update-stock/:id"
+          }
+          element={
+            <AdminRoute>
+              <WarehouseStock />
+            </AdminRoute>
+          }
+        />
+
         <Route
           path="/request-reset-password"
           element={
