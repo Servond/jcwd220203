@@ -10,11 +10,21 @@ const User = db.User
 
 const adminTransactionController = {
     showAllTransaction: async (req, res) => {
-        const { WarehouseId = "", _limit = 5, _page = 1 } = req.query
+        const {
+            _sortBy = "id",
+            // _sortDir = "ASC",
+            WarehouseId = "",
+            _limit = 10,
+            _page = 1,
+            TransactionId = "id",
+        } = req.query
         try {
             if (WarehouseId) {
                 const seeAllTransactionWithFilter =
                     await Transaction.findAndCountAll({
+                        limit: Number(_limit),
+                        offset: (_page - 1) * _limit,
+                        subQuery: false,
                         include: [
                             {
                                 model: Transaction_Item,
@@ -24,6 +34,7 @@ const adminTransactionController = {
                                         include: [
                                             {
                                                 model: Total_Stock,
+
                                                 include: [
                                                     {
                                                         model: Warehouse,
@@ -36,8 +47,8 @@ const adminTransactionController = {
                             },
                             { model: User },
                         ],
-                        limit: Number(_limit),
-                        offset: (_page - 1) * _limit,
+
+                        // order: [[_sortBy]],
                     })
                 return res.status(200).json({
                     message: "With filter",
@@ -45,7 +56,11 @@ const adminTransactionController = {
                     dataCount: seeAllTransactionWithFilter.count,
                 })
             }
+
             const seeAllTransaction = await Transaction.findAndCountAll({
+                limit: Number(_limit),
+                offset: (_page - 1) * _limit,
+                subQuery: false,
                 include: [
                     {
                         model: Transaction_Item,
@@ -67,8 +82,8 @@ const adminTransactionController = {
                     },
                     { model: User },
                 ],
-                limit: Number(_limit),
-                offset: (_page - 1) * _limit,
+
+                // order: [[_sortBy]],
             })
             return res.status(200).json({
                 message: "With filter",
