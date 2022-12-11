@@ -56,7 +56,7 @@ const Navbar = ({ onChange, onClick, onKeyDown }) => {
     const dispatch = useDispatch()
     const toast = useToast()
     const navigate = useNavigate()
-
+    const apiImg = process.env.REACT_APP_IMAGE_URL
     const location = useLocation()
 
     const refreshPage = () => {
@@ -829,9 +829,7 @@ const Navbar = ({ onChange, onClick, onKeyDown }) => {
                                                     width={"25px"}
                                                     height="25px"
                                                     my="auto"
-                                                    src={
-                                                        authSelector.profile_picture
-                                                    }
+                                                    src={`${apiImg}/${authSelector.profile_picture}`}
                                                 />
                                                 <Text
                                                     my="auto"
@@ -875,9 +873,7 @@ const Navbar = ({ onChange, onClick, onKeyDown }) => {
                                                             width={"50px"}
                                                             height="50px"
                                                             my="auto"
-                                                            src={
-                                                                authSelector.profile_picture
-                                                            }
+                                                            src={`${apiImg}/${authSelector.profile_picture}`}
                                                         />
                                                         <Text
                                                             my="auto"
