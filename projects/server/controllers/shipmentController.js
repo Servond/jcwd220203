@@ -8,11 +8,11 @@ const Warehouse = db.Warehouse
 const shipmentController = {
     getAddressById: async (req, res) => {
         try {
-          const response = await Address.findAll({
+          const response = await Address.findOne({
             where: {
               UserId: req.user.id,
+              is_default: 1,
             },
-            order: [["is_default", "DESC"]],
           })
     
           return res.status(200).json({

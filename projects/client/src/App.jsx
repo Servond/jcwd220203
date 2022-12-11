@@ -31,8 +31,8 @@ import AdminCategory from "./pages/AdminCategory"
 import NotFound from "./components/404Page"
 import Cart from "./pages/Cart"
 import ProtectedRoute from "./components/ProtectedRoute"
-import ProductData from "./pages/admin/ProductData"
-import ProductDataDetail from "./pages/admin/ProductDataDetail"
+import AdminProductData from "./pages/admin/AdminProductData"
+import AdminProductDataDetail from "./pages/admin/AdminProductDataDetail"
 import Shipment from "./pages/shipment/Shipment"
 import UpdateStock from "./pages/admin/UpdateStock"
 import WarehouseStock from "./components/admin/WarehouseStock"
@@ -264,7 +264,7 @@ function App() {
           path="/admin/product"
           element={
             <AdminRoute>
-              <ProductData />
+              <AdminProductData />
             </AdminRoute>
           }
         />
@@ -272,12 +272,12 @@ function App() {
           path="/admin/product/detail/:id"
           element={
             <AdminRoute>
-              <ProductDataDetail />
+              <AdminProductDataDetail />
             </AdminRoute>
           }
         />
-        <Route path="/product-data" element={<ProductData />} />
-        <Route path="/product/detail/:id" element={<ProductDataDetail />} />
+
+        
         {/* Product Route */}
         <Route path="/product" element={<Product />} />
         <Route path="/product/:id/:product_name" element={<ProductDetail />} />
