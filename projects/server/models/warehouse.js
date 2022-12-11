@@ -9,13 +9,21 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
-            Warehouse.belongsTo(models.User, {foreignKey:{ allowNull: false, defaultValues: 1}})
+            Warehouse.hasOne(models.User)
         }
     }
     Warehouse.init(
         {
-            nama_warehouse: DataTypes.STRING,
-            address: DataTypes.STRING,
+            warehouse_name: DataTypes.STRING,
+            address_labels: DataTypes.STRING,
+            province: DataTypes.STRING,
+            provinceId: DataTypes.INTEGER,
+            city: DataTypes.STRING,
+            cityId: DataTypes.INTEGER,
+            districts: DataTypes.STRING,
+            latitude: DataTypes.STRING,
+            longitude: DataTypes.STRING,
+            full_address: DataTypes.STRING,
         },
         {
             sequelize,

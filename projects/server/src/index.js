@@ -8,9 +8,19 @@ const { verifyToken } = require("../middlewares/authMiddleware")
 const fs = require("fs")
 
 // Import Routes
+const profileRoute = require("../routes/profileRoute")
 const authRoute = require("../routes/authRoute")
-const warehouseRoute = require("../routes/warehouseRoute.js")
+const adminWarehouseRoute = require("../routes/adminWarehouseRoute.js")
+const userDataRoute = require("../routes/userDataRoute")
 const adminRoute = require("../routes/adminRoute")
+const addressRoute = require("../routes/addressRoute")
+const stockRoute = require("../routes/stockRoute")
+const productRoute = require("../routes/productRoute.js")
+const adminProductRoute = require("../routes/adminProductRoute.js")
+const shipmentRoute = require("../routes/shipmentRoute.js")
+const cartsRoute = require("../routes/cartsRoute")
+const categoryRoute = require("../routes/categoryRoute")
+const addressCheckoutRoute = require("../routes/addressCheckoutRoute")
 const userProfileRoute = require("../routes/userProfileRoute")
 
 const PORT = process.env.PORT || 8000
@@ -33,13 +43,24 @@ app.use(express.json())
 // NOTE : Add your routes here
 app.use("/admin", adminRoute)
 
-app.use("/warehouse", warehouseRoute)
+app.use("/userData", userDataRoute)
+app.use("/product", productRoute)
+app.use("/categories", categoryRoute)
+app.use("/carts", cartsRoute)
 
 app.use("/auth", authRoute)
+app.use("/shipment", shipmentRoute)
 
-app.use("/user-profile", verifyToken, userProfileRoute)
+app.use("/profile", verifyToken, profileRoute)
+
+app.use("/admin/product", verifyToken, adminProductRoute)
+app.use("/warehouse", verifyToken, adminWarehouseRoute)
 
 app.use("/public", express.static("public"))
+app.use("/address", addressRoute)
+app.use("/stock", stockRoute)
+app.use("/checkoutAddress", addressCheckoutRoute)
+app.use("/user-profile", verifyToken, userProfileRoute)
 
 app.get("/api", (req, res) => {
     res.send(`Hello, this is my API`)
