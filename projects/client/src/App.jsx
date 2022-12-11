@@ -27,7 +27,7 @@ import ResetPasswordConfirmation from "./pages/ResetPasswordConfirmation"
 import RequestResetPassword from "./pages/RequestResetPassword"
 import ManageUserData from "./pages/admin/ManageUserData"
 import ManageAdminData from "./pages/admin/ManageAdminData"
-import AdminCategory from "./pages/AdminCategory"
+import AdminCategory from "./pages/admin/AdminCategory"
 import NotFound from "./components/404Page"
 import Cart from "./pages/Cart"
 import ProtectedRoute from "./components/ProtectedRoute"
@@ -43,14 +43,14 @@ function App() {
   const [message, setMessage] = useState("")
   const authSelector = useSelector((state) => state.auth)
 
-  // useEffect(() => {
-  //   ;(async () => {
-  //     const { data } = await axios.get(
-  //       `${process.env.REACT_APP_API_BASE_URL}/greetings`
-  //     )
-  //     setMessage(data?.message || "")
-  //   })()
-  // }, [])
+  useEffect(() => {
+    ; (async () => {
+      const { data } = await axios.get(
+        `${process.env.REACT_APP_API_BASE_URL}/api/greetings`
+      )
+      setMessage(data?.message || "")
+    })()
+  }, [])
 
   const [authCheck, setAuthCheck] = useState(false)
 
@@ -122,6 +122,7 @@ function App() {
       location.pathname === "/cart/shipment" ||
       authSelector.RoleId === 3 ||
       authSelector.RoleId === 2 ? null : (
+
         <Box>
           <Navbar />
         </Box>
@@ -301,6 +302,7 @@ function App() {
       location.pathname === "/cart/shipment" ||
       authSelector.RoleId === 3 ||
       authSelector.RoleId === 2 ? null : (
+
         <Box>
           <Footer />
         </Box>

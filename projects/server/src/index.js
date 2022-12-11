@@ -15,9 +15,11 @@ const userDataRoute = require("../routes/userDataRoute")
 const adminRoute = require("../routes/adminRoute")
 const addressRoute = require("../routes/addressRoute")
 const stockRoute = require("../routes/stockRoute")
-const productRoute = require("../routes/productRoute.js")
-const adminProductRoute = require("../routes/adminProductRoute.js")
-const shipmentRoute = require("../routes/shipmentRoute.js")
+const productRoute = require("../routes/productRoute.js");
+const adminProductRoute = require("../routes/adminProductRoute.js");
+const shipmentRoute = require("../routes/shipmentRoute.js");
+const cartsRoute = require("../routes/cartsRoute")
+const categoryRoute = require("../routes/categoryRoute")
 const addressCheckoutRoute = require("../routes/addressCheckoutRoute")
 
 const PORT = process.env.PORT || 8000
@@ -42,6 +44,8 @@ app.use("/admin", adminRoute)
 
 app.use("/userData", userDataRoute)
 app.use("/product", productRoute)
+app.use("/categories", categoryRoute)
+app.use("/carts", cartsRoute)
 
 app.use("/auth", authRoute)
 app.use("/shipment", shipmentRoute)
