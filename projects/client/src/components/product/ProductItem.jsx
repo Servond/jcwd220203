@@ -53,8 +53,6 @@ const ProductItem = ({ product_name, id }) => {
                     borderRadius="12px"
                     boxShadow="1px 1px 6px 1px #e0e0e0"
                     cursor="pointer"
-                    // px="8px"
-                    // pb="16px"
                 >
                     {/* Image */}
                     <Image

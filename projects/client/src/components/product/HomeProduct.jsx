@@ -1,15 +1,4 @@
-import {
-    Box,
-    Center,
-    Text,
-    Grid,
-    GridItem,
-    Heading,
-    Flex,
-    HStack,
-    Spacer,
-    Button,
-} from "@chakra-ui/react"
+import { Box, Text, Grid, GridItem, HStack } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { axiosInstance } from "../../api"
@@ -52,11 +41,7 @@ const HomeProduct = () => {
                 <ProductItem
                     key={val.id.toString()}
                     product_name={val.product_name}
-                    // description={val.description}
                     price={val.price}
-                    // category_name={val.category_name}
-                    // stock={val.stock}
-                    // image_url={val.image_url}
                     id={val.id}
                 />
             )
@@ -131,16 +116,8 @@ const HomeProduct = () => {
             </Box>
 
             {/* Product Recommendation */}
-            <Box
-                m="24px 0"
-                // border="1px solid red"
-                display="block"
-                mx="auto"
-                w="1100px"
-                h="400px"
-            >
+            <Box m="24px 0" display="block" mx="auto" w="1100px" h="400px">
                 <Box
-                    // border="1px solid blue"
                     display="flex"
                     fontSize="20px"
                     fontWeight="800px"

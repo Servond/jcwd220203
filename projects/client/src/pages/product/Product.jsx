@@ -169,7 +169,6 @@ const Product = () => {
                 onKeyDown={handleKeyEnter}
             />
             <Box
-                // border="1px solid red"
                 mx="auto"
                 mt="90px"
                 w="1100px"
@@ -179,7 +178,6 @@ const Product = () => {
             >
                 {/* Filter and Search */}
                 <Box
-                    // border="1px solid blue"
                     marginBlockEnd="16px"
                     marginBlockStart="18px"
                     display="flex"
@@ -202,12 +200,7 @@ const Product = () => {
                 </Box>
 
                 {/* Content */}
-                <Box
-                    // border="1px solid brown"
-                    display="flex"
-                    gap="4px"
-                    // borderBottom="1px solid #dfe1e3"
-                >
+                <Box display="flex" gap="4px">
                     {/* Fitler */}
                     <Box
                         border="1px solid #dfe1e3"
@@ -215,7 +208,7 @@ const Product = () => {
                         boxShadow="1px 1px 6px 1px #e0e0e0"
                         display="block"
                         w="auto"
-                        h="800px"
+                        h="50%"
                         p="12px"
                     >
                         <Flex borderBottom="1px solid #dfe1e3">
@@ -236,7 +229,7 @@ const Product = () => {
                             </Button>
                         </Flex>
 
-                        <Box mt="20px" display="grid" h="auto">
+                        <Box mt="20px" display="grid" h="auto" w="160px">
                             <Text fontWeight="bold" fontSize="14px" mb="10px">
                                 Categories
                             </Text>
@@ -297,7 +290,6 @@ const Product = () => {
 
                     {/* Product */}
                     <Box
-                        // border="1px solid green"
                         borderRadius="12px"
                         w="912px"
                         h="1000px"
@@ -313,12 +305,9 @@ const Product = () => {
                         ) : null}
                         <GridItem>
                             <Grid
-                                // border="1px solid green"
                                 p="16px 0"
                                 pl="16px"
-                                // px="8px"
                                 gap="4"
-                                // cursor="pointer"
                                 templateColumns="repeat(5,1fr)"
                             >
                                 {renderProduct()}
