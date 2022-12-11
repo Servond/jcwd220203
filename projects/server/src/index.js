@@ -8,10 +8,10 @@ const { verifyToken } = require("../middlewares/authMiddleware")
 const fs = require("fs")
 
 // Import Routes
-const profileRoute = require("../routes/profileRoute")
 const authRoute = require("../routes/authRoute")
 const warehouseRoute = require("../routes/warehouseRoute.js")
 const adminRoute = require("../routes/adminRoute")
+const userProfileRoute = require("../routes/userProfileRoute")
 
 const PORT = process.env.PORT || 8000
 const app = express()
@@ -37,7 +37,7 @@ app.use("/warehouse", warehouseRoute)
 
 app.use("/auth", authRoute)
 
-app.use("/profile", verifyToken, profileRoute)
+app.use("/user-profile", verifyToken, userProfileRoute)
 
 app.use("/public", express.static("public"))
 
@@ -79,9 +79,9 @@ const clientPath = "../../client/build"
 app.use(express.static(join(__dirname, clientPath)))
 
 // Serve the HTML page
-app.get("*", (req, res) => {
-    res.sendFile(join(__dirname, clientPath, "index.html"))
-})
+// app.get("*", (req, res) => {
+//     res.sendFile(join(__dirname, clientPath, "index.html"))
+// })
 
 //#endregion
 
