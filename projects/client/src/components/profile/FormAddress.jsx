@@ -180,7 +180,7 @@ const FormAddress = ({
 
             <Box mt="12px">
               <Grid templateColumns={"repeat(2, 1fr)"} gap="4">
-                <Box>
+                {/* <Box>
                   <FormLabel mb="8px">Province</FormLabel>
                   <FormControl isInvalid={formik.errors.province}>
                     <Select
@@ -205,7 +205,7 @@ const FormAddress = ({
                     </Select>
                     <FormErrorMessage>{formik.errors.city}</FormErrorMessage>
                   </FormControl>
-                </Box>
+                </Box> */}
               </Grid>
             </Box>
 
@@ -269,9 +269,9 @@ const FormAddress = ({
                   !formik.values.phone_number ||
                   !formik.values.address_labels ||
                   !formik.values.full_address ||
-                  !formik.values.districts ||
-                  selectedCity === 0 ||
-                  selectedProvince === 0
+                  !formik.values.districts
+                  // selectedCity === 0 ||
+                  // selectedProvince === 0
                 }
               >
                 Save
