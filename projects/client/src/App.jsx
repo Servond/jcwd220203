@@ -38,10 +38,7 @@ import UpdateStock from "./pages/admin/UpdateStock"
 import WarehouseStock from "./components/admin/WarehouseStock"
 import ChangeAddress from "./components/order/ChangeAddress"
 import Checkout from "./pages/order/Checkout"
-<<<<<<< Updated upstream
-=======
 import ShippingComponent from "./components/product/ShippingComponent"
->>>>>>> Stashed changes
 
 function App() {
     const [message, setMessage] = useState("")
@@ -236,17 +233,6 @@ function App() {
                     }
                 />
 
-<<<<<<< Updated upstream
-=======
-        <Route
-          path="/admin/warehouse-management"
-          element={
-            <AdminRoute>
-              <WarehouseManagement />
-            </AdminRoute>
-          }
-        />
->>>>>>> Stashed changes
                 {/* Profiling Route */}
                 <Route
                     path="/user/profile"
@@ -281,8 +267,6 @@ function App() {
                     }
                 />
                 <Route
-<<<<<<< Updated upstream
-=======
                     path="/shipment-component"
                     element={
                         <ProtectedRoute>
@@ -291,7 +275,6 @@ function App() {
                     }
                 />
                 <Route
->>>>>>> Stashed changes
                     path="/cart/shipment"
                     element={
                         <ProtectedRoute>
