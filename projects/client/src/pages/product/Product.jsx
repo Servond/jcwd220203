@@ -319,17 +319,17 @@ const Product = () => {
                                         onClick={prevPageBtnHandler}
                                         color="#0095DA"
                                         cursor="pointer"
-                                        size={20}
+                                        size={30}
                                     />
                                 )}
-
+                                <Text>{page}</Text>
                                 {page >= maxPage ? null : (
                                     <CgChevronRight
                                         bgColor="#0095DA"
                                         color="#0095DA"
                                         onClick={nextPageBtnHandler}
                                         cursor="pointer"
-                                        size={20}
+                                        size={30}
                                     />
                                 )}
                             </HStack>
