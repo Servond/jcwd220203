@@ -37,6 +37,7 @@ import * as Yup from "yup";
 import { Link } from "react-router-dom";
 import { CgChevronLeft, CgChevronRight } from "react-icons/cg";
 import { TbCameraPlus } from "react-icons/tb";
+import upload from "../../assets/upload.png"
 
 const AdminProductData = () => {
   const [data, setData] = useState({});
@@ -55,6 +56,7 @@ const AdminProductData = () => {
   const inputFileRef = useRef();
 
   const [category, setCategory] = useState({});
+
 
   const fetchProductData = async () => {
     try {
@@ -413,7 +415,7 @@ const AdminProductData = () => {
                     src={
                       selectedImage
                         ? selectedImage
-                        : "Input Your Profile Picture"
+                        : upload
                     }
                   />
                   <Button
