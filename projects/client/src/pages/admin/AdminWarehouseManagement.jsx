@@ -27,8 +27,8 @@ import * as Yup from "yup";
 import { useCallback } from "react";
 import React, { useEffect, useState } from "react";
 import { CgChevronLeft, CgChevronRight } from "react-icons/cg";
-import WarehouseAddress from "./WarehouseAddress";
-import WarehouseAddressEdit from "./WarehouseAddressEdit";
+import WarehouseAddress from "../../components/admin/WarehouseAddress";
+import WarehouseAddressEdit from "../../components/admin/WarehouseAddressEdit";
 
 const WarehouseManagement = () => {
   const [data, setData] = useState([]);
@@ -45,8 +45,10 @@ const WarehouseManagement = () => {
   const [keywordHandler, setKeywordHandler] = useState("");
   const maxItemsPage = 5;
 
-  const [selectedProvince, setSelectedProvince] = useState(0);
-  const [selectedCity, setSelectedCity] = useState(0);
+  const [selectedAddProvince, setSelectedAddProvince] = useState(0);
+  const [selectedAddCity, setSelectedAddCity] = useState(0);
+  const [selectedEditProvince, setSelectedEditProvince] = useState(0);
+  const [selectedEditCity, setSelectedEditCity] = useState(0);
 
   const {
     isOpen: isOpenEditWarehouseAddress,
@@ -125,12 +127,12 @@ const WarehouseManagement = () => {
         let addWarehouse = {
           warehouse_name: values.warehouse_name,
           address_labels: values.address_labels,
-          province: selectedProvince,
-          city: selectedCity,
+          province: selectedAddProvince,
+          city: selectedAddCity,
           districts: values.districts,
           full_address: values.full_address,
         };
-
+      
         const response = await axiosInstance.post(`/warehouse`, addWarehouse);
         // console.log(response)
 
@@ -188,8 +190,8 @@ const WarehouseManagement = () => {
         let editedWarehouse = {
           warehouse_name: values.warehouse_name,
           address_labels: values.address_labels,
-          province: selectedProvince,
-          city: selectedCity,
+          province: selectedEditProvince,
+          city: selectedEditCity,
           districts: values.districts,
           full_address: values.full_address,
         };
@@ -266,21 +268,22 @@ const WarehouseManagement = () => {
 
   return (
     <Box marginBottom={"50px"} ml="275px" mt="65px">
-      <Text fontSize={"30px"} fontWeight="bold">
+      <Text fontSize={"30px"} fontWeight="bold" color="#0095DA">
         Warehouse Data
       </Text>
-      <FormControl>
-        <Input
-          name="input"
-          value={keywordHandler}
-          onChange={(event) => setKeywordHandler(event.target.value)}
-        />
+      <HStack mt="5px">
+          <FormControl>
+            <Input
+              name="input"
+              value={keywordHandler}
+              onChange={(event) => setKeywordHandler(event.target.value)}
+            />
+          </FormControl>
 
-        <Button onClick={searchKey} mr={0}>
-          Search
-        </Button>
-      </FormControl>
-      <Text></Text>
+          <Button onClick={searchKey} mr={0} bgColor="#F7931E" color="white">
+            Search
+          </Button>
+        </HStack>
       <Table>
         <Thead>
           <Tr>
@@ -349,8 +352,8 @@ const WarehouseManagement = () => {
         formChangeHandler={formChangeHandler}
         formik={addFormik}
         header={"Add Form"}
-        selectProvince={setSelectedProvince}
-        selectCity={setSelectedCity}
+        selectProvince={setSelectedAddProvince}
+        selectCity={setSelectedAddCity}
       />
 
       {/* Modal untuk Editing data */}
@@ -361,8 +364,8 @@ const WarehouseManagement = () => {
         formChangeHandler={editFormChangeHandler}
         formik={editFormik}
         header={"Change Form"}
-        selectProvince={setSelectedProvince}
-        selectCity={setSelectedCity}
+        selectProvince={setSelectedEditProvince}
+        selectCity={setSelectedEditCity}
       />
     </Box>
   );

@@ -74,7 +74,6 @@ const Product = () => {
                 },
             })
             setCatTotalCount(response.data.dataCount)
-
             if (catPage === 1) {
                 setCategory(response.data.data)
             } else {
@@ -114,7 +113,6 @@ const Product = () => {
         const { value } = target
         setFilter(value)
     }
-
     const nextPageBtnHandler = () => {
         setPage(page + 1)
     }
@@ -125,7 +123,6 @@ const Product = () => {
 
     const searchBtnHandler = () => {
         setSearchValue(searchProduct)
-
         const params = {}
         params["name"] = searchProduct
         setSearchParam(params)
@@ -168,14 +165,7 @@ const Product = () => {
                 onChange={(e) => setSearchProduct(e.target.value)}
                 onKeyDown={handleKeyEnter}
             />
-            <Box
-                mx="auto"
-                mt="90px"
-                w="1100px"
-                h="1600px"
-                display="block"
-                // borderBottom="1px solid #dfe1e3"
-            >
+            <Box mx="auto" mt="90px" w="1100px" h="1600px" display="block">
                 {/* Filter and Search */}
                 <Box
                     marginBlockEnd="16px"

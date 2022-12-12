@@ -23,9 +23,9 @@ import React, { useEffect } from "react"
 import { useState } from "react"
 import { axiosInstance } from "../../api"
 import * as Yup from "yup"
-import AddNewAdmin from "./AddNewAdmin"
-import Alert from "../profile/Alert"
-import EditAdmin from "./EditAdmin"
+import AddNewAdmin from "../../components/admin/AddNewAdmin"
+import Alert from "../../components/profile/Alert"
+import EditAdmin from "../../components/admin/EditAdmin"
 import { TbSearch } from "react-icons/tb"
 import { IoIosAlert } from "react-icons/io"
 
@@ -88,6 +88,8 @@ const ManageAdminData = () => {
     }
   }
 
+  const apiImg = process.env.REACT_APP_IMAGE_URL
+
   const renderUser = () => {
     return userData.map((val) => {
       return (
@@ -97,7 +99,7 @@ const ManageAdminData = () => {
               size={"lg"}
               borderRadius={"0"}
               name={val.username}
-              src={val.profile_picture}
+              src={`${apiImg}/${val.profile_picture}`}
             />
           </Td>
           <Td p="5px">{val.username}</Td>

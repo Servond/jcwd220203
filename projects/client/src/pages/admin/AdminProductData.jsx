@@ -1,15 +1,12 @@
 import {
   Box,
   Button,
-  Container,
   FormControl,
   FormLabel,
   HStack,
-  Img,
   Input,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -29,56 +26,74 @@ import {
   Alert,
   AlertIcon,
   AlertTitle,
+  Image,
+  Avatar,
+  Select,
 } from "@chakra-ui/react";
 import { axiosInstance } from "../../api/index";
-import { useEffect, useState } from "react";
-import { useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router-dom";
-import { CgChevronLeft, CgChevronRight } from "react-icons/cg"
+import { CgChevronLeft, CgChevronRight } from "react-icons/cg";
+import { TbCameraPlus } from "react-icons/tb";
 
-
-const ProductData = () => {
+const AdminProductData = () => {
   const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const [openedEdit, setOpenedEdit] = useState(null);
-  const [images, setImages] = useState({});
+  const [rows, setRows] = useState(0);
+  const [admin, setAdmin] = useState([]);
+  const [pages, setPages] = useState(0);
+  const [maxPage, setMaxPage] = useState(0);
+  const [keyword, setKeyword] = useState("");
+  const [keywordHandler, setKeywordHandler] = useState("");
+  const maxItemsPage = 5;
 
-  const [rows, setRows] = useState(0)
-  const [admin, setAdmin] = useState([])
-  const [pages, setPages] = useState(0)
-  const [maxPage, setMaxPage] = useState(0)
-  const [page, setPage] = useState(1)
-  const [keyword, setKeyword] = useState("")
-  const [keywordHandler, setKeywordHandler] = useState("")
-  const maxItemsPage = 5
+  const [selectedImage, setSelectedImage] = useState(null);
+  const inputFileRef = useRef();
+
+  const [category, setCategory] = useState({});
 
   const fetchProductData = async () => {
     try {
-      const productData = await axiosInstance.get("/product", {
+      const productData = await axiosInstance.get("/admin/product", {
         params: {
           _keywordHandler: keyword,
           _page: pages,
           _limit: maxItemsPage,
-  
         },
-      });;
+      });
       setData(productData.data.data);
       setAdmin(productData.data.data);
+      console.log(productData.data.data);
+      // console.warn(productData.data.data.Image_Urls);
+      // console.warn(data.Image_Urls);
       setRows(productData.data.totalRows - maxItemsPage);
       setMaxPage(Math.ceil(productData.data.totalRows / maxItemsPage));
-      console.warn(pages)
+
+      const categoryRes = await axiosInstance.get("/admin/product/category");
+      setCategory(categoryRes.data.data);
+      console.log(category);
+
       setIsLoading(true);
     } catch (error) {
       console.log(error);
     }
   };
 
+  const renderCategory = () => {
+    console.log(isLoading);
+    console.warn(category);
+    return Array.from(category).map((val) => {
+      return (
+        <option value={val.id} key={val.id.toString()}>
+          {val.category_name}
+        </option>
+      );
+    });
+  };
   const nextPage = () => {
     setPages(pages + 1);
   };
@@ -92,53 +107,48 @@ const ProductData = () => {
     setKeyword(keywordHandler);
   };
 
-  // const fetchImages = async (id) => {
-  //   try {
-  //     const productDataImage = await axiosInstance.get(
-  //       `/product/detail/images/${id}`
-  //     );
-  //     setImages(productDataImage.data.data);
-  //     console.log(images);
-  //     console.warn("test");
-  //     setIsLoading(true);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  const deleteBtnHandler = async (id) => {
+  const deleteBtnHandler = async (val) => {
     try {
-      await axiosInstance.delete(`/product/${id}`);
+      await axiosInstance.delete(`/admin/product/detail/${val.id}`);
       toast({ title: "Successfully deleted product", status: "success" });
       fetchProductData();
     } catch (error) {
       console.log(error);
     }
   };
-
+  // console.log(data.Image_Urls[0]);
   const renderProductData = () => {
     return data.map((val) => {
       return (
         <Tr key={val.id.toString()}>
           <Td>{val.id.toString()}</Td>
+          <Td>
+            <Image
+              width="100px"
+              height="100px"
+              src={val?.Image_Urls[0]?.image_url}
+            />
+          </Td>
           <Td>{val.product_name || "null"}</Td>
           <Td>{val.description || "null"}</Td>
           <Td>
-            {val.price.toLocaleString("in-ID", {
-              style: "currency",
-              currency: "IDR",
-            }) || "null"}
+            {val.price
+              ? val.price.toLocaleString("in-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                })
+              : "null"}
           </Td>
+          <Td>{val?.Category?.category_name}</Td>
           <Td>
             <Box>
               <Box mb={"2"}>
-                <Link to={`/product/detail/${val.id}`}>
+                <Link to={`/admin/product/detail/${val.id}`}>
                   <Button
                     width={"100px"}
                     bgColor={"#0095DA"}
                     _hover={false}
                     color="white"
-                    onClick={() => {}}
                   >
                     Edit
                   </Button>
@@ -170,25 +180,54 @@ const ProductData = () => {
 
   const formikAddProduct = useFormik({
     initialValues: {
+      image_url:{},
       product_name: "",
       description: "",
       price: "",
+      CategoryId: "",
     },
-    onSubmit: async ({ product_name, description, price }) => {
+    onSubmit: async ({
+      image_url,
+      product_name,
+      description,
+      price,
+      CategoryId,
+    }) => {
       try {
-        const response = await axiosInstance.post("/product/", {
-          product_name,
-          description,
-          price,
-        });
+        const data = new FormData();
+
+        if (image_url) {
+          console.log(image_url)
+          data.append("image_url", image_url);
+        }
+        if (product_name) {
+          data.append("product_name", product_name);
+        }
+        if (description) {
+          data.append("description", description);
+          console.log(description)
+        }
+        if (price) {
+          data.append("price", price);
+        }
+        if (CategoryId) {
+          data.append("CategoryId", CategoryId);
+        }
+        console.warn(data.image_url)
+        const response = await axiosInstance.post("/admin/product/", 
+          data
+        );
+
         toast({
           title: "Registration Success",
           description: response.data.message,
           status: "success",
         });
+        formikAddProduct.setFieldValue("image_url", "");
         formikAddProduct.setFieldValue("product_name", "");
         formikAddProduct.setFieldValue("description", "");
         formikAddProduct.setFieldValue("price", "");
+        formikAddProduct.setFieldValue("CategoryId", "");
         fetchProductData();
       } catch (error) {
         console.log(error.response);
@@ -203,6 +242,7 @@ const ProductData = () => {
       product_name: Yup.string().required().min(3),
       description: Yup.string().required().min(3),
       price: Yup.number().required().min(3),
+      CategoryId: Yup.number().required(),
     }),
     validateOnChange: false,
   });
@@ -252,32 +292,22 @@ const ProductData = () => {
     validateOnChange: false,
   });
 
-  const editFormChangeHandler = ({ target }) => {
-    const { name, value } = target;
-    editFormik.setFieldValue(name, value);
+  const onCloseModal = () => {
+    formikAddProduct.handleSubmit();
+    onCloseAddNewProduct();
   };
-
-  //Carousel
-  const settings = {
-    dots: true,
-    autoplay: true,
-    infinite: true,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-  };
-
   useEffect(() => {
     fetchProductData();
-  }, [openedEdit, images, pages, setPages, keyword]);
+    // fetchCategory();
+  }, [openedEdit, pages, setPages, keyword]);
 
   useEffect(() => {
-    // console.log(openedEdit.id)
     if (openedEdit) {
-      // fetchImages(openedEdit.id);
       console.log(openedEdit.id);
       editFormik.setFieldValue("product_name", openedEdit.product_name);
       editFormik.setFieldValue("description", openedEdit.description);
       editFormik.setFieldValue("price", openedEdit.price);
+      editFormik.setFieldValue("CategoryId", openedEdit.CategoryId);
     }
   }, [openedEdit]);
 
@@ -285,22 +315,12 @@ const ProductData = () => {
     <>
       <Box marginLeft="250px" marginTop="65px">
         <HStack justifyContent="space-between">
-          <Text fontSize={"2xl"} fontWeight="bold" color={"#F7931E"}>
+          <Text fontSize={"2xl"} fontWeight="bold" color={"#0095DA"}>
             Product Data
           </Text>
-          <FormControl>
-            <Input
-              name="input"
-              value={keywordHandler}
-              onChange={(event) => setKeywordHandler(event.target.value)}
-            />
-
-            <Button onClick={searchKey} mr={0}>
-              Search
-            </Button>
-          </FormControl>
+          <br />
           <Button
-            bgColor={"#0095DA"}
+            bgColor={"#F7931E"}
             color="white"
             _hover={false}
             onClick={onOpenAddNewProduct}
@@ -308,15 +328,29 @@ const ProductData = () => {
             Add New Product
           </Button>
         </HStack>
+        <HStack mt="5px">
+          <FormControl>
+            <Input
+              name="input"
+              value={keywordHandler}
+              onChange={(event) => setKeywordHandler(event.target.value)}
+            />
+          </FormControl>
 
+          <Button onClick={searchKey} mr={0} bgColor="#F7931E" color="white">
+            Search
+          </Button>
+        </HStack>
         <Table>
           <Thead>
             <Tr>
               <Th w="10px">ID</Th>
-              {/* <Th w="100px">Photo Profile</Th> */}
+              <Th w="100px">Photo Profile</Th>
               <Th w="150px">Name</Th>
               <Th w="450px">Description</Th>
               <Th>Price</Th>
+              <Th>Category</Th>
+              <Th>Action</Th>
             </Tr>
           </Thead>
           <Tbody>{isLoading && renderProductData()}</Tbody>
@@ -356,16 +390,73 @@ const ProductData = () => {
         isOpen={isOpenAddNewProduct}
         onClose={onCloseAddNewProduct}
         motionPreset="slideInBottom"
-        size={"md"}
+        size={"4xl"}
       >
         <form onSubmit={formikAddProduct.handleSubmit}>
           <ModalOverlay />
-          <ModalContent bgColor={"#0095DA"} color="white" p="20px">
+          <ModalContent bgColor={"#0095DA"} p="20px">
             <ModalHeader fontSize={"2xl"} fontWeight="bold">
               New Product
             </ModalHeader>
 
             <ModalBody>
+              <HStack>
+                <FormControl isInvalid={formikAddProduct.errors.image_url}>
+                  <Image
+                    w={"150px"}
+                    h="150px"
+                    objectFit={"cover"}
+                    borderRadius={"8px"}
+                    border="3px solid"
+                    color={"#0095DA"}
+                    mx="auto"
+                    src={
+                      selectedImage
+                        ? selectedImage
+                        : "Input Your Profile Picture"
+                    }
+                  />
+                  <Button
+                    borderRadius={"50%"}
+                    w="auto"
+                    h="30px"
+                    border="2px solid"
+                    onClick={() => inputFileRef.current.click()}
+                    color={"#F7931E"}
+                    _hover={false}
+                    ml="58%"
+                    size={"xs"}
+                    mt="-33px"
+                  >
+                    <TbCameraPlus color={"#F7931E"} />
+                  </Button>
+
+                  <Input
+                    w="100%"
+                    _hover={false}
+                    fontWeight="bold"
+                    bgColor={"white"}
+                    onChange={(e) => {
+                      console.log(e.target.files[0].File)
+                      formikAddProduct.setFieldValue(
+                        "image_url",
+                        e.target.files[0]
+                      );
+                      setSelectedImage(URL.createObjectURL(e.target.files[0]));
+                    }}
+                    accept="image/*"
+                    name="image_url"
+                    type="file"
+                    color="transparent"
+                    border="0"
+                    display={"none"}
+                    ref={inputFileRef}
+                  />
+                  <FormErrorMessage>
+                    {formikAddProduct.errors.image_url}
+                  </FormErrorMessage>
+                </FormControl>
+              </HStack>
               <FormLabel>Name</FormLabel>
               <FormControl isInvalid={formikAddProduct.errors.product_name}>
                 <Input
@@ -385,7 +476,6 @@ const ProductData = () => {
                   value={formikAddProduct.values.description}
                   name="description"
                   onChange={formChangeHandler}
-                  //
                 />
                 <FormErrorMessage>
                   {formikAddProduct.errors.description}
@@ -398,111 +488,40 @@ const ProductData = () => {
                   value={formikAddProduct.values.price}
                   name="price"
                   onChange={formChangeHandler}
-                  //
                 />
                 <FormErrorMessage>
                   {formikAddProduct.errors.price}
                 </FormErrorMessage>
               </FormControl>
 
-              {/* <FormLabel mt={"15px"}>Product Picture</FormLabel>
-              <FormControl isInvalid={formikAddNewAdmin.errors.image_url}>
-                  <Input
-                    value={formikAddNewAdmin.values.image_url}
-                    name="image_url"
-                    type="tel"
-                    onChange={formChangeHandler}
-                  />
+              <FormLabel mt={"15px"}>Category</FormLabel>
+              <FormControl isInvalid={formikAddProduct.errors.CategoryId}>
+                <Select
+                  name="CategoryId"
+                  onChange={formChangeHandler}
+                  placeholder="Select category"
+                >
+                  {isLoading && renderCategory()}
+                </Select>
                 <FormErrorMessage>
-                  {formikAddNewAdmin.errors.image_url}
+                  {formikAddProduct.errors.CategoryId}
                 </FormErrorMessage>
-              </FormControl> */}
+              </FormControl>
             </ModalBody>
 
             <ModalFooter>
               <Button colorScheme="red" mr={3} onClick={onCloseAddNewProduct}>
                 Cancel
               </Button>
-              <Button
-                colorScheme="green"
-                mr={3}
-                onClick={formikAddProduct.handleSubmit}
-              >
+              <Button colorScheme="green" mr={3} onClick={onCloseModal}>
                 Add New Product
               </Button>
             </ModalFooter>
           </ModalContent>
         </form>
       </Modal>
-
-      {/* Modal edit */}
-      <Modal isOpen={openedEdit} onClose={() => setOpenedEdit(null)}>
-        <ModalContent bgColor="#0095DA" color="white">
-          <ModalHeader>Editing Product Data</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <HStack>
-              <Box>
-                <div className="carousel">
-                  <Slider {...settings}>
-                    {/* {isLoading && renderImages()} */}
-                  </Slider>
-                  <Text> Images </Text>
-                </div>
-              </Box>
-              <Box>
-                <FormControl isInvalid={editFormik.errors.product_name}>
-                  <FormLabel>Product Name</FormLabel>
-                  <Input
-                    name="product_name"
-                    type={"text"}
-                    onChange={editFormChangeHandler}
-                    value={editFormik.values.product_name}
-                  />
-                </FormControl>
-                <FormControl isInvalid={editFormik.errors.description}>
-                  <FormLabel>Description</FormLabel>
-                  <Input
-                    name="description"
-                    type={"text"}
-                    onChange={editFormChangeHandler}
-                    value={editFormik.values.description}
-                  />
-                </FormControl>
-                <FormControl isInvalid={editFormik.errors.price}>
-                  <FormLabel>Price</FormLabel>
-                  <Input
-                    name="price"
-                    type={"text"}
-                    onChange={editFormChangeHandler}
-                    value={editFormik.values.price}
-                  />
-                </FormControl>
-              </Box>
-            </HStack>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button
-              colorScheme="red"
-              mr={3}
-              onClick={() => setOpenedEdit(null)}
-            >
-              Cancel
-            </Button>
-            <Button
-              colorScheme="green"
-              mr={3}
-              onClick={() => editFormik.handleSubmit()}
-              type="submit"
-            >
-              Edit
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </>
   );
 };
 
-export default ProductData;
+export default AdminProductData;

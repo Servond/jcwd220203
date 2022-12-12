@@ -30,8 +30,8 @@ import FacebookLogin from "react-facebook-login/dist/facebook-login-render-props
 import { useDispatch } from "react-redux"
 import { login } from "../redux/features/authSlice"
 
-const clientId =
-  "551516387346-2skc8ac82egk828q4agk7htffth1iiga.apps.googleusercontent.com"
+const clientId = process.env.REACT_APP_CLIENT_ID
+const appId = process.env.REACT_APP_APP_ID
 
 const Register = () => {
   const location = useLocation()
@@ -93,6 +93,8 @@ const Register = () => {
           username: response.data.data.username,
           phone_number: response.data.data.phone_number,
           profile_picture: response.data.data.profile_picture,
+          is_verify: response.data.data.is_verify,
+          WarehouseId: response?.data.data.WarehouseId,
         })
       )
       navigate("/")
@@ -128,6 +130,8 @@ const Register = () => {
           username: response.data.data.username,
           phone_number: response.data.data.phone_number,
           profile_picture: response.data.data.profile_picture,
+          is_verify: response.data.data.is_verify,
+          WarehouseId: response?.data.data.WarehouseId,
         })
       )
       navigate("/")
@@ -254,7 +258,7 @@ const Register = () => {
               />
 
               <FacebookLogin
-                appId="3125096074449200"
+                appId={appId}
                 autoLoad={false}
                 callback={responseFacebook}
                 fields="name,email,picture"
