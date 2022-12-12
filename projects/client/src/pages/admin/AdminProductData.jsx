@@ -57,7 +57,6 @@ const AdminProductData = () => {
 
   const [category, setCategory] = useState({});
 
-
   const fetchProductData = async () => {
     try {
       const productData = await axiosInstance.get("/admin/product", {
@@ -416,6 +415,7 @@ const AdminProductData = () => {
                       selectedImage
                         ? selectedImage
                         : upload
+
                     }
                   />
                   <Button

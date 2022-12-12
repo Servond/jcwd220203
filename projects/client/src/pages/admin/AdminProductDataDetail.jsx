@@ -44,6 +44,7 @@ const AdminProductDataDetail = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageData, setImageData] = useState({});
 
+
   const {
     isOpen: isOpenAddNewProduct,
     onOpen: onOpenAddNewProduct,
@@ -52,16 +53,13 @@ const AdminProductDataDetail = () => {
 
   const fetchProductData = async () => {
     try {
-      console.log("test1");
       const response = await axiosInstance.get(
         `/admin/product/detail/${params.id}`
       );
 
       setDataDetail(response.data.data);
-      // console.log(response)
-      // console.log(dataDetail.Image_Urls);
-      // console.log("test2");
       setImageData(dataDetail.Image_Urls);
+      console.log(dataDetail);
       // console.log(dataDetail.Image_Urls)
       // console.warn(response.data.data.Image_Urls)
       editDetailFormik.setFieldValue(
@@ -82,13 +80,10 @@ const AdminProductDataDetail = () => {
         response.data.data.Category.CategoryId
       );
 
-      // console.log("test3");
-      // console.log(imageData)
+      setIsLoading(true);
       const categoryRes = await axiosInstance.get("/admin/product/category");
       setCategory(categoryRes.data.data);
-      // console.log(category);
-      // console.log("test4");
-      setIsLoading(true);
+      //console.log(category);
     } catch (err) {
       console.log(err);
     }
@@ -127,6 +122,7 @@ const AdminProductDataDetail = () => {
       toast({ title: "Error deleting product image", status: "error" });
     }
   };
+
   const destroyProduct = async () => {
     try {
       await axiosInstance.delete(`/admin/product/detail/${params.id}`);
@@ -178,7 +174,10 @@ const AdminProductDataDetail = () => {
     initialValues: {
       image_url: "",
     },
-    onSubmit: async ({ image_url }) => {
+
+    onSubmit: async ({
+      image_url,
+    }) => {
       try {
         const data = new FormData();
 
@@ -208,9 +207,6 @@ const AdminProductDataDetail = () => {
     addPictureFormik.handleSubmit();
     onCloseAddNewProduct();
   };
-
-  // console.warn(imageData);
-  // console.warn(isLoading);
 
   useEffect(() => {
     fetchProductData();
@@ -275,6 +271,7 @@ const AdminProductDataDetail = () => {
               Add New Picture
             </Button>
             <br />
+
             <Button
               mt="2"
               mr="8"
