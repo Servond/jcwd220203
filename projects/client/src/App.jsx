@@ -33,7 +33,7 @@ import Cart from "./pages/Cart"
 import ProtectedRoute from "./components/ProtectedRoute"
 import ProductData from "./pages/admin/ProductData"
 import ProductDataDetail from "./pages/admin/ProductDataDetail"
-import AdminTransactionList from "./pages/admin/AdminTransactionList"
+import AdminTransactionHistory from "./pages/admin/AdminTransactionHistory"
 
 function App() {
     const [message, setMessage] = useState("")
@@ -201,10 +201,10 @@ function App() {
                 />
 
                 <Route
-                    path="/admin/transaction-list"
+                    path="/admin/transaction-history"
                     element={
                         <AdminRoute>
-                            <AdminTransactionList />
+                            <AdminTransactionHistory />
                         </AdminRoute>
                     }
                 />

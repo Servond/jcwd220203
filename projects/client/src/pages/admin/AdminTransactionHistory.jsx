@@ -29,7 +29,7 @@ import { axiosInstance } from "../../api"
 import { Carousel } from "react-responsive-carousel"
 import "react-responsive-carousel/lib/styles/carousel.min.css"
 
-const AdminTransactionList = () => {
+const AdminTransactionHistory = () => {
     const [transactionData, setTransactionData] = useState([])
     const [warehouseData, setWarehouseData] = useState([])
     const [imageData, setImageData] = useState([])
@@ -48,19 +48,20 @@ const AdminTransactionList = () => {
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     const maxItemsPerPage = 10
-    const a = process.env.REACT_APP_IMAGE
-    console.log("api", a)
     const fetchData = async () => {
         try {
-            const response = await axiosInstance.get(`/admin/transaction/get`, {
-                params: {
-                    _page: page,
-                    _limit: maxItemsPerPage,
-                    // _sortBy: sortBy,
-                    // _sortDir: sortDir,
-                    WarehouseId: filter,
-                },
-            })
+            const response = await axiosInstance.get(
+                `/admin/transaction-history/get`,
+                {
+                    params: {
+                        _page: page,
+                        _limit: maxItemsPerPage,
+                        // _sortBy: sortBy,
+                        // _sortDir: sortDir,
+                        WarehouseId: filter,
+                    },
+                }
+            )
             setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
             console.log("response", response.data.data)
             if (page === 1) {
@@ -245,14 +246,15 @@ const AdminTransactionList = () => {
                                             </Text>
                                         </Td>
                                         <Td>
-                                            <Text>{val.createdAt}</Text>
+                                            <Text>
+                                                {val.createdAt.split("T")[0]}
+                                            </Text>
                                         </Td>
                                         <Td>
                                             <Text>{val.total_quantity}</Text>
                                         </Td>
                                         <Td>
                                             <Text>
-                                                {" "}
                                                 {new Intl.NumberFormat(
                                                     "id-ID",
                                                     {
@@ -415,4 +417,4 @@ const AdminTransactionList = () => {
     )
 }
 
-export default AdminTransactionList
+export default AdminTransactionHistory

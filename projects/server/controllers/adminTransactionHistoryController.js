@@ -8,15 +8,16 @@ const Product = db.Product
 const Total_Stock = db.Total_Stock
 const User = db.User
 
-const adminTransactionController = {
+const adminTransactionHistoryController = {
     showAllTransaction: async (req, res) => {
         const {
             _sortBy = "id",
             // _sortDir = "ASC",
-            WarehouseId = "",
+            WarehouseId = "id",
             _limit = 10,
             _page = 1,
             TransactionId = "id",
+            id,
         } = req.query
         try {
             if (WarehouseId) {
@@ -38,6 +39,11 @@ const adminTransactionController = {
                                                 include: [
                                                     {
                                                         model: Warehouse,
+                                                        where: {
+                                                            id: {
+                                                                id: WarehouseId,
+                                                            },
+                                                        },
                                                     },
                                                 ],
                                             },
@@ -99,4 +105,4 @@ const adminTransactionController = {
     },
 }
 
-module.exports = adminTransactionController
+module.exports = adminTransactionHistoryController

@@ -16,7 +16,7 @@ const adminRoute = require("../routes/adminRoute")
 const productRoute = require("../routes/productRoute")
 const addressRoute = require("../routes/addressRoute")
 const adminProductRoute = require("../routes/adminProductRoute.js")
-const adminTransactionRoute = require("../routes/adminTransactionRoute")
+const adminTransactionHistoryRoute = require("../routes/adminTransactionHistoryRoute")
 const PORT = process.env.PORT || 8000
 const app = express()
 app.use(
@@ -40,7 +40,7 @@ app.use("/admin", adminRoute)
 app.use("/warehouse", warehouseRoute)
 app.use("/userData", userDataRoute)
 app.use("/product", productRoute)
-app.use("/admin/transaction", adminTransactionRoute)
+app.use("/admin/transaction-history", adminTransactionHistoryRoute)
 app.use("/auth", authRoute)
 
 app.use("/profile", verifyToken, profileRoute)
@@ -52,14 +52,6 @@ app.use(
 
 app.use("/public", express.static("public"))
 app.use("/address", addressRoute)
-
-app.use("/product", productRoute)
-
-app.use("/product", productRoute)
-
-app.use("/product", productRoute)
-
-app.use("/product", productRoute)
 
 app.use("/product", productRoute)
 
