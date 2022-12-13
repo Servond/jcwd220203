@@ -42,12 +42,12 @@ const AdminTransactionHistory = () => {
     const [productId, setProductId] = useState(0)
     const [page, setPage] = useState(1)
     const [maxPage, setMaxPage] = useState(1)
-    const [filter, setFilter] = useState("All")
+    const [filter, setFilter] = useState("")
     // const [sortBy, setSortBy] = useState(0)
     // const [sortDir, setSortDir] = useState("")
     const { isOpen, onOpen, onClose } = useDisclosure()
 
-    const maxItemsPerPage = 10
+    const maxItemsPerPage = 5
     const fetchData = async () => {
         try {
             const response = await axiosInstance.get(
@@ -63,6 +63,7 @@ const AdminTransactionHistory = () => {
                 }
             )
             setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
+            // setTransactionData(response.data.data)
             console.log("response", response.data.data)
             if (page === 1) {
                 setTransactionData(response.data.data)
@@ -73,7 +74,6 @@ const AdminTransactionHistory = () => {
             console.log(err)
         }
     }
-
     const fetchWarehouse = async () => {
         try {
             const response = await axiosInstance.get("/warehouse")
@@ -163,7 +163,7 @@ const AdminTransactionHistory = () => {
                             <HStack gap="2">
                                 <Text alignSelf="center">Filter: </Text>
                                 <Select onChange={filterBtnHandler}>
-                                    <option value="All">---Select---</option>
+                                    <option value="">---Select---</option>
                                     {warehouseData.map((val) => (
                                         <option value={val.id}>
                                             {val.warehouse_name}
@@ -221,19 +221,22 @@ const AdminTransactionHistory = () => {
                                                 variant="link"
                                                 onClick={() => {
                                                     setProductId(
-                                                        val.Transaction_Items.map(
-                                                            (val) =>
-                                                                val.ProductId
-                                                        )
+                                                        // val.Transaction_Items.map(
+                                                        //     (val) =>
+                                                        val.ProductId
                                                     )
+                                                    // )
                                                     onOpen()
                                                 }}
                                             >
                                                 <Text color="#0095DA">
                                                     #
-                                                    {val.Transaction_Items.map(
-                                                        (val) => val.id
-                                                    )}
+                                                    {
+                                                        // val.Transaction_Items.map(
+                                                        //     (val) => val.id
+                                                        // )
+                                                        val.TransactionId
+                                                    }
                                                 </Text>
                                             </Button>
                                         </Td>
@@ -242,7 +245,8 @@ const AdminTransactionHistory = () => {
                                                 overflow="hidden"
                                                 textOverflow="ellipsis"
                                             >
-                                                {val.User.username}
+                                                {/* {val.User.username} */}
+                                                {val.username}
                                             </Text>
                                         </Td>
                                         <Td>
@@ -271,14 +275,14 @@ const AdminTransactionHistory = () => {
 
                                         <Td>
                                             <Text>
-                                                {val.Transaction_Items.map(
+                                                {/* {val.Transaction_Items.map((val) =>
+                                                val.Product.Total_Stocks.map(
                                                     (val) =>
-                                                        val.Product.Total_Stocks.map(
-                                                            (val) =>
-                                                                val.Warehouse
-                                                                    .warehouse_name
-                                                        )
-                                                )}
+                                                        val.Warehouse
+                                                            .warehouse_name
+                                                )
+                                            )} */}
+                                                {val.warehouse_name}
                                             </Text>
                                         </Td>
                                     </Tr>

@@ -3,6 +3,6 @@ const express = require("express")
 
 const router = express.Router()
 
-router.get("/get", adminTransactionHistoryController.showAllTransaction)
+router.get("/get", adminTransactionHistoryController.test)
 
 module.exports = router
