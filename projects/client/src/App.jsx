@@ -40,6 +40,7 @@ import ChangeAddress from "./components/order/ChangeAddress"
 import Checkout from "./pages/order/Checkout"
 import ShippingComponent from "./components/product/ShippingComponent"
 import ShippingComponent2 from "./components/product/ShippingComponent2"
+import AdminStockChangesReport from "./pages/admin/AdminStockChangesReport"
 
 function App() {
     const [message, setMessage] = useState("")
@@ -296,6 +297,14 @@ function App() {
                     element={
                         <AdminRoute>
                             <AdminProductDataDetail />
+                        </AdminRoute>
+                    }
+                />
+                <Route
+                    path="/admin/report/stock"
+                    element={
+                        <AdminRoute>
+                            <AdminStockChangesReport />
                         </AdminRoute>
                     }
                 />
