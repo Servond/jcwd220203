@@ -72,8 +72,8 @@ const SideNavBar = () => {
                         </a>
                     </li>
                     <li>
-                        <a href="/admin/transaction-history">
-                            <Text>Transaction History</Text>
+                        <a href="/admin/order-history">
+                            <Text>Order History</Text>
                         </a>
                     </li>
                     <li>

@@ -28,9 +28,11 @@ import { CgChevronLeft, CgChevronRight } from "react-icons/cg"
 import { axiosInstance } from "../../api"
 import { Carousel } from "react-responsive-carousel"
 import "react-responsive-carousel/lib/styles/carousel.min.css"
+import { useSelector } from "react-redux"
 
 const AdminTransactionHistory = () => {
     const [transactionData, setTransactionData] = useState([])
+    const [dataById, setDataById] = useState([])
     const [warehouseData, setWarehouseData] = useState([])
     const [imageData, setImageData] = useState([])
     const [productData, setProductData] = useState({
@@ -43,28 +45,31 @@ const AdminTransactionHistory = () => {
     const [page, setPage] = useState(1)
     const [maxPage, setMaxPage] = useState(1)
     const [filter, setFilter] = useState("")
-    // const [sortBy, setSortBy] = useState(0)
-    // const [sortDir, setSortDir] = useState("")
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const authSelector = useSelector((state) => state.auth)
 
-    const maxItemsPerPage = 5
+    const maxItemsPerPage = 7
     const fetchData = async () => {
         try {
-            const response = await axiosInstance.get(
-                `/admin/transaction-history/get`,
-                {
-                    params: {
-                        _page: page,
-                        _limit: maxItemsPerPage,
-                        // _sortBy: sortBy,
-                        // _sortDir: sortDir,
-                        WarehouseId: filter,
-                    },
-                }
-            )
+            let url = `/admin/transaction-history/get`
+
+            console.log("CCCCCC", authSelector)
+            if (authSelector.WarehouseId) {
+                await axiosInstance.get(
+                    (url += `?WarehouseId=${authSelector.WarehouseId}`)
+                )
+            }
+            console.log("URLLL", url)
+            const response = await axiosInstance.get(url, {
+                params: {
+                    _page: page,
+                    _limit: maxItemsPerPage,
+                    WarehouseId: filter,
+                },
+            })
+            console.log(`AAAAAAAAAAAAA`, authSelector.WarehouseId)
             setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
-            // setTransactionData(response.data.data)
-            console.log("response", response.data.data)
+            console.log("response", response.data)
             if (page === 1) {
                 setTransactionData(response.data.data)
             } else {
@@ -74,6 +79,7 @@ const AdminTransactionHistory = () => {
             console.log(err)
         }
     }
+
     const fetchWarehouse = async () => {
         try {
             const response = await axiosInstance.get("/warehouse")
@@ -93,6 +99,31 @@ const AdminTransactionHistory = () => {
         }
     }
 
+    const fetchById = async () => {
+        try {
+            const response = await axiosInstance.get(
+                `/admin/transaction-history/getId`,
+                {
+                    params: {
+                        _page: page,
+                        _limit: maxItemsPerPage,
+                        WarehouseId: filter,
+                    },
+                }
+            )
+            setDataById(response.data.data)
+            setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
+            console.log("response", response.data)
+            if (page === 1) {
+                setDataById(response.data.data)
+            } else {
+                setDataById(response.data.data)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     const filterBtnHandler = ({ target }) => {
         const { value } = target
         setFilter(value)
@@ -107,11 +138,16 @@ const AdminTransactionHistory = () => {
         setPage(page - 1)
     }
 
+    console.log("maxp", maxPage)
+    console.log("auth", authSelector.WarehouseId)
+    console.log("wr", dataById)
+
     useEffect(() => {
         fetchData()
         fetchWarehouse()
         fetchProduct()
-    }, [page, filter, productId])
+        fetchById()
+    }, [page, filter, productId, authSelector])
     return (
         <>
             <Box ml="250px" mr="1.5em">
@@ -303,7 +339,7 @@ const AdminTransactionHistory = () => {
                             />
                         )}
                         <Text color="#0095DA">{page}</Text>
-                        {page >= maxPage ? null : (
+                        {page > maxPage ? null : (
                             <CgChevronRight
                                 bgColor="#0095DA"
                                 color="#0095DA"

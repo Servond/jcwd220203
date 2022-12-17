@@ -77,7 +77,8 @@ const LoginPage = () => {
                         username: response.data.data.username,
                         phone_number: response.data.data.phone_number,
                         profile_picture: response.data.data.profile_picture,
-                        is_verify: response.data.data.is_verify
+                        is_verify: response.data.data.is_verify,
+                        WarehouseId: response.data.data.WarehouseId,
                     })
                 )
                 formik.setFieldValue("email", "")
@@ -129,7 +130,7 @@ const LoginPage = () => {
                     username: response.data.data.username,
                     phone_number: response.data.data.phone_number,
                     profile_picture: response.data.data.profile_picture,
-                    is_verify: response.data.data.is_verify
+                    is_verify: response.data.data.is_verify,
                 })
             )
         } catch (error) {
@@ -164,7 +165,7 @@ const LoginPage = () => {
                     username: response.data.data.username,
                     phone_number: response.data.data.phone_number,
                     profile_picture: response.data.data.profile_picture,
-                    is_verify: response.data.data.is_verify
+                    is_verify: response.data.data.is_verify,
                 })
             )
         } catch (error) {

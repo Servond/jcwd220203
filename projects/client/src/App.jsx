@@ -201,7 +201,7 @@ function App() {
                 />
 
                 <Route
-                    path="/admin/transaction-history"
+                    path="/admin/order-history"
                     element={
                         <AdminRoute>
                             <AdminTransactionHistory />
