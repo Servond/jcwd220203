@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Address.belongsTo(models.User)
+      Address.hasMany(models.Transaction)
     }
   }
   Address.init(
@@ -19,7 +20,9 @@ module.exports = (sequelize, DataTypes) => {
       longitude: DataTypes.STRING,
       phone_number: DataTypes.STRING,
       address_labels: DataTypes.STRING,
+      provinceId: DataTypes.INTEGER,
       province: DataTypes.STRING,
+      cityId: DataTypes.INTEGER,
       city: DataTypes.STRING,
       districts: DataTypes.STRING,
       full_address: DataTypes.STRING,

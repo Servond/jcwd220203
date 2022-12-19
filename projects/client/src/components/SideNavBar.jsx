@@ -31,65 +31,82 @@ const SideNavBar = () => {
                 <div className="profile">
                     <img src={Logo} alt="profile_picture" />
                     <h3>Hello, {authSelector.username}!</h3>
-                    <p>Admin : {authSelector.RoleId}</p>
+                    <p>
+                        {authSelector.RoleId === 3
+                            ? "Super Admin"
+                            : "Warehouse Admin"}
+                    </p>
                 </div>
 
                 {/* Dashboard */}
                 <ul>
                     <li>
-                        <Link to="/admin-dashboard">
+                        <Link to="/admin/dashboard">
                             <Text>Dashboard Homepage</Text>
                         </Link>
                     </li>
                     <li>
-                        <Link to="/warehouse-management">
+                        <Link to="/admin/warehouse-management">
                             <Text>Warehouse Management</Text>
                         </Link>
                     </li>
+                    {authSelector.RoleId === 3 ? (
+                        <>
+                            <li>
+                                <Link to={"/admin/manage-admin-data"}>
+                                    <Text>Manage Admin Data</Text>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/admin/manage-user-data">
+                                    <Text>Manage User Data</Text>
+                                </Link>
+                            </li>
+                        </>
+                    ) : null}
                     <li>
-                        <Link to={"/manage-admin-data"}>
-                            <Text>Manage Admin Data</Text>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/manage-user-data">
-                            <Text>Manage User Data</Text>
-                        </Link>
-                    </li>
-                    <li>
-                        <a href="/product-data">
+                        <Link to="/admin/product">
                             <Text>Manage Product Data</Text>
-                        </a>
+                        </Link>
                     </li>
                     <li>
                         <Link to="/admin/category">
                             <Text>Manage Category</Text>
                         </Link>
                     </li>
+                    {authSelector.RoleId === 3 ? (
+                        <li>
+                            <Link to="/admin/update-stock">
+                                <Text>Update Product Stock</Text>
+                            </Link>
+                        </li>
+                    ) : null}
+                    {authSelector.RoleId === 2 ? (
+                        <li>
+                            <Link to="/admin/update-stock">
+                                <Text>Update Product Stock</Text>
+                            </Link>
+                        </li>
+                    ) : null}
                     <li>
-                        <a href="#empty">
-                            <Text>Update Product Stock</Text>
-                        </a>
+                        <Link to="/admin/order">
+                            <Text>Order</Text>
+                        </Link>
                     </li>
                     <li>
-                        <a href="/admin/order-history">
+                        <Link href="/admin/order-history">
                             <Text>Order History</Text>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="/user-data">
-                            <Text>Change Role Status</Text>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/user-data">
-                            <Text>Change Role Status</Text>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#empty">
+                        <Link to="#empty">
                             <Text>Sales Report</Text>
-                        </a>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/admin/report/stock">
+                            <Text>Stock Report</Text>
+                        </Link>
                     </li>
                     <li>
                         <Button

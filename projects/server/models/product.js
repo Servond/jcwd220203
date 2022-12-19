@@ -12,19 +12,24 @@ module.exports = (sequelize, DataTypes) => {
             Product.hasMany(models.Image_Url)
             Product.hasMany(models.Total_Stock)
             Product.belongsTo(models.Category)
-            Product.hasMany(models.Transaction_Item)
+            Product.hasMany(models.TransactionItem)
         }
     }
+
     Product.init(
         {
             product_name: DataTypes.STRING,
-            description: DataTypes.STRING,
+            description: {
+                type: DataTypes.TEXT("long"),
+                allowNull: true,
+            },
             price: DataTypes.INTEGER,
+            product_weight: DataTypes.INTEGER,
         },
         {
             sequelize,
             modelName: "Product",
         }
     )
-    return Product
 }
+return Product

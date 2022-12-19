@@ -1,13 +1,38 @@
 const axios = require("axios")
+const { Op } = require("sequelize")
 const db = require("../models")
 const Address = db.Address
 
-const RajaOngkirKey = "b846db1d8b8034b8c1d64c373ac4f5c7"
-const OpenCageKey = "6833b88f6e234551a37c6dcb7f4de083"
+const RajaOngkirKey = process.env.RAJAONGKIR_API_KEY
+const OpenCageKey = process.env.OPENCAGE_API_KEY
 
 const addressController = {
   getAddressById: async (req, res) => {
     try {
+      const { recipients_name = "", full_address = "" } = req.query
+
+      if (recipients_name || full_address) {
+        const response = await Address.findAll({
+          where: {
+            UserId: req.user.id,
+            [Op.or]: {
+              recipients_name: {
+                [Op.like]: `%${recipients_name}%`,
+              },
+              full_address: {
+                [Op.like]: `%${full_address}%`,
+              },
+            },
+          },
+          order: [["is_default", "DESC"]],
+        })
+
+        return res.status(200).json({
+          message: "Get User Address by name and full address",
+          data: response,
+        })
+      }
+
       const response = await Address.findAll({
         where: {
           UserId: req.user.id,
@@ -54,11 +79,42 @@ const addressController = {
       const latitude = location.data.results[0].geometry.lat
       const longitude = location.data.results[0].geometry.lng
 
+      const findAddress = await Address.findOne({
+        where: {
+          UserId: req.user.id,
+        },
+      })
+
+      if (!findAddress) {
+        const response = await Address.create({
+          recipients_name,
+          phone_number,
+          address_labels,
+          provinceId: province,
+          province: provinceName,
+          cityId: city,
+          city: cityNameAndType,
+          districts,
+          full_address,
+          UserId: req.user.id,
+          longitude,
+          latitude,
+          is_default: true,
+        })
+
+        return res.status(200).json({
+          message: "New Address",
+          data: response,
+        })
+      }
+
       const response = await Address.create({
         recipients_name,
         phone_number,
         address_labels,
+        provinceId: province,
         province: provinceName,
+        cityId: city,
         city: cityNameAndType,
         districts,
         full_address,
@@ -112,7 +168,9 @@ const addressController = {
           recipients_name,
           phone_number,
           address_labels,
+          provinceId: province,
           province: provinceName,
+          cityId: city,
           city: cityNameAndType,
           districts,
           full_address,

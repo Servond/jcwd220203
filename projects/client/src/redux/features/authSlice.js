@@ -8,7 +8,6 @@ const initialState = {
     profile_picture: "",
     RoleId: 0,
     is_verify: false,
-    WarehouseId: 0,
 }
 
 const authSlice = createSlice({
@@ -23,7 +22,7 @@ const authSlice = createSlice({
             state.profile_picture = action.payload.profile_picture
             state.RoleId = action.payload.RoleId
             state.is_verify = action.payload.is_verify
-            state.WarehouseId = action.payload.WarehouseId
+            state.WarehouseId = action?.payload.WarehouseId
         },
         logout: (state) => {
             state.id = 0

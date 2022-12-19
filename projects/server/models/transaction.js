@@ -10,17 +10,49 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             // define association here
             Transaction.belongsTo(models.User)
-            Transaction.hasMany(models.Transaction_Item)
+            Transaction.belongsTo(models.Order_status)
+            Transaction.belongsTo(models.Payment_status)
+            Transaction.hasMany(models.TransactionItem)
+            Transaction.belongsTo(models.Address)
         }
     }
     Transaction.init(
         {
-            order_status: DataTypes.STRING,
-            payment_date: DataTypes.DATE,
-            payment_proof: DataTypes.STRING,
-            total_quantity: DataTypes.INTEGER,
-            total_price: DataTypes.INTEGER,
-            is_paid: DataTypes.BOOLEAN,
+            transaction_name: {
+                type: DataTypes.STRING,
+            },
+            total_quantity: {
+                type: DataTypes.INTEGER,
+                defaultValue: 0,
+            },
+            payment_date: {
+                type: DataTypes.DATE,
+            },
+            total_quantity: {
+                type: DataTypes.INTEGER,
+            },
+            payment_method: {
+                type: DataTypes.STRING,
+            },
+            payment_proof: {
+                type: DataTypes.STRING,
+            },
+            total_price: {
+                type: DataTypes.INTEGER,
+            },
+            shipping_fee: {
+                type: DataTypes.INTEGER,
+            },
+            payment_expired_date: {
+                type: DataTypes.DATE,
+            },
+            courir_duration: {
+                type: DataTypes.STRING,
+            },
+            is_paid: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+            },
         },
         {
             sequelize,

@@ -27,14 +27,14 @@ import Oshop from "../assets/sales-shop.svg"
 import logo from "../assets/logo.png"
 import { BiShow } from "react-icons/bi"
 import { BiHide } from "react-icons/bi"
+import Warehouse from "../components/admin/Warehouse"
 
-const clientId =
-    "551516387346-2skc8ac82egk828q4agk7htffth1iiga.apps.googleusercontent.com"
+const clientId = process.env.REACT_APP_CLIENT_ID
+const appId = process.env.REACT_APP_APP_ID
 
 const LoginPage = () => {
     const authSelector = useSelector((state) => state.auth)
 
-    console.log(authSelector)
     const [showPassword, setShowPassword] = useState(false)
 
     const dispatch = useDispatch()
@@ -78,7 +78,7 @@ const LoginPage = () => {
                         phone_number: response.data.data.phone_number,
                         profile_picture: response.data.data.profile_picture,
                         is_verify: response.data.data.is_verify,
-                        WarehouseId: response.data.data.WarehouseId,
+                        WarehouseId: response?.data.data.WarehouseId,
                     })
                 )
                 formik.setFieldValue("email", "")
@@ -131,6 +131,7 @@ const LoginPage = () => {
                     phone_number: response.data.data.phone_number,
                     profile_picture: response.data.data.profile_picture,
                     is_verify: response.data.data.is_verify,
+                    WarehouseId: response?.data.data.WarehouseId,
                 })
             )
         } catch (error) {
@@ -166,6 +167,7 @@ const LoginPage = () => {
                     phone_number: response.data.data.phone_number,
                     profile_picture: response.data.data.profile_picture,
                     is_verify: response.data.data.is_verify,
+                    WarehouseId: response?.data.data.WarehouseId,
                 })
             )
         } catch (error) {
@@ -478,7 +480,7 @@ const LoginPage = () => {
 
                                 {/* facebook login */}
                                 <FacebookLogin
-                                    appId="624798946100981"
+                                    appId={appId}
                                     autoLoad={false}
                                     callback={responseFacebook}
                                     fields="name,email,picture"
