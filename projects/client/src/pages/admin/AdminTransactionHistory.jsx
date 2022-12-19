@@ -51,7 +51,7 @@ const AdminTransactionHistory = () => {
     const maxItemsPerPage = 7
     const fetchData = async () => {
         try {
-            let url = `/admin/transaction-history/get`
+            let url = `/admin/order-history/get`
 
             console.log("CCCCCC", authSelector)
             if (authSelector.WarehouseId) {
@@ -160,7 +160,7 @@ const AdminTransactionHistory = () => {
                         Transaction History
                     </Text>
                     <Flex mt="3vh">
-                        <Box
+                        {/* <Box
                             display="flex"
                             border="1px solid #dfe1e3"
                             borderRadius="8px"
@@ -193,7 +193,7 @@ const AdminTransactionHistory = () => {
                             >
                                 <Text fontSize="sm">Canceled</Text>
                             </Button>
-                        </Box>
+                        </Box> */}
                         <Spacer />
                         <Box display="flex" alignSelf="center">
                             <HStack gap="2">
@@ -259,7 +259,7 @@ const AdminTransactionHistory = () => {
                                                     setProductId(
                                                         // val.Transaction_Items.map(
                                                         //     (val) =>
-                                                        val.ProductId
+                                                        val.productId
                                                     )
                                                     // )
                                                     onOpen()

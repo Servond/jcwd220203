@@ -9,7 +9,7 @@ const Product = db.Product
 const Total_Stock = db.Total_Stock
 const User = db.User
 
-const adminTransactionHistoryController = {
+const adminOrderHistoryController = {
     // showAllTransaction: async (req, res) => {
     //     const {
     //         _sortBy = "id",
@@ -102,28 +102,59 @@ const adminTransactionHistoryController = {
     //     }
     // },
 
-    test: async (req, res) => {
+    getOrder: async (req, res) => {
         const { _limit = 10, _page = 1 } = req.query
         const WarehouseId = req.query.WarehouseId[0]
         console.log(req.query)
         try {
-            let query = `SELECT wr.id as warehouse_id,ts.WarehouseId,trx_items.TransactionId,us.username, trx.createdAt, trx.total_quantity, trx.total_price, trx.order_status, wr.warehouse_name, pr.product_name, pr.price, pr.description                      
+            let query = `SELECT wr.id as warehouse_id,ts.WarehouseId,trx_items.TransactionId,us.username, trx.createdAt, trx.total_quantity, trx.total_price, trx.order_status, wr.warehouse_name,pr.id as productId                      
                         FROM transactions as trx
                         JOIN users as us ON us.id = trx.UserId
                         JOIN transaction_items as trx_items ON trx_items.TransactionId = trx.id
                         JOIN products as pr ON pr.id = trx_items.ProductId
                         JOIN total_stocks as ts ON ts.ProductId = pr.id
-                        JOIN warehouses as wr ON wr.id = ts.WarehouseId
-                        `
+                        JOIN warehouses as wr ON wr.id = ts.WarehouseId `
             if (WarehouseId) {
                 query += `WHERE wr.id = ${WarehouseId} `
             }
             query += `ORDER BY trx_items.TransactionId DESC
                     LIMIT ${_limit}
-                    OFFSET ${(_page - 1) * _limit}`
+                    OFFSET ${(_page - 1) * _limit} `
 
             const test = await db.sequelize.query(query)
             const test0 = test[0]
+
+            const transformArr = (orig) => {
+                var newArr = [],
+                    types = {},
+                    i,
+                    j,
+                    cur
+                for (i = 0, j = orig.length; i < j; i++) {
+                    cur = orig[i]
+                    if (!(cur.TransactionId in types)) {
+                        types[cur.TransactionId] = {
+                            TransactionId: cur.TransactionId,
+                            product_names: [],
+                            prices: [],
+                            qtys: [],
+                            descriptions: [],
+                            productIds: [],
+                            usernames: [],
+                        }
+                        newArr.push(types[cur.TransactionId])
+                    }
+                    types[cur.TransactionId].product_names.push(
+                        cur.product_name
+                    )
+                    types[cur.TransactionId].prices.push(cur.price)
+                    types[cur.TransactionId].qtys.push(cur.qty)
+                    types[cur.TransactionId].descriptions.push(cur.description)
+                    types[cur.TransactionId].productIds.push(cur.productId)
+                    types[cur.TransactionId].usernames.push(cur.username)
+                }
+                return newArr
+            }
 
             return res.status(200).json({
                 message: "Filtered",
@@ -140,28 +171,30 @@ const adminTransactionHistoryController = {
     getByWarehouseId: async (req, res) => {
         try {
             const { WarehouseId = "", _limit = 10, _page = 1 } = req.query
-            if (WarehouseId) {
-                const test2 = await db.sequelize
-                    .query(`SELECT wr.id as warehouse_id,ts.WarehouseId,trx_items.TransactionId,us.username, trx.createdAt, trx.total_quantity, trx.total_price, trx.order_status, wr.warehouse_name, pr.product_name, pr.price, pr.description                      
-                        FROM transactions as trx
-                        JOIN users as us ON us.id = trx.UserId
-                        JOIN transaction_items as trx_items ON trx_items.TransactionId = trx.id
-                        JOIN products as pr ON pr.id = trx_items.ProductId
-                        JOIN total_stocks as ts ON ts.ProductId = pr.id
-                        JOIN warehouses as wr ON wr.id = ts.WarehouseId
-                        WHERE wr.id = ${WarehouseId}
-                        ORDER BY trx_items.TransactionId DESC
-                        LIMIT ${_limit}
-                        OFFSET ${(_page - 1) * _limit}
-                        `)
 
-                const test20 = test2[0]
-                return res.status(200).json({
-                    message: "Filter",
-                    data: test20,
-                    dataCount: test20.length,
-                })
-            }
+            const test2 = await Transaction.findAll({
+                include: [
+                    {
+                        model: Transaction_Item,
+                        include: [
+                            {
+                                model: Product,
+                                include: [
+                                    {
+                                        model: Total_Stock,
+                                        include: [{ model: Warehouse }],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            })
+
+            return res.status(200).json({
+                message: "All",
+                data: test2,
+            })
         } catch (err) {
             return res.status(500).json({
                 message: err.message,
@@ -170,4 +203,4 @@ const adminTransactionHistoryController = {
     },
 }
 
-module.exports = adminTransactionHistoryController
+module.exports = adminOrderHistoryController
