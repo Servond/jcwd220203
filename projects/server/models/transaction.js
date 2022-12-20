@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       Transaction.belongsTo(models.Order_status)
       Transaction.belongsTo(models.Payment_status)
       Transaction.hasMany(models.TransactionItem)
+      Transaction.belongsTo(models.Warehouse)
     }
   }
   Transaction.init(
@@ -44,6 +45,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       payment_expired_date: {
         type: DataTypes.DATE,
+      },
+      is_paid: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
     },
     {

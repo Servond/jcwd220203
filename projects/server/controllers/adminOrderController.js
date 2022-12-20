@@ -13,21 +13,34 @@ const adminOrderController = {
         transaction_name = "",
         PaymentStatusId = "",
         OrderStatusId = "",
+        WarehouseId = "",
+        payment_method = "",
         _sortBy = "id",
         _sortDir = "ASC",
         _limit = 6,
         _page = 1,
       } = req.query
 
-      if (req.user.id === 2) {
+      const findAdmin = await db.User.findOne({
+        where: {
+          id: req.user.id,
+        },
+      })
+
+      if (findAdmin.RoleId === 2) {
         if (
           _sortBy === "createdAt" ||
           username ||
           transaction_name ||
+          payment_method ||
           PaymentStatusId ||
           OrderStatusId
         ) {
-          if (!Number(PaymentStatusId) && !Number(OrderStatusId)) {
+          if (
+            !Number(PaymentStatusId) &&
+            !Number(OrderStatusId) &&
+            !payment_method
+          ) {
             const response = await db.Transaction.findAndCountAll({
               limit: Number(_limit),
               offset: (_page - 1) * _limit,
@@ -48,6 +61,12 @@ const adminOrderController = {
                 },
                 { model: db.Order_status },
                 { model: db.Payment_status },
+                {
+                  model: db.Warehouse,
+                  where: {
+                    id: findAdmin.WarehouseId,
+                  },
+                },
               ],
             })
 
@@ -83,6 +102,136 @@ const adminOrderController = {
                 },
                 { model: db.Order_status },
                 { model: db.Payment_status },
+                {
+                  model: db.Warehouse,
+                  where: {
+                    id: findAdmin.WarehouseId,
+                  },
+                },
+              ],
+            })
+
+            return res.status(200).json({
+              message: "Waiting Confrimation And",
+              data: response.rows,
+              dataCount: response.count,
+            })
+          }
+
+          if (payment_method && OrderStatusId) {
+            const response = await db.Transaction.findAndCountAll({
+              limit: Number(_limit),
+              offset: (_page - 1) * _limit,
+              order: [[_sortBy, _sortDir]],
+              where: {
+                transaction_name: {
+                  [Op.like]: `%${transaction_name}%`,
+                },
+                [Op.and]: {
+                  payment_method,
+                  OrderStatusId,
+                },
+              },
+              include: [
+                {
+                  model: db.User,
+                  where: {
+                    username: {
+                      [Op.like]: `%${username}%`,
+                    },
+                  },
+                },
+                { model: db.Order_status },
+                { model: db.Payment_status },
+                {
+                  model: db.Warehouse,
+                  where: {
+                    id: findAdmin.WarehouseId,
+                  },
+                },
+              ],
+            })
+
+            return res.status(200).json({
+              message: "Waiting Confrimation And",
+              data: response.rows,
+              dataCount: response.count,
+            })
+          }
+
+          if (PaymentStatusId && payment_method) {
+            const response = await db.Transaction.findAndCountAll({
+              limit: Number(_limit),
+              offset: (_page - 1) * _limit,
+              order: [[_sortBy, _sortDir]],
+              where: {
+                transaction_name: {
+                  [Op.like]: `%${transaction_name}%`,
+                },
+                [Op.and]: {
+                  payment_method,
+                  PaymentStatusId,
+                },
+              },
+              include: [
+                {
+                  model: db.User,
+                  where: {
+                    username: {
+                      [Op.like]: `%${username}%`,
+                    },
+                  },
+                },
+                { model: db.Order_status },
+                { model: db.Payment_status },
+                {
+                  model: db.Warehouse,
+                  where: {
+                    id: findAdmin.WarehouseId,
+                  },
+                },
+              ],
+            })
+
+            return res.status(200).json({
+              message: "Waiting Confrimation And",
+              data: response.rows,
+              dataCount: response.count,
+            })
+          }
+
+          if (OrderStatusId && PaymentStatusId && payment_method) {
+            const response = await db.Transaction.findAndCountAll({
+              limit: Number(_limit),
+              offset: (_page - 1) * _limit,
+              order: [[_sortBy, _sortDir]],
+              where: {
+                transaction_name: {
+                  [Op.like]: `%${transaction_name}%`,
+                },
+                [Op.and]: {
+                  payment_method,
+                  PaymentStatusId,
+                  OrderStatusId,
+                },
+              },
+              include: [
+                {
+                  model: db.User,
+                  where: {
+                    username: {
+                      [Op.like]: `%${username}%`,
+                    },
+                  },
+                },
+                { model: db.Order_status },
+                { model: db.Payment_status },
+                {
+                  model: db.Warehouse,
+                  where: {
+                    id: findAdmin.WarehouseId,
+                  },
+                },
               ],
             })
 
@@ -104,6 +253,7 @@ const adminOrderController = {
               [Op.or]: {
                 PaymentStatusId,
                 OrderStatusId,
+                payment_method,
               },
             },
             include: [
@@ -117,6 +267,12 @@ const adminOrderController = {
               },
               { model: db.Order_status },
               { model: db.Payment_status },
+              {
+                model: db.Warehouse,
+                where: {
+                  id: findAdmin.WarehouseId,
+                },
+              },
             ],
           })
 
@@ -135,6 +291,12 @@ const adminOrderController = {
             { model: db.User },
             { model: db.Order_status },
             { model: db.Payment_status },
+            {
+              model: db.Warehouse,
+              where: {
+                id: findAdmin.WarehouseId,
+              },
+            },
           ],
         })
 
@@ -149,10 +311,17 @@ const adminOrderController = {
         _sortBy === "createdAt" ||
         username ||
         transaction_name ||
+        payment_method ||
         PaymentStatusId ||
-        OrderStatusId
+        OrderStatusId ||
+        WarehouseId
       ) {
-        if (!Number(PaymentStatusId) && !Number(OrderStatusId)) {
+        if (
+          !Number(PaymentStatusId) &&
+          !Number(OrderStatusId) &&
+          !Number(WarehouseId) &&
+          !payment_method
+        ) {
           const response = await db.Transaction.findAndCountAll({
             limit: Number(_limit),
             offset: (_page - 1) * _limit,
@@ -173,6 +342,7 @@ const adminOrderController = {
               },
               { model: db.Order_status },
               { model: db.Payment_status },
+              { model: db.Warehouse },
             ],
           })
 
@@ -183,7 +353,206 @@ const adminOrderController = {
           })
         }
 
-        if (PaymentStatusId && OrderStatusId) {
+        if (
+          Number(PaymentStatusId) &&
+          Number(OrderStatusId) &&
+          Number(WarehouseId) &&
+          payment_method
+        ) {
+          const response = await db.Transaction.findAndCountAll({
+            limit: Number(_limit),
+            offset: (_page - 1) * _limit,
+            order: [[_sortBy, _sortDir]],
+            where: {
+              transaction_name: {
+                [Op.like]: `%${transaction_name}%`,
+              },
+              [Op.and]: {
+                payment_method,
+                PaymentStatusId,
+                OrderStatusId,
+                WarehouseId,
+              },
+            },
+            include: [
+              {
+                model: db.User,
+                where: {
+                  username: {
+                    [Op.like]: `%${username}%`,
+                  },
+                },
+              },
+              { model: db.Order_status },
+              { model: db.Payment_status },
+              { model: db.Warehouse },
+            ],
+          })
+
+          return res.status(200).json({
+            message: "Waiting Confrimation And",
+            data: response.rows,
+            dataCount: response.count,
+          })
+        }
+
+        if (
+          Number(OrderStatusId) &&
+          Number(PaymentStatusId) &&
+          payment_method
+        ) {
+          const response = await db.Transaction.findAndCountAll({
+            limit: Number(_limit),
+            offset: (_page - 1) * _limit,
+            order: [[_sortBy, _sortDir]],
+            where: {
+              transaction_name: {
+                [Op.like]: `%${transaction_name}%`,
+              },
+              [Op.and]: {
+                payment_method,
+                PaymentStatusId,
+                OrderStatusId,
+              },
+            },
+            include: [
+              {
+                model: db.User,
+                where: {
+                  username: {
+                    [Op.like]: `%${username}%`,
+                  },
+                },
+              },
+              { model: db.Order_status },
+              { model: db.Payment_status },
+              { model: db.Warehouse },
+            ],
+          })
+
+          return res.status(200).json({
+            message: "Waiting Confrimation And",
+            data: response.rows,
+            dataCount: response.count,
+          })
+        }
+
+        if (
+          Number(OrderStatusId) &&
+          Number(PaymentStatusId) &&
+          Number(WarehouseId)
+        ) {
+          const response = await db.Transaction.findAndCountAll({
+            limit: Number(_limit),
+            offset: (_page - 1) * _limit,
+            order: [[_sortBy, _sortDir]],
+            where: {
+              transaction_name: {
+                [Op.like]: `%${transaction_name}%`,
+              },
+              [Op.and]: {
+                WarehouseId,
+                PaymentStatusId,
+                OrderStatusId,
+              },
+            },
+            include: [
+              {
+                model: db.User,
+                where: {
+                  username: {
+                    [Op.like]: `%${username}%`,
+                  },
+                },
+              },
+              { model: db.Order_status },
+              { model: db.Payment_status },
+              { model: db.Warehouse },
+            ],
+          })
+
+          return res.status(200).json({
+            message: "Waiting Confrimation And",
+            data: response.rows,
+            dataCount: response.count,
+          })
+        }
+
+        if (Number(OrderStatusId) && Number(WarehouseId) && payment_method) {
+          const response = await db.Transaction.findAndCountAll({
+            limit: Number(_limit),
+            offset: (_page - 1) * _limit,
+            order: [[_sortBy, _sortDir]],
+            where: {
+              transaction_name: {
+                [Op.like]: `%${transaction_name}%`,
+              },
+              [Op.and]: {
+                payment_method,
+                WarehouseId,
+                OrderStatusId,
+              },
+            },
+            include: [
+              {
+                model: db.User,
+                where: {
+                  username: {
+                    [Op.like]: `%${username}%`,
+                  },
+                },
+              },
+              { model: db.Order_status },
+              { model: db.Payment_status },
+              { model: db.Warehouse },
+            ],
+          })
+
+          return res.status(200).json({
+            message: "Waiting Confrimation And",
+            data: response.rows,
+            dataCount: response.count,
+          })
+        }
+
+        if (Number(WarehouseId) && Number(PaymentStatusId) && payment_method) {
+          const response = await db.Transaction.findAndCountAll({
+            limit: Number(_limit),
+            offset: (_page - 1) * _limit,
+            order: [[_sortBy, _sortDir]],
+            where: {
+              transaction_name: {
+                [Op.like]: `%${transaction_name}%`,
+              },
+              [Op.and]: {
+                WarehouseId,
+                PaymentStatusId,
+                payment_method,
+              },
+            },
+            include: [
+              {
+                model: db.User,
+                where: {
+                  username: {
+                    [Op.like]: `%${username}%`,
+                  },
+                },
+              },
+              { model: db.Order_status },
+              { model: db.Payment_status },
+              { model: db.Warehouse },
+            ],
+          })
+
+          return res.status(200).json({
+            message: "Waiting Confrimation And",
+            data: response.rows,
+            dataCount: response.count,
+          })
+        }
+
+        if (Number(PaymentStatusId) && Number(OrderStatusId)) {
           const response = await db.Transaction.findAndCountAll({
             limit: Number(_limit),
             offset: (_page - 1) * _limit,
@@ -208,11 +577,192 @@ const adminOrderController = {
               },
               { model: db.Order_status },
               { model: db.Payment_status },
+              { model: db.Warehouse },
+            ],
+          })
+
+          return res.status(200).json({
+            message: "Waiting Confrimation And atas bet",
+            data: response.rows,
+            dataCount: response.count,
+          })
+        }
+
+        if (payment_method && Number(OrderStatusId)) {
+          const response = await db.Transaction.findAndCountAll({
+            limit: Number(_limit),
+            offset: (_page - 1) * _limit,
+            order: [[_sortBy, _sortDir]],
+            where: {
+              transaction_name: {
+                [Op.like]: `%${transaction_name}%`,
+              },
+              [Op.and]: {
+                payment_method,
+                OrderStatusId,
+              },
+            },
+            include: [
+              {
+                model: db.User,
+                where: {
+                  username: {
+                    [Op.like]: `%${username}%`,
+                  },
+                },
+              },
+              { model: db.Order_status },
+              { model: db.Payment_status },
+              { model: db.Warehouse },
             ],
           })
 
           return res.status(200).json({
             message: "Waiting Confrimation And",
+            data: response.rows,
+            dataCount: response.count,
+          })
+        }
+
+        if (Number(PaymentStatusId) && payment_method) {
+          const response = await db.Transaction.findAndCountAll({
+            limit: Number(_limit),
+            offset: (_page - 1) * _limit,
+            order: [[_sortBy, _sortDir]],
+            where: {
+              transaction_name: {
+                [Op.like]: `%${transaction_name}%`,
+              },
+              [Op.and]: {
+                payment_method,
+                PaymentStatusId,
+              },
+            },
+            include: [
+              {
+                model: db.User,
+                where: {
+                  username: {
+                    [Op.like]: `%${username}%`,
+                  },
+                },
+              },
+              { model: db.Order_status },
+              { model: db.Payment_status },
+              { model: db.Warehouse },
+            ],
+          })
+
+          return res.status(200).json({
+            message: "Waiting Confrimation And",
+            data: response.rows,
+            dataCount: response.count,
+          })
+        }
+
+        if (Number(PaymentStatusId) && Number(WarehouseId)) {
+          const response = await db.Transaction.findAndCountAll({
+            limit: Number(_limit),
+            offset: (_page - 1) * _limit,
+            order: [[_sortBy, _sortDir]],
+            where: {
+              transaction_name: {
+                [Op.like]: `%${transaction_name}%`,
+              },
+              [Op.and]: {
+                PaymentStatusId,
+                WarehouseId,
+              },
+            },
+            include: [
+              {
+                model: db.User,
+                where: {
+                  username: {
+                    [Op.like]: `%${username}%`,
+                  },
+                },
+              },
+              { model: db.Order_status },
+              { model: db.Payment_status },
+              { model: db.Warehouse },
+            ],
+          })
+
+          return res.status(200).json({
+            message: "Waiting Confrimation And 1",
+            data: response.rows,
+            dataCount: response.count,
+          })
+        }
+
+        if (Number(WarehouseId) && Number(OrderStatusId)) {
+          const response = await db.Transaction.findAndCountAll({
+            limit: Number(_limit),
+            offset: (_page - 1) * _limit,
+            order: [[_sortBy, _sortDir]],
+            where: {
+              transaction_name: {
+                [Op.like]: `%${transaction_name}%`,
+              },
+              [Op.and]: {
+                WarehouseId,
+                OrderStatusId,
+              },
+            },
+            include: [
+              {
+                model: db.User,
+                where: {
+                  username: {
+                    [Op.like]: `%${username}%`,
+                  },
+                },
+              },
+              { model: db.Order_status },
+              { model: db.Payment_status },
+              { model: db.Warehouse },
+            ],
+          })
+
+          return res.status(200).json({
+            message: "Waiting Confrimation And 2",
+            data: response.rows,
+            dataCount: response.count,
+          })
+        }
+
+        if (Number(WarehouseId) && payment_method) {
+          const response = await db.Transaction.findAndCountAll({
+            limit: Number(_limit),
+            offset: (_page - 1) * _limit,
+            order: [[_sortBy, _sortDir]],
+            where: {
+              transaction_name: {
+                [Op.like]: `%${transaction_name}%`,
+              },
+              [Op.and]: {
+                payment_method,
+                WarehouseId,
+              },
+            },
+            include: [
+              {
+                model: db.User,
+                where: {
+                  username: {
+                    [Op.like]: `%${username}%`,
+                  },
+                },
+              },
+              { model: db.Order_status },
+              { model: db.Payment_status },
+              { model: db.Warehouse },
+            ],
+          })
+
+          return res.status(200).json({
+            message: "Waiting Confrimation And 3",
             data: response.rows,
             dataCount: response.count,
           })
@@ -229,6 +779,8 @@ const adminOrderController = {
             [Op.or]: {
               PaymentStatusId,
               OrderStatusId,
+              payment_method,
+              WarehouseId,
             },
           },
           include: [
@@ -242,6 +794,7 @@ const adminOrderController = {
             },
             { model: db.Order_status },
             { model: db.Payment_status },
+            { model: db.Warehouse },
           ],
         })
 
@@ -260,6 +813,7 @@ const adminOrderController = {
           { model: db.User },
           { model: db.Order_status },
           { model: db.Payment_status },
+          { model: db.Warehouse },
         ],
       })
 
@@ -305,6 +859,21 @@ const adminOrderController = {
       })
     }
   },
+  findWarehouse: async (req, res) => {
+    try {
+      const response = await db.Warehouse.findAll()
+
+      return res.status(200).json({
+        message: "Find all warehouse",
+        data: response,
+      })
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({
+        message: "Server Error",
+      })
+    }
+  },
   approvePayment: async (req, res) => {
     try {
       const { id } = req.params
@@ -319,13 +888,11 @@ const adminOrderController = {
           message: "Transaction not found",
         })
       }
-      const now = new Date()
-      console.log(now)
+
       await db.Transaction.update(
         {
           OrderStatusId: 2,
           PaymentStatusId: 3,
-          payment_date: now,
         },
         {
           where: {
@@ -398,6 +965,7 @@ const adminOrderController = {
       await db.Transaction.update(
         {
           PaymentStatusId: 1,
+          is_paid: fasle,
         },
         {
           where: {
