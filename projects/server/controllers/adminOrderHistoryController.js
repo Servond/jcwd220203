@@ -8,6 +8,7 @@ const Warehouse = db.Warehouse
 const Product = db.Product
 const Total_Stock = db.Total_Stock
 const User = db.User
+const Order_status = db.Order_status
 
 const adminOrderHistoryController = {
     // showAllTransaction: async (req, res) => {
@@ -107,7 +108,8 @@ const adminOrderHistoryController = {
         const WarehouseId = req.query.WarehouseId[0]
         console.log(req.query)
         try {
-            let query = `SELECT wr.id as warehouse_id,ts.WarehouseId,trx_items.TransactionId,trx.transaction_name, us.username, trx.createdAt, trx.total_quantity, trx.total_price, ps.payment_status_name as order_status, wr.warehouse_name,pr.id as productId                      
+            let query = `SELECT wr.id as warehouse_id,ts.WarehouseId,trx_items.TransactionId,trx.transaction_name, 
+            us.username, trx.createdAt, trx.total_quantity, trx.total_price, ps.payment_status_name as order_status, wr.warehouse_name,pr.id as productId                      
                         FROM transactions as trx
                         JOIN users as us ON us.id = trx.UserId
                         JOIN transactionitems as trx_items ON trx_items.TransactionId = trx.id
@@ -171,30 +173,55 @@ const adminOrderHistoryController = {
 
     getByWarehouseId: async (req, res) => {
         try {
-            const { WarehouseId = "", _limit = 10, _page = 1 } = req.query
+            const { WarehouseId, _limit = 10, _page = 1 } = req.query
+            if (WarehouseId) {
+                const test2 = await Transaction.findAndCountAll({
+                    include: [
+                        {
+                            model: Transaction_Item,
+                            include: [
+                                {
+                                    model: Product,
+                                },
+                            ],
+                        },
+                        { model: Warehouse },
+                        { model: User },
+                        { model: Order_status },
+                    ],
+                    where: { WarehouseId },
+                    limit: Number(_limit),
+                    offset: (_page - 1) * _limit,
+                })
 
-            const test2 = await Transaction.findAll({
+                return res.status(200).json({
+                    message: "All",
+                    data: test2.rows,
+                    dataCount: test2.count,
+                })
+            }
+            const test3 = await Transaction.findAndCountAll({
                 include: [
                     {
                         model: Transaction_Item,
                         include: [
                             {
                                 model: Product,
-                                include: [
-                                    {
-                                        model: Total_Stock,
-                                        include: [{ model: Warehouse }],
-                                    },
-                                ],
                             },
                         ],
                     },
+                    { model: Warehouse },
+                    { model: User },
+                    { model: Order_status },
                 ],
+                limit: Number(_limit),
+                offset: (_page - 1) * _limit,
             })
 
             return res.status(200).json({
                 message: "All",
-                data: test2,
+                data: test3.rows,
+                dataCount: test3.count,
             })
         } catch (err) {
             return res.status(500).json({

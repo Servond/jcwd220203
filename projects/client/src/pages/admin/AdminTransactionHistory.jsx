@@ -32,7 +32,6 @@ import { useSelector } from "react-redux"
 
 const AdminTransactionHistory = () => {
     const [transactionData, setTransactionData] = useState([])
-    const [dataById, setDataById] = useState([])
     const [warehouseData, setWarehouseData] = useState([])
     const [imageData, setImageData] = useState([])
     const [productData, setProductData] = useState({
@@ -49,17 +48,45 @@ const AdminTransactionHistory = () => {
     const authSelector = useSelector((state) => state.auth)
 
     const maxItemsPerPage = 7
-    const fetchData = async () => {
-        try {
-            let url = `/admin/order-history/get`
+    // const fetchData = async () => {
+    //     try {
+    //         let url = `/admin/order-history/get`
 
-            console.log("CCCCCC", authSelector)
+    //         console.log("CCCCCC", authSelector)
+    //         if (authSelector.WarehouseId) {
+    //             await axiosInstance.get(
+    //                 (url += `?WarehouseId=${authSelector.WarehouseId}`)
+    //             )
+    //         }
+    //         console.log("URLLL", url)
+    //         const response = await axiosInstance.get(url, {
+    //             params: {
+    //                 _page: page,
+    //                 _limit: maxItemsPerPage,
+    //                 WarehouseId: filter,
+    //             },
+    //         })
+    //         console.log(`AAAAAAAAAAAAA`, authSelector.WarehouseId)
+    //         setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
+    //         console.log("response", response.data)
+    //         if (page === 1) {
+    //             setTransactionData(response.data.data)
+    //         } else {
+    //             setTransactionData(response.data.data)
+    //         }
+    //     } catch (err) {
+    //         console.log(err)
+    //     }
+    // }
+
+    const fetchData2 = async () => {
+        try {
+            let url = `/admin/order-history/get2`
+
             if (authSelector.WarehouseId) {
-                await axiosInstance.get(
-                    (url += `?WarehouseId=${authSelector.WarehouseId}`)
-                )
+                url += `?WarehouseId=${authSelector.WarehouseId}`
             }
-            console.log("URLLL", url)
+
             const response = await axiosInstance.get(url, {
                 params: {
                     _page: page,
@@ -67,9 +94,7 @@ const AdminTransactionHistory = () => {
                     WarehouseId: filter,
                 },
             })
-            console.log(`AAAAAAAAAAAAA`, authSelector.WarehouseId)
             setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
-            console.log("response", response.data)
             if (page === 1) {
                 setTransactionData(response.data.data)
             } else {
@@ -79,7 +104,6 @@ const AdminTransactionHistory = () => {
             console.log(err)
         }
     }
-
     const fetchWarehouse = async () => {
         try {
             const response = await axiosInstance.get("/warehouse")
@@ -112,13 +136,10 @@ const AdminTransactionHistory = () => {
     const prevPageBtnHandler = () => {
         setPage(page - 1)
     }
-
-    console.log("maxp", maxPage)
-    console.log("auth", authSelector.WarehouseId)
-    console.log("wr", dataById)
-
+    console.log("trans", transactionData)
     useEffect(() => {
-        fetchData()
+        // fetchData()
+        fetchData2()
         fetchWarehouse()
         fetchProduct()
     }, [page, filter, productId, authSelector])
@@ -174,11 +195,27 @@ const AdminTransactionHistory = () => {
                                 <Text alignSelf="center">Filter: </Text>
                                 <Select onChange={filterBtnHandler}>
                                     <option value="">---Select---</option>
-                                    {warehouseData.map((val) => (
+                                    {/* raw query */}
+                                    {/* {warehouseData.map((val) => (
                                         <option value={val.id}>
                                             {val.warehouse_name}
                                         </option>
-                                    ))}
+                                    ))} */}
+
+                                    {authSelector.WarehouseId ===
+                                    transactionData.map(
+                                        (val) => val.WarehouseId
+                                    )[0]
+                                        ? transactionData.map((val) => (
+                                              <option value={val.WarehouseId}>
+                                                  {val.Warehouse.warehouse_name}
+                                              </option>
+                                          ))
+                                        : warehouseData.map((val) => (
+                                              <option value={val.id}>
+                                                  {val.warehouse_name}
+                                              </option>
+                                          ))}
                                 </Select>
                             </HStack>
                         </Box>
@@ -229,10 +266,13 @@ const AdminTransactionHistory = () => {
                                                 variant="link"
                                                 onClick={() => {
                                                     setProductId(
-                                                        // val.Transaction_Items.map(
-                                                        //     (val) =>
-                                                        val.productId
+                                                        val.TransactionItems.map(
+                                                            (val) =>
+                                                                val.ProductId
+                                                        )
                                                     )
+
+                                                    // val.productId  //raw query
                                                     // )
                                                     onOpen()
                                                 }}
@@ -240,10 +280,9 @@ const AdminTransactionHistory = () => {
                                                 <Text color="#0095DA">
                                                     #
                                                     {
-                                                        // val.Transaction_Items.map(
-                                                        //     (val) => val.id
-                                                        // )
                                                         val.transaction_name
+
+                                                        // val.transaction_name //raw query
                                                     }
                                                 </Text>
                                             </Button>
@@ -253,8 +292,10 @@ const AdminTransactionHistory = () => {
                                                 overflow="hidden"
                                                 textOverflow="ellipsis"
                                             >
-                                                {/* {val.User.username} */}
-                                                {val.username}
+                                                {val.User.username}
+
+                                                {/* raw query */}
+                                                {/* {val.username}  */}
                                             </Text>
                                         </Td>
                                         <Td>
@@ -278,19 +319,23 @@ const AdminTransactionHistory = () => {
                                             </Text>
                                         </Td>
                                         <Td>
-                                            <Text>{val.order_status}</Text>
+                                            <Text>
+                                                {
+                                                    val.Order_status
+                                                        .order_status_name
+                                                }
+
+                                                {/* raw query */}
+                                                {/* {val.order_status} */}
+                                            </Text>
                                         </Td>
 
                                         <Td>
                                             <Text>
-                                                {/* {val.Transaction_Items.map((val) =>
-                                                val.Product.Total_Stocks.map(
-                                                    (val) =>
-                                                        val.Warehouse
-                                                            .warehouse_name
-                                                )
-                                            )} */}
-                                                {val.warehouse_name}
+                                                {val.Warehouse.warehouse_name}
+
+                                                {/* raw query */}
+                                                {/* {val.warehouse_name} */}
                                             </Text>
                                         </Td>
                                     </Tr>
@@ -311,7 +356,7 @@ const AdminTransactionHistory = () => {
                             />
                         )}
                         <Text color="#0095DA">{page}</Text>
-                        {page > maxPage ? null : (
+                        {page >= maxPage ? null : (
                             <CgChevronRight
                                 bgColor="#0095DA"
                                 color="#0095DA"
