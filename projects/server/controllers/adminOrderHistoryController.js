@@ -3,7 +3,7 @@ const { Op } = require("sequelize")
 const { sequelize } = require("../models")
 
 const Transaction = db.Transaction
-const Transaction_Item = db.Transaction_Item
+const Transaction_Item = db.TransactionItem
 const Warehouse = db.Warehouse
 const Product = db.Product
 const Total_Stock = db.Total_Stock
@@ -107,13 +107,14 @@ const adminOrderHistoryController = {
         const WarehouseId = req.query.WarehouseId[0]
         console.log(req.query)
         try {
-            let query = `SELECT wr.id as warehouse_id,ts.WarehouseId,trx_items.TransactionId,us.username, trx.createdAt, trx.total_quantity, trx.total_price, trx.order_status, wr.warehouse_name,pr.id as productId                      
+            let query = `SELECT wr.id as warehouse_id,ts.WarehouseId,trx_items.TransactionId,trx.transaction_name, us.username, trx.createdAt, trx.total_quantity, trx.total_price, ps.payment_status_name as order_status, wr.warehouse_name,pr.id as productId                      
                         FROM transactions as trx
                         JOIN users as us ON us.id = trx.UserId
-                        JOIN transaction_items as trx_items ON trx_items.TransactionId = trx.id
+                        JOIN transactionitems as trx_items ON trx_items.TransactionId = trx.id
                         JOIN products as pr ON pr.id = trx_items.ProductId
                         JOIN total_stocks as ts ON ts.ProductId = pr.id
-                        JOIN warehouses as wr ON wr.id = ts.WarehouseId `
+                        JOIN warehouses as wr ON wr.id = ts.WarehouseId
+                        JOIN payment_statuses as ps ON ps.id = trx.PaymentStatusId `
             if (WarehouseId) {
                 query += `WHERE wr.id = ${WarehouseId} `
             }

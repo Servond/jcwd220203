@@ -99,31 +99,6 @@ const AdminTransactionHistory = () => {
         }
     }
 
-    const fetchById = async () => {
-        try {
-            const response = await axiosInstance.get(
-                `/admin/transaction-history/getId`,
-                {
-                    params: {
-                        _page: page,
-                        _limit: maxItemsPerPage,
-                        WarehouseId: filter,
-                    },
-                }
-            )
-            setDataById(response.data.data)
-            setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
-            console.log("response", response.data)
-            if (page === 1) {
-                setDataById(response.data.data)
-            } else {
-                setDataById(response.data.data)
-            }
-        } catch (err) {
-            console.log(err)
-        }
-    }
-
     const filterBtnHandler = ({ target }) => {
         const { value } = target
         setFilter(value)
@@ -146,7 +121,6 @@ const AdminTransactionHistory = () => {
         fetchData()
         fetchWarehouse()
         fetchProduct()
-        fetchById()
     }, [page, filter, productId, authSelector])
     return (
         <>
@@ -219,9 +193,7 @@ const AdminTransactionHistory = () => {
                             <Thead>
                                 <Tr>
                                     <Th w="100px">
-                                        <Text fontSize="10px">
-                                            product name
-                                        </Text>
+                                        <Text fontSize="10px">invoice</Text>
                                     </Th>
                                     <Th w="100px">
                                         <Text fontSize="10px">User</Text>
@@ -271,7 +243,7 @@ const AdminTransactionHistory = () => {
                                                         // val.Transaction_Items.map(
                                                         //     (val) => val.id
                                                         // )
-                                                        val.TransactionId
+                                                        val.transaction_name
                                                     }
                                                 </Text>
                                             </Button>
