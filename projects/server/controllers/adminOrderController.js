@@ -77,7 +77,53 @@ const adminOrderController = {
             })
           }
 
-          if (PaymentStatusId && OrderStatusId) {
+          if (
+            Number(OrderStatusId) &&
+            Number(PaymentStatusId) &&
+            payment_method
+          ) {
+            const response = await db.Transaction.findAndCountAll({
+              limit: Number(_limit),
+              offset: (_page - 1) * _limit,
+              order: [[_sortBy, _sortDir]],
+              where: {
+                transaction_name: {
+                  [Op.like]: `%${transaction_name}%`,
+                },
+                [Op.and]: {
+                  payment_method,
+                  PaymentStatusId,
+                  OrderStatusId,
+                },
+              },
+              include: [
+                {
+                  model: db.User,
+                  where: {
+                    username: {
+                      [Op.like]: `%${username}%`,
+                    },
+                  },
+                },
+                { model: db.Order_status },
+                { model: db.Payment_status },
+                {
+                  model: db.Warehouse,
+                  where: {
+                    id: findAdmin.WarehouseId,
+                  },
+                },
+              ],
+            })
+
+            return res.status(200).json({
+              message: "Waiting Confrimation And",
+              data: response.rows,
+              dataCount: response.count,
+            })
+          }
+
+          if (Number(PaymentStatusId) && Number(OrderStatusId)) {
             const response = await db.Transaction.findAndCountAll({
               limit: Number(_limit),
               offset: (_page - 1) * _limit,
@@ -118,7 +164,7 @@ const adminOrderController = {
             })
           }
 
-          if (payment_method && OrderStatusId) {
+          if (payment_method && Number(OrderStatusId)) {
             const response = await db.Transaction.findAndCountAll({
               limit: Number(_limit),
               offset: (_page - 1) * _limit,
@@ -159,7 +205,7 @@ const adminOrderController = {
             })
           }
 
-          if (PaymentStatusId && payment_method) {
+          if (Number(PaymentStatusId) && payment_method) {
             const response = await db.Transaction.findAndCountAll({
               limit: Number(_limit),
               offset: (_page - 1) * _limit,
@@ -171,48 +217,6 @@ const adminOrderController = {
                 [Op.and]: {
                   payment_method,
                   PaymentStatusId,
-                },
-              },
-              include: [
-                {
-                  model: db.User,
-                  where: {
-                    username: {
-                      [Op.like]: `%${username}%`,
-                    },
-                  },
-                },
-                { model: db.Order_status },
-                { model: db.Payment_status },
-                {
-                  model: db.Warehouse,
-                  where: {
-                    id: findAdmin.WarehouseId,
-                  },
-                },
-              ],
-            })
-
-            return res.status(200).json({
-              message: "Waiting Confrimation And",
-              data: response.rows,
-              dataCount: response.count,
-            })
-          }
-
-          if (OrderStatusId && PaymentStatusId && payment_method) {
-            const response = await db.Transaction.findAndCountAll({
-              limit: Number(_limit),
-              offset: (_page - 1) * _limit,
-              order: [[_sortBy, _sortDir]],
-              where: {
-                transaction_name: {
-                  [Op.like]: `%${transaction_name}%`,
-                },
-                [Op.and]: {
-                  payment_method,
-                  PaymentStatusId,
-                  OrderStatusId,
                 },
               },
               include: [

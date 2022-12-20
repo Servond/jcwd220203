@@ -93,6 +93,8 @@ const AdminOrder = () => {
         }
       )
 
+      console.log(response)
+
       setTotalCount(response.data.dataCount)
       setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
 
@@ -269,101 +271,199 @@ const AdminOrder = () => {
         </Text>
       </Box>
 
-      <Grid gap="4" templateColumns={"repeat(6, 1fr)"} mt="4" mb="4">
-        <Select
-          onChange={sortHandler}
-          fontSize={"15px"}
-          fontWeight="normal"
-          color={"#6D6D6F"}
-          placeholder="Sort"
-          bgColor={"white"}
-        >
-          <option value="createdAt DESC">Latest</option>
-          <option value="createdAt ASC">Old</option>
-        </Select>
-
-        <Select
-          fontSize={"15px"}
-          fontWeight="normal"
-          onChange={orderStatusHandler}
-          color={"#6D6D6F"}
-          placeholder="Order Status"
-          bgColor={"white"}
-        >
-          {orderStatus.map((val) => {
-            return <option value={val.id}>{val.order_status_name}</option>
-          })}
-        </Select>
-
-        <Select
-          fontSize={"15px"}
-          fontWeight="normal"
-          onChange={paymentStatusHandler}
-          color={"#6D6D6F"}
-          placeholder="Payment Status"
-          bgColor={"white"}
-        >
-          {paymentStatus.map((val) => {
-            return <option value={val.id}>{val.payment_status_name}</option>
-          })}
-        </Select>
-
-        <Select
-          onChange={paymentMethodHandler}
-          fontSize={"15px"}
-          fontWeight="normal"
-          color={"#6D6D6F"}
-          placeholder="Payment Method"
-          bgColor={"white"}
-        >
-          <option value="BCA Virtual Account">BCA Virtual Account</option>
-          <option value="BNI Virtual Account">BNI Virtual Account</option>
-          <option value="Mandiri Virtual Account">
-            Mandiri Virtual Account
-          </option>
-        </Select>
-
-        {authSelector.RoleId === 3 ? (
+      {authSelector.RoleId === 2 ? (
+        <Grid gap="4" templateColumns={"repeat(5, 1fr)"} mt="4" mb="4">
           <Select
-            onChange={warehouseHandler}
+            onChange={sortHandler}
             fontSize={"15px"}
             fontWeight="normal"
             color={"#6D6D6F"}
-            placeholder="Warehouse"
+            placeholder="Sort"
             bgColor={"white"}
           >
-            {warehouse.map((val) => {
-              return <option value={val.id}>{val.warehouse_name}</option>
+            <option value="createdAt DESC">Latest</option>
+            <option value="createdAt ASC">Old</option>
+          </Select>
+
+          <Select
+            fontSize={"15px"}
+            fontWeight="normal"
+            onChange={orderStatusHandler}
+            color={"#6D6D6F"}
+            placeholder="Order Status"
+            bgColor={"white"}
+          >
+            {orderStatus.map((val) => {
+              return <option value={val.id}>{val.order_status_name}</option>
             })}
           </Select>
-        ) : null}
 
-        <form onSubmit={formikSearch.handleSubmit}>
-          <FormControl>
-            <InputGroup textAlign={"right"}>
-              <Input
-                type={"text"}
-                placeholder="Search here"
-                name="search"
-                bgColor={"white"}
-                onChange={searchHandler}
-                borderRightRadius="0"
-                value={formikSearch.values.search}
-              />
+          <Select
+            fontSize={"15px"}
+            fontWeight="normal"
+            onChange={paymentStatusHandler}
+            color={"#6D6D6F"}
+            placeholder="Payment Status"
+            bgColor={"white"}
+          >
+            {paymentStatus.map((val) => {
+              return <option value={val.id}>{val.payment_status_name}</option>
+            })}
+          </Select>
 
-              <Button
-                borderLeftRadius={"0"}
-                type="submit"
-                bgColor={"white"}
-                border="1px solid #e2e8f0"
-                borderLeft={"0px"}
-              >
-                <TbSearch />
-              </Button>
-            </InputGroup>
-          </FormControl>
-        </form>
-      </Grid>
+          <Select
+            onChange={paymentMethodHandler}
+            fontSize={"15px"}
+            fontWeight="normal"
+            color={"#6D6D6F"}
+            placeholder="Payment Method"
+            bgColor={"white"}
+          >
+            <option value="BCA Virtual Account">BCA Virtual Account</option>
+            <option value="BNI Virtual Account">BNI Virtual Account</option>
+            <option value="Mandiri Virtual Account">
+              Mandiri Virtual Account
+            </option>
+          </Select>
+
+          {authSelector.RoleId === 3 ? (
+            <Select
+              onChange={warehouseHandler}
+              fontSize={"15px"}
+              fontWeight="normal"
+              color={"#6D6D6F"}
+              placeholder="Warehouse"
+              bgColor={"white"}
+            >
+              {warehouse.map((val) => {
+                return <option value={val.id}>{val.warehouse_name}</option>
+              })}
+            </Select>
+          ) : null}
+
+          <form onSubmit={formikSearch.handleSubmit}>
+            <FormControl>
+              <InputGroup textAlign={"right"}>
+                <Input
+                  type={"text"}
+                  placeholder="Search here"
+                  name="search"
+                  bgColor={"white"}
+                  onChange={searchHandler}
+                  borderRightRadius="0"
+                  value={formikSearch.values.search}
+                />
+
+                <Button
+                  borderLeftRadius={"0"}
+                  type="submit"
+                  bgColor={"white"}
+                  border="1px solid #e2e8f0"
+                  borderLeft={"0px"}
+                >
+                  <TbSearch />
+                </Button>
+              </InputGroup>
+            </FormControl>
+          </form>
+        </Grid>
+      ) : (
+        <Grid gap="4" templateColumns={"repeat(6, 1fr)"} mt="4" mb="4">
+          <Select
+            onChange={sortHandler}
+            fontSize={"15px"}
+            fontWeight="normal"
+            color={"#6D6D6F"}
+            placeholder="Sort"
+            bgColor={"white"}
+          >
+            <option value="createdAt DESC">Latest</option>
+            <option value="createdAt ASC">Old</option>
+          </Select>
+
+          <Select
+            fontSize={"15px"}
+            fontWeight="normal"
+            onChange={orderStatusHandler}
+            color={"#6D6D6F"}
+            placeholder="Order Status"
+            bgColor={"white"}
+          >
+            {orderStatus.map((val) => {
+              return <option value={val.id}>{val.order_status_name}</option>
+            })}
+          </Select>
+
+          <Select
+            fontSize={"15px"}
+            fontWeight="normal"
+            onChange={paymentStatusHandler}
+            color={"#6D6D6F"}
+            placeholder="Payment Status"
+            bgColor={"white"}
+          >
+            {paymentStatus.map((val) => {
+              return <option value={val.id}>{val.payment_status_name}</option>
+            })}
+          </Select>
+
+          <Select
+            onChange={paymentMethodHandler}
+            fontSize={"15px"}
+            fontWeight="normal"
+            color={"#6D6D6F"}
+            placeholder="Payment Method"
+            bgColor={"white"}
+          >
+            <option value="BCA Virtual Account">BCA Virtual Account</option>
+            <option value="BNI Virtual Account">BNI Virtual Account</option>
+            <option value="Mandiri Virtual Account">
+              Mandiri Virtual Account
+            </option>
+          </Select>
+
+          {authSelector.RoleId === 3 ? (
+            <Select
+              onChange={warehouseHandler}
+              fontSize={"15px"}
+              fontWeight="normal"
+              color={"#6D6D6F"}
+              placeholder="Warehouse"
+              bgColor={"white"}
+            >
+              {warehouse.map((val) => {
+                return <option value={val.id}>{val.warehouse_name}</option>
+              })}
+            </Select>
+          ) : null}
+
+          <form onSubmit={formikSearch.handleSubmit}>
+            <FormControl>
+              <InputGroup textAlign={"right"}>
+                <Input
+                  type={"text"}
+                  placeholder="Search here"
+                  name="search"
+                  bgColor={"white"}
+                  onChange={searchHandler}
+                  borderRightRadius="0"
+                  value={formikSearch.values.search}
+                />
+
+                <Button
+                  borderLeftRadius={"0"}
+                  type="submit"
+                  bgColor={"white"}
+                  border="1px solid #e2e8f0"
+                  borderLeft={"0px"}
+                >
+                  <TbSearch />
+                </Button>
+              </InputGroup>
+            </FormControl>
+          </form>
+        </Grid>
+      )}
 
       <Table
         variant={"striped"}
