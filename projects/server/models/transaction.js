@@ -14,12 +14,13 @@ module.exports = (sequelize, DataTypes) => {
       Transaction.belongsTo(models.Payment_status)
       Transaction.hasMany(models.TransactionItem)
       Transaction.belongsTo(models.Warehouse)
+      Transaction.belongsTo(models.Address)
     }
   }
   Transaction.init(
     {
       transaction_name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING
       },
       total_quantity: {
         type: DataTypes.INTEGER,
@@ -41,15 +42,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
       },
       shipping_fee: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER
       },
       payment_expired_date: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATE
+      },
+      courir_duration: {
+        type: DataTypes.STRING
       },
       is_paid: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
+        defaultValue: false
+      }
     },
     {
       sequelize,
@@ -58,3 +62,4 @@ module.exports = (sequelize, DataTypes) => {
   )
   return Transaction
 }
+

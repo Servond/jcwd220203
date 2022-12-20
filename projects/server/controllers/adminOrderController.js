@@ -892,7 +892,6 @@ const adminOrderController = {
           message: "Transaction not found",
         })
       }
-
       await db.Transaction.update(
         {
           OrderStatusId: 2,
