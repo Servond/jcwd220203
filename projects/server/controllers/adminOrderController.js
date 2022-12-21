@@ -553,13 +553,14 @@ const adminOrderController = {
               { model: db.Warehouse },
             ],
           })
-
+          
           return res.status(200).json({
             message: "Waiting Confrimation And atas bet",
             data: response.rows,
             dataCount: response.count,
           })
         }
+
 
         if (payment_method && Number(OrderStatusId)) {
           const response = await db.Transaction.findAndCountAll({
@@ -589,7 +590,7 @@ const adminOrderController = {
               { model: db.Warehouse },
             ],
           })
-
+          
           return res.status(200).json({
             message: "Waiting Confrimation And",
             data: response.rows,
@@ -628,6 +629,114 @@ const adminOrderController = {
 
           return res.status(200).json({
             message: "Waiting Confrimation And",
+            data: response.rows,
+            dataCount: response.count,
+          })
+        }
+
+        if (Number(PaymentStatusId) && Number(WarehouseId)) {
+          const response = await db.Transaction.findAndCountAll({
+            limit: Number(_limit),
+            offset: (_page - 1) * _limit,
+            order: [[_sortBy, _sortDir]],
+            where: {
+              transaction_name: {
+                [Op.like]: `%${transaction_name}%`,
+              },
+              [Op.and]: {
+                PaymentStatusId,
+                WarehouseId,
+              },
+            },
+            include: [
+              {
+                model: db.User,
+                where: {
+                  username: {
+                    [Op.like]: `%${username}%`,
+                  },
+                },
+              },
+              { model: db.Order_status },
+              { model: db.Payment_status },
+              { model: db.Warehouse },
+            ],
+          })
+
+          return res.status(200).json({
+            message: "Waiting Confrimation And 1",
+            data: response.rows,
+            dataCount: response.count,
+          })
+        }
+
+        if (Number(WarehouseId) && Number(OrderStatusId)) {
+          const response = await db.Transaction.findAndCountAll({
+            limit: Number(_limit),
+            offset: (_page - 1) * _limit,
+            order: [[_sortBy, _sortDir]],
+            where: {
+              transaction_name: {
+                [Op.like]: `%${transaction_name}%`,
+              },
+              [Op.and]: {
+                WarehouseId,
+                OrderStatusId,
+              },
+            },
+            include: [
+              {
+                model: db.User,
+                where: {
+                  username: {
+                    [Op.like]: `%${username}%`,
+                  },
+                },
+              },
+              { model: db.Order_status },
+              { model: db.Payment_status },
+              { model: db.Warehouse },
+            ],
+          })
+
+          return res.status(200).json({
+            message: "Waiting Confrimation And 2",
+            data: response.rows,
+            dataCount: response.count,
+          })
+        }
+
+        if (Number(WarehouseId) && payment_method) {
+          const response = await db.Transaction.findAndCountAll({
+            limit: Number(_limit),
+            offset: (_page - 1) * _limit,
+            order: [[_sortBy, _sortDir]],
+            where: {
+              transaction_name: {
+                [Op.like]: `%${transaction_name}%`,
+              },
+              [Op.and]: {
+                payment_method,
+                WarehouseId,
+              },
+            },
+            include: [
+              {
+                model: db.User,
+                where: {
+                  username: {
+                    [Op.like]: `%${username}%`,
+                  },
+                },
+              },
+              { model: db.Order_status },
+              { model: db.Payment_status },
+              { model: db.Warehouse },
+            ],
+          })
+
+          return res.status(200).json({
+            message: "Waiting Confrimation And 3",
             data: response.rows,
             dataCount: response.count,
           })
