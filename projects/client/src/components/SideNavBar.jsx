@@ -99,7 +99,7 @@ const SideNavBar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link to="#empty">
+                        <Link to="/admin/sales-report">
                             <Text>Sales Report</Text>
                         </Link>
                     </li>
