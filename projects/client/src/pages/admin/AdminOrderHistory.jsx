@@ -136,7 +136,7 @@ const AdminOrderHistory = () => {
     const prevPageBtnHandler = () => {
         setPage(page - 1)
     }
-    console.log("trans", transactionData)
+    console.log("trans", transactionData.map((val) => val.WarehouseId)[0])
     useEffect(() => {
         // fetchData()
         fetchData2()
@@ -210,7 +210,7 @@ const AdminOrderHistory = () => {
                                               <option value={val.WarehouseId}>
                                                   {val.Warehouse.warehouse_name}
                                               </option>
-                                          ))
+                                          ))[0]
                                         : warehouseData.map((val) => (
                                               <option value={val.id}>
                                                   {val.warehouse_name}
