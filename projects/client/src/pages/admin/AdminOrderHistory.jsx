@@ -30,7 +30,7 @@ import { Carousel } from "react-responsive-carousel"
 import "react-responsive-carousel/lib/styles/carousel.min.css"
 import { useSelector } from "react-redux"
 
-const AdminTransactionHistory = () => {
+const AdminOrderHistory = () => {
     const [transactionData, setTransactionData] = useState([])
     const [warehouseData, setWarehouseData] = useState([])
     const [imageData, setImageData] = useState([])
@@ -474,4 +474,4 @@ const AdminTransactionHistory = () => {
     )
 }
 
-export default AdminTransactionHistory
+export default AdminOrderHistory

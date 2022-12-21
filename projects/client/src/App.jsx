@@ -43,7 +43,7 @@ import ShippingComponent2 from "./components/product/ShippingComponent2"
 import AdminStockChangesReport from "./pages/admin/AdminStockChangesReport"
 import AdminOrder from "./pages/admin/AdminOrder"
 import PaymentProof from "./pages/PaymentProof"
-import AdminTransactionHistory from "./pages/admin/AdminTransactionHistory"
+import AdminOrderHistory from "./pages/admin/AdminOrderHistory"
 
 function App() {
     const [message, setMessage] = useState("")
@@ -242,7 +242,7 @@ function App() {
                     path="/admin/order-history"
                     element={
                         <AdminRoute>
-                            <AdminTransactionHistory />
+                            <AdminOrderHistory />
                         </AdminRoute>
                     }
                 />

@@ -192,6 +192,7 @@ const adminOrderHistoryController = {
                     where: { WarehouseId },
                     limit: Number(_limit),
                     offset: (_page - 1) * _limit,
+                    order: [["transaction_name", "DESC"]],
                 })
 
                 return res.status(200).json({
@@ -216,6 +217,7 @@ const adminOrderHistoryController = {
                 ],
                 limit: Number(_limit),
                 offset: (_page - 1) * _limit,
+                order: [["transaction_name", "DESC"]],
             })
 
             return res.status(200).json({
