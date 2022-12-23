@@ -4,6 +4,7 @@ const fs = require("fs")
 const handlebars = require("handlebars")
 const { Op } = require("sequelize")
 const moment = require("moment")
+const schedule = require("node-schedule")
 
 const adminOrderController = {
   waitingConfirmation: async (req, res) => {
@@ -1334,21 +1335,26 @@ const adminOrderController = {
         }
       )
 
+      schedule
+
       const dueDateConfirm = moment()
-        .add(5, "minutes")
+        .add(7, "days")
         .format("YYYY-MM-DD HH:mm:ss")
 
-      console.log(dueDateConfirm)
-      if (new Date() === dueDateConfirm) {
-        await db.Transaction.update(
-          {
-            OrderStatusId: 4,
-          },
-          {
-            id: id,
-          }
-        )
-      }
+      schedule.scheduleJob(
+        dueDateConfirm,
+        async () =>
+          await db.Transaction.update(
+            {
+              OrderStatusId: 4,
+            },
+            {
+              where: {
+                id: id,
+              },
+            }
+          )
+      )
 
       return res.status(200).json({
         message: "Order Send",
