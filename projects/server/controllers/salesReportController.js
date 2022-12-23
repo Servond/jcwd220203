@@ -225,6 +225,9 @@ const salesReportController = {
                 sql += `WHERE ct.category_name LIKE "%${category_name}%" `
             }
 
+            const dataCount = await db.sequelize.query(sql)
+            const dataCountReal = dataCount[0]
+
             sql += `ORDER BY trx_items.createdAt ${_sortBy}
                     LIMIT ${_limit}
                     OFFSET ${(_page - 1) * _limit} `
@@ -236,6 +239,7 @@ const salesReportController = {
             return res.status(200).json({
                 message: "Filtered",
                 data: findDataReal,
+                dataCount: dataCountReal.length,
             })
         } catch (err) {
             return res.status(500).json({
