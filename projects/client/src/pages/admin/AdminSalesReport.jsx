@@ -12,12 +12,18 @@ import {
     HStack,
     Grid,
     GridItem,
+    Input,
+    InputGroup,
+    FormControl,
+    Button,
 } from "@chakra-ui/react"
 import { useEffect } from "react"
 import { useState } from "react"
 import { CgChevronLeft, CgChevronRight } from "react-icons/cg"
 import { axiosInstance } from "../../api"
 import { useSelector } from "react-redux"
+import { Form, useFormik } from "formik"
+import { TbSearch } from "react-icons/tb"
 
 const AdminSalesReport = () => {
     const [salesData, setSalesData] = useState([])
@@ -28,9 +34,12 @@ const AdminSalesReport = () => {
     const [filterWarehouse, setFilterWarehouse] = useState("")
     const [filterCategory, setFilterCategory] = useState("")
     const [filterMonth, setFilterMonth] = useState("")
+    const [productSearch, setProductSearch] = useState("")
+    const [categorySearch, setCategorySearch] = useState("")
+    const [sort, setSort] = useState("")
     const authSelector = useSelector((state) => state.auth)
 
-    const maxItemsPerPage = 5
+    const maxItemsPerPage = 10
     const fetchData = async () => {
         try {
             let url = `/admin/sales-report/get2`
@@ -46,6 +55,9 @@ const AdminSalesReport = () => {
                     WarehouseId: filterWarehouse,
                     CategoryId: filterCategory,
                     createdAt: filterMonth,
+                    product_name: productSearch,
+                    category_name: categorySearch,
+                    _sortBy: sort,
                 },
             })
             setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
@@ -63,7 +75,7 @@ const AdminSalesReport = () => {
 
     // const fetchData2 = async () => {
     //     try {
-    //         let url = `/admin/order-history/get2`
+    //         let url = `/admin/sales-report/get`
 
     //         if (authSelector.WarehouseId) {
     //             url += `?WarehouseId=${authSelector.WarehouseId}`
@@ -73,14 +85,16 @@ const AdminSalesReport = () => {
     //             params: {
     //                 _page: page,
     //                 _limit: maxItemsPerPage,
-    //                 WarehouseId: filter,
+    //                 WarehouseId: filterWarehouse,
+    //                 CategoryId: filterCategory,
+    //                 createdAt: filterMonth,
     //             },
     //         })
     //         setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
     //         if (page === 1) {
-    //             setTransactionData(response.data.data)
+    //             setSalesData(response.data.data)
     //         } else {
-    //             setTransactionData(response.data.data)
+    //             setSalesData(response.data.data)
     //         }
     //     } catch (err) {
     //         console.log(err)
@@ -130,6 +144,54 @@ const AdminSalesReport = () => {
         setFilterMonth(value)
     }
 
+    // const categoryFormikSearch = useFormik({
+    //     initialValues: {
+    //         search: "",
+    //     },
+    //     onSubmit: ({ search }) => {
+    //         setCategorySearch(search)
+    //         setPage(1)
+    //     },
+    // })
+    // const categorySearchBtnHandler = (e) => {
+    //     // const { name, value } = target
+    //     // categoryFormikSearch.setFieldValue(name, value)
+    //     setCategorySearch(e)
+    // }
+
+    // const productFormikSearch = useFormik({
+    //     initialValues: {
+    //         search: "",
+    //     },
+    //     onSubmit: ({ search }) => {
+    //         setProductSearch(search)
+    //         setPage(1)
+    //     },
+    // })
+    const productSearchBtnHandler = (e) => {
+        // const { name, value } = target
+        // productFormikSearch.setFieldValue(name, value)
+        setProductSearch(e.target.value)
+    }
+
+    const handleKeyEnter = (e) => {
+        if (e.key === "Enter") {
+            setProductSearch(productSearch)
+        }
+    }
+    // const searching = () => {
+    //     if (categorySearch) {
+    //         categorySearchBtnHandler()
+    //     } else if (productSearch) {
+    //         productSearchBtnHandler()
+    //     }
+    // }
+
+    const sortHandler = ({ target }) => {
+        const { value } = target
+        setSort(value)
+    }
+
     const nextPageBtnHandler = () => {
         setPage(page + 1)
     }
@@ -139,13 +201,32 @@ const AdminSalesReport = () => {
     }
     // console.log("trans", transactionData.map((val) => val.WarehouseId)[0])
     console.log("cat", categoryData)
+    console.log(
+        "sal",
+        salesData.map((val) => val.category_name)
+    )
+    console.log("salllll", salesData)
+
+    console.log("sss", sort)
     useEffect(() => {
         fetchData()
         // fetchData2()
+    }, [
+        filterWarehouse,
+        filterCategory,
+        filterMonth,
+        page,
+        sort,
+        productSearch,
+        categorySearch,
+        authSelector,
+    ])
+
+    useEffect(() => {
         fetchWarehouse()
         // fetchProduct()
         fetchCategory()
-    }, [filterWarehouse, filterCategory, filterMonth, page, authSelector])
+    }, [])
     return (
         <>
             <Box ml="250px" mr="1.5em">
@@ -160,10 +241,25 @@ const AdminSalesReport = () => {
                     <Box mt="3vh">
                         <Grid
                             p="5px"
-                            gap="2"
+                            gap="5"
                             w="full"
-                            gridTemplateColumns="repeat(3,1fr)"
+                            gridTemplateColumns="repeat(5,1fr)"
                         >
+                            {/* Sort */}
+                            <GridItem
+                                w="full"
+                                justifySelf="center"
+                                border="1px solid #dfe1e3"
+                                borderRadius="8px"
+                                onChange={sortHandler}
+                            >
+                                <Select>
+                                    <option value="">---Sort---</option>
+                                    <option value={"ASC"}>Ascending</option>
+                                    <option value={"DESC"}>Descending</option>
+                                </Select>
+                            </GridItem>
+
                             {/* Month */}
                             <GridItem
                                 w="full"
@@ -215,6 +311,7 @@ const AdminSalesReport = () => {
                                 border="1px solid #dfe1e3"
                                 borderRadius="8px"
                             >
+                                {/* RAW QUERY */}
                                 <Select>
                                     <option value="">---By Warehouse---</option>
                                     {authSelector.WarehouseId ===
@@ -230,6 +327,40 @@ const AdminSalesReport = () => {
                                               </option>
                                           ))}
                                 </Select>
+
+                                {/* <Select>
+                                    <option value="">---By Warehouse---</option>
+                                    {authSelector.WarehouseId === salesData.map((val) => val.WarehouseId)[0]
+                                    ? salesData.map((val) => (
+                                        <option value={val.WarehouseId}
+                                    ))
+                                    }
+                                </Select> */}
+                            </GridItem>
+
+                            {/* Search */}
+                            <GridItem
+                                w="full"
+                                justifySelf="center"
+                                border="1px solid #dfe1e3"
+                                borderRadius="8px"
+                            >
+                                <InputGroup>
+                                    <Input
+                                        onChange={productSearchBtnHandler}
+                                        onKeyDown={handleKeyEnter}
+                                        value={productSearch}
+                                    />
+                                    {/* <Button
+                                        borderLeftRadius={"0"}
+                                        type="submit"
+                                        bgColor={"white"}
+                                        border="1px solid #e2e8f0"
+                                        borderLeft={"0px"}
+                                    >
+                                        <TbSearch />
+                                    </Button> */}
+                                </InputGroup>
                             </GridItem>
                         </Grid>
                     </Box>
@@ -277,21 +408,34 @@ const AdminSalesReport = () => {
                                 {salesData.map((val) => (
                                     <Tr>
                                         <Td>
+                                            {/* RAW QUERY */}
                                             <Text>
                                                 {val.createdAt.split("T")[0]} /{" "}
                                                 {val.createdAt
                                                     .split("T")[1]
                                                     .split(".000Z")}
                                             </Text>
+
+                                            {/* <Text maxW="150px">
+                                                {val.createdAt.split("T")[0]} /{" "}
+                                                {val.createdAt
+                                                    .split("T")[1]
+                                                    .split(".000Z")}
+                                            </Text> */}
                                         </Td>
                                         <Td>
+                                            {/* RAW QUERY */}
                                             <Text>
                                                 {
-                                                    // val.transaction_name
-
                                                     val.productId //raw query
                                                 }
                                             </Text>
+
+                                            {/* <Text>
+                                                {val.TransactionItems.map(
+                                                    (val) => val.ProductId
+                                                )}
+                                            </Text> */}
                                         </Td>
                                         <Td>
                                             <Text>
