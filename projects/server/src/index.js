@@ -26,6 +26,7 @@ const addressCheckoutRoute = require("../routes/addressCheckoutRoute")
 const userProfileRoute = require("../routes/userProfileRoute")
 const transactionsRoute = require("../routes/transactionsRoute")
 const exportRoute = require("../routes/exportRoute")
+const stockMutationRoute = require("../routes/stockMutationRoute")
 
 const adminOrderRoute = require("../routes/adminOrderRoute")
 
@@ -69,6 +70,7 @@ app.use("/checkoutAddress", addressCheckoutRoute)
 app.use("/user-profile", verifyToken, userProfileRoute)
 app.use("/export", verifyToken, exportRoute)
 app.use("/adminOrder", verifyToken, adminOrderRoute)
+app.use("/stock-mutation", verifyToken, stockMutationRoute)
 
 app.get("/api", (req, res) => {
   res.send(`Hello, this is my API`)

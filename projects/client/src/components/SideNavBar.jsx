@@ -90,6 +90,11 @@ const SideNavBar = () => {
             </Link>
           </li>
           <li>
+            <Link to="/admin/stock-mutation">
+              <Text>Stock Mutation</Text>
+            </Link>
+          </li>
+          <li>
             <Link to="#empty">
               <Text>Sales Report</Text>
             </Link>
