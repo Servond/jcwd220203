@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
       mutation_status: {
         type: DataTypes.STRING,
       },
+
     },
     {
       sequelize,
@@ -39,4 +40,5 @@ module.exports = (sequelize, DataTypes) => {
     }
   )
   return Mutation
+
 }
