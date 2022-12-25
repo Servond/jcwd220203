@@ -29,7 +29,7 @@ import ManageUserData from "./pages/admin/ManageUserData"
 import ManageAdminData from "./pages/admin/ManageAdminData"
 import AdminCategory from "./pages/admin/AdminCategory"
 import NotFound from "./components/404Page"
-import Cart from "./pages/Cart"
+import Cart from "./pages/Cart/Cart"
 import ProtectedRoute from "./components/ProtectedRoute"
 import AdminProductData from "./pages/admin/AdminProductData"
 import AdminProductDataDetail from "./pages/admin/AdminProductDataDetail"
@@ -43,6 +43,7 @@ import ShippingComponent2 from "./components/product/ShippingComponent2"
 import AdminStockChangesReport from "./pages/admin/AdminStockChangesReport"
 import AdminOrder from "./pages/admin/AdminOrder"
 import PaymentProof from "./pages/PaymentProof"
+import AdminMutationStock from "./pages/admin/AdminMutationStock"
 import AdminOrderHistory from "./pages/admin/AdminOrderHistory"
 import AdminSalesReport from "./pages/admin/AdminSalesReport"
 
@@ -51,7 +52,7 @@ function App() {
     const authSelector = useSelector((state) => state.auth)
 
     useEffect(() => {
-        ;(async () => {
+        ; (async () => {
             const { data } = await axios.get(
                 `${process.env.REACT_APP_API_BASE_URL}/api/greetings`
             )
@@ -123,12 +124,12 @@ function App() {
             ) : null}
 
             {location.pathname === "/login" ||
-            location.pathname === "/register" ||
-            location.pathname === "/reset-password-confirmation" ||
-            location.pathname === "/request-reset-password" ||
-            location.pathname === "/cart/shipment" ||
-            authSelector.RoleId === 3 ||
-            authSelector.RoleId === 2 ? null : (
+                location.pathname === "/register" ||
+                location.pathname === "/reset-password-confirmation" ||
+                location.pathname === "/request-reset-password" ||
+                location.pathname === "/cart/shipment" ||
+                authSelector.RoleId === 3 ||
+                authSelector.RoleId === 2 ? null : (
                 <Box>
                     <Navbar />
                 </Box>
@@ -238,7 +239,6 @@ function App() {
                         </AdminRoute>
                     }
                 />
-
                 <Route
                     path="/admin/order-history"
                     element={
@@ -331,6 +331,14 @@ function App() {
                     }
                 />
                 <Route
+                    path="/admin/stock-mutation"
+                    element={
+                        <AdminRoute>
+                            <AdminMutationStock />
+                        </AdminRoute>
+                    }
+                />
+                <Route
                     path="/admin/order"
                     element={
                         <AdminRoute>
@@ -413,19 +421,16 @@ function App() {
                 />
                 {/* Product Route */}
                 <Route path="/product" element={<Product />} />
-                <Route
-                    path="/product/:id/:product_name"
-                    element={<ProductDetail />}
-                />
+                <Route path="/product/:id/:product_name" element={<ProductDetail />} />
             </Routes>
 
             {location.pathname === "/login" ||
-            location.pathname === "/register" ||
-            location.pathname === "/reset-password-confirmation" ||
-            location.pathname === "/request-reset-password" ||
-            location.pathname === "/cart/shipment" ||
-            authSelector.RoleId === 3 ||
-            authSelector.RoleId === 2 ? null : (
+                location.pathname === "/register" ||
+                location.pathname === "/reset-password-confirmation" ||
+                location.pathname === "/request-reset-password" ||
+                location.pathname === "/cart/shipment" ||
+                authSelector.RoleId === 3 ||
+                authSelector.RoleId === 2 ? null : (
                 <Box>
                     <Footer />
                 </Box>
