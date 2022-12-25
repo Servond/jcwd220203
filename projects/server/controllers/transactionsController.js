@@ -39,7 +39,7 @@ const transactionsController = {
     },
     createNewTransaction: async (req, res) => {
         try {
-            const { payment_method, shipping_fee, total_price, AddressId, courir_duration } = req.body
+            const { payment_method, shipping_fee, total_price, AddressId, courir_duration, WarehouseId } = req.body
 
             const getCheckedCartItems = await Cart.findAll({
                 where: {
@@ -73,6 +73,9 @@ const transactionsController = {
                 group by c.id;`
             )
 
+            const productNameArr = getTotal[0].map((val) => val.product_name)
+            console.log(getTotal[0].map((val) => val.product_name))
+
             const stockProduct = getTotal[0]
 
             const arrProductStock = stockProduct.map((val) => Number(val.totalStock))
@@ -80,9 +83,10 @@ const transactionsController = {
             const arrCartQuantity = stockProduct.map((val) => val.quantity)
 
             for (let i = 0; i < arrProductStock.length; i++) {
+
                 if (arrProductStock[i] < arrCartQuantity[i]) {
                     return res.status(400).json({
-                        message: "Insufficient product stock"
+                        message: `Insufficient product stock ${productNameArr[i]}`
                     })
                 }
             }
@@ -108,6 +112,8 @@ const transactionsController = {
 
             const total_quantity = totalQuantity
 
+            const payment_date = moment().add().format("YYYY-MM-DD HH:mm:ss")
+
             const expDate = moment().add(1, 'days').format("YYYY-MM-DD HH:mm:ss")
 
             const createTransaction = await Transaction.create({
@@ -117,10 +123,12 @@ const transactionsController = {
                 shipping_fee: shipping_fee,
                 payment_method: `${payment_method} Virtual Account`,
                 payment_expired_date: expDate,
-                OrderStatusId: 1,
+                OrderStatusId: 0,
                 PaymentStatusId: 1,
                 AddressId: AddressId,
-                courir_duration: courir_duration
+                courir_duration: courir_duration,
+                payment_date: payment_date,
+                WarehouseId: WarehouseId
             })
 
             await Transaction.update(
@@ -210,14 +218,12 @@ const transactionsController = {
 
             const { payment_proof } = req.body
 
-            const payment_date = moment().add().format("YYYY-MM-DD HH:mm:ss")
-
             await Transaction.update(
                 {
                     payment_proof: payment_proof,
                     PaymentStatusId: 2,
+                    OrderStatusId: 1,
                     is_paid: true,
-                    payment_date: payment_date
                 },
                 {
                     where:
@@ -262,6 +268,868 @@ const transactionsController = {
                 message: "payment expired",
             })
 
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({
+                message: "Server error",
+            })
+        }
+    },
+    getAllMyTransaction: async (req, res) => {
+        try {
+            const { _page = 1, _sortBy = "id", _sortDir = "ASC" } = req.query
+
+            const MyTransactionList = await Transaction.findAndCountAll({
+                order: [[_sortBy, _sortDir]],
+                include: [
+                    {
+                        model: TransactionItem,
+                        include: [
+                            {
+                                model: db.Product,
+                                include: [
+                                    {
+                                        model: db.Image_Url,
+                                    },
+                                ],
+                            },
+                        ],
+
+                    },
+                    {
+                        model: db.Order_status
+                    }
+                ],
+                where: {
+                    UserId: req.user.id,
+                },
+            })
+
+            const count = MyTransactionList.rows.map((val) => val.id)
+
+            const dataCount = count.length
+
+            return res.status(200).json({
+                message: "payment expired",
+                data: MyTransactionList.rows,
+                dataCount: dataCount
+            })
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({
+                message: "Server error",
+            })
+        }
+    },
+    getMyTransactionList: async (req, res) => {
+        try {
+            const { _limit = 10, _page = 1, _sortBy = "id", _sortDir = "DESC", transaction_name = "", status = "", keyword = "" } = req.query
+
+            if (keyword && status === "On Going") {
+                const getProductOnGoing = await db.sequelize.query(
+                    `Select product_name, t.OrderStatusId, t.id as TransactionId, transaction_name, t.is_paid, t.UserId from transactionItems ti
+                    join products p
+                    on p.id = ti.ProductId
+                    join transactions t
+                    on ti.TransactionId = t.id
+                    join order_statuses os
+                    where p.product_name Like '%${keyword}%' && UserId = ${req.user.id}  && is_paid=${true} && 
+                    (t.OrderStatusId=1 or t.OrderStatusId=2 or t.OrderStatusId=3 or t.OrderStatusId=4)
+                    group by t.id;`
+                )
+
+                const getTransactionId = getProductOnGoing[0].map((val) => val.TransactionId)
+
+                const MyTransactionList = await Transaction.findAndCountAll({
+                    limit: Number(_limit),
+                    offset: (_page - 1) * _limit,
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        id: getTransactionId,
+                        is_paid: true,
+                        // UserId: req.user.id,
+                    },
+                })
+                const count = MyTransactionList.rows.map((val) => val.id)
+
+                const dataCount = count.length
+
+                return res.status(200).json({
+                    message: "Get Transaction On Going List",
+                    data: MyTransactionList,
+                    dataCount: dataCount
+                })
+            }
+
+            const getProduct = await db.sequelize.query(
+                `Select product_name, t.id as TransactionId, transaction_name, t.UserId from transactionItems ti
+                join products p
+                on p.id = ti.ProductId
+                join transactions t
+                on ti.TransactionId = t.id
+                where p.product_name Like '%${keyword}%' && UserId = ${req.user.id} && is_paid=${true};`
+            )
+
+            if (keyword) {
+                const getTransactionId = getProduct[0].map((val) => val.TransactionId)
+
+                const MyTransactionList = await Transaction.findAndCountAll({
+                    limit: Number(_limit),
+                    offset: (_page - 1) * _limit,
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        id: getTransactionId,
+                        is_paid: true,
+                    },
+                })
+                const count = MyTransactionList.rows.map((val) => val.id)
+
+                const dataCount = count.length
+
+                return res.status(200).json({
+                    message: "Get Transaction List",
+                    data: MyTransactionList.rows,
+                    dataCount: dataCount
+                })
+            }
+
+            if (status === "On Going") {
+
+                const getTransactionId = getProduct[0].map((val) => val.TransactionId)
+
+                const MyTransactionList = await Transaction.findAndCountAll({
+                    limit: Number(_limit),
+                    offset: (_page - 1) * _limit,
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        [Op.or]: [
+                            { OrderStatusId: 1 },
+                            { OrderStatusId: 2 },
+                            { OrderStatusId: 3 },
+                            { OrderStatusId: 4 }
+                        ],
+                        UserId: req.user.id,
+                    }
+                })
+
+                const MyTransactionListAll = await Transaction.findAll({
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        [Op.or]: [
+                            { OrderStatusId: 1 },
+                            { OrderStatusId: 2 },
+                            { OrderStatusId: 3 },
+                            { OrderStatusId: 4 }
+                        ],
+                        UserId: req.user.id
+                    }
+                })
+                const count = MyTransactionListAll.map((val) => val.id)
+
+                const dataCount = count.length
+
+                return res.status(200).json({
+                    message: "Get Transaction List By Status",
+                    data: MyTransactionList.rows,
+                    dataCount: dataCount
+                })
+            }
+
+            if (status === "Awaiting Confirmation") {
+                const MyTransactionList = await Transaction.findAndCountAll({
+                    limit: Number(_limit),
+                    offset: (_page - 1) * _limit,
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        OrderStatusId: 1,
+                        UserId: req.user.id
+                    }
+                })
+
+                const MyTransactionListAll = await Transaction.findAll({
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        OrderStatusId: 1,
+                        UserId: req.user.id
+                    }
+                })
+                const count = MyTransactionListAll.map((val) => val.id)
+
+                const dataCount = count.length
+
+                return res.status(200).json({
+                    message: "Get Transaction List By Status",
+                    data: MyTransactionList.rows,
+                    dataCount: dataCount
+                })
+            }
+
+            if (status === "Processed") {
+                const MyTransactionList = await Transaction.findAndCountAll({
+                    limit: Number(_limit),
+                    offset: (_page - 1) * _limit,
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        OrderStatusId: 2,
+                        UserId: req.user.id
+                    }
+                })
+
+                const MyTransactionListAll = await Transaction.findAll({
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        OrderStatusId: 2,
+                        UserId: req.user.id
+                    }
+                })
+
+                const count = MyTransactionListAll.map((val) => val.id)
+
+                const dataCount = count.length
+
+                return res.status(200).json({
+                    message: "Get Transaction List By Status",
+                    data: MyTransactionList.rows,
+                    dataCount: dataCount
+                })
+            }
+
+            if (status === "Shipping") {
+                const MyTransactionList = await Transaction.findAndCountAll({
+                    limit: Number(_limit),
+                    offset: (_page - 1) * _limit,
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        OrderStatusId: 3,
+                        UserId: req.user.id
+                    }
+                })
+
+                const MyTransactionListAll = await Transaction.findAll({
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        OrderStatusId: 3,
+                        UserId: req.user.id
+                    }
+                })
+                const count = MyTransactionListAll.map((val) => val.id)
+
+                const dataCount = count.length
+
+                return res.status(200).json({
+                    message: "Get Transaction List By Status",
+                    data: MyTransactionList.rows,
+                    dataCount: dataCount
+                })
+            }
+
+            if (status === "Delivered") {
+                const MyTransactionList = await Transaction.findAndCountAll({
+                    limit: Number(_limit),
+                    offset: (_page - 1) * _limit,
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        OrderStatusId: 4,
+                        UserId: req.user.id
+                    }
+                })
+
+                const MyTransactionListAll = await Transaction.findAll({
+                    limit: Number(_limit),
+                    offset: (_page - 1) * _limit,
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        OrderStatusId: 4,
+                        UserId: req.user.id
+                    }
+                })
+
+                const count = MyTransactionListAll.map((val) => val.id)
+
+                const dataCount = count.length
+
+                return res.status(200).json({
+                    message: "Get Transaction List By Status",
+                    data: MyTransactionList.rows,
+                    dataCount: dataCount
+                })
+            }
+
+            if (status === "Done") {
+                const MyTransactionList = await Transaction.findAndCountAll({
+                    limit: Number(_limit),
+                    offset: (_page - 1) * _limit,
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        OrderStatusId: 5,
+                        UserId: req.user.id
+                    }
+                })
+
+                const MyTransactionListAll = await Transaction.findAll({
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        OrderStatusId: 5,
+                        UserId: req.user.id
+                    }
+                })
+                const count = MyTransactionListAll.map((val) => val.id)
+
+                const dataCount = count.length
+
+                return res.status(200).json({
+                    message: "Get Transaction List By Status",
+                    data: MyTransactionList.rows,
+                    dataCount: dataCount
+                })
+            }
+
+            if (status === "Cancelled") {
+                const MyTransactionList = await Transaction.findAndCountAll({
+                    limit: Number(_limit),
+                    offset: (_page - 1) * _limit,
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        OrderStatusId: 6,
+                        UserId: req.user.id
+                    }
+                })
+
+                const MyTransactionListAll = await Transaction.findAll({
+                    order: [[_sortBy, _sortDir]],
+                    include: [
+                        {
+                            model: TransactionItem,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    include: [
+                                        {
+                                            model: db.Image_Url,
+                                        },
+                                        {
+                                            model: db.Total_Stock
+                                        }
+                                    ],
+                                },
+                            ],
+
+                        },
+                        {
+                            model: db.Order_status
+                        },
+                        { model: db.Address }
+                    ],
+                    where: {
+                        OrderStatusId: 6,
+                        UserId: req.user.id
+                    }
+                })
+                const count = MyTransactionListAll.map((val) => val.id)
+
+                const dataCount = count.length
+
+                return res.status(200).json({
+                    message: "Get Transaction List By Status",
+                    data: MyTransactionList.rows,
+                    dataCount: dataCount
+                })
+            }
+
+            const MyTransactionList = await Transaction.findAndCountAll({
+                limit: Number(_limit),
+                offset: (_page - 1) * _limit,
+                order: [[_sortBy, _sortDir]],
+                include: [
+                    {
+                        model: TransactionItem,
+                        include: [
+                            {
+                                model: db.Product,
+                                include: [
+                                    {
+                                        model: db.Image_Url,
+                                    },
+                                    {
+                                        model: db.Total_Stock
+                                    }
+                                ],
+                            },
+                        ],
+
+                    },
+                    {
+                        model: db.Order_status
+                    },
+                    { model: db.Address }
+                ],
+                where: {
+                    is_paid: true,
+                    UserId: req.user.id
+                },
+            })
+
+            const MyTransactionListAll = await Transaction.findAll({
+                order: [[_sortBy, _sortDir]],
+                include: [
+                    {
+                        model: TransactionItem,
+                        include: [
+                            {
+                                model: db.Product,
+                                include: [
+                                    {
+                                        model: db.Image_Url,
+                                    },
+                                    {
+                                        model: db.Total_Stock
+                                    }
+                                ],
+                            },
+                        ],
+
+                    },
+                    {
+                        model: db.Order_status
+                    },
+                    { model: db.Address }
+                ],
+                where: {
+                    is_paid: true,
+                    UserId: req.user.id
+                },
+            })
+
+            const count = MyTransactionListAll.map((val) => val.id)
+
+            const dataCount = count.length
+
+            return res.status(200).json({
+                message: "Get keyword",
+                data: MyTransactionList.rows,
+                dataCount: dataCount
+            })
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({
+                message: "Server error",
+            })
+        }
+    },
+    getUnpaidTransaction: async (req, res) => {
+        try {
+            const { _sortBy = "id", _sortDir = "DESC" } = req.query
+
+            const MyTransactionList = await Transaction.findAndCountAll({
+                order: [[_sortBy, _sortDir]],
+                include: [
+                    {
+                        model: TransactionItem,
+                        include: [
+                            {
+                                model: db.Product,
+                                include: [
+                                    {
+                                        model: db.Image_Url,
+                                    },
+                                    {
+                                        model: db.Total_Stock
+                                    }
+                                ],
+                            },
+                        ],
+
+                    },
+                    {
+                        model: db.Order_status
+                    },
+                    { model: db.Address }
+                ],
+                where: {
+                    is_paid: false,
+                    UserId: req.user.id
+                },
+            })
+
+            const count = MyTransactionList.rows.map((val) => val.id)
+
+            const dataCount = count.length
+
+            return res.status(200).json({
+                message: "payment expired",
+                data: MyTransactionList.rows,
+                dataCount: dataCount
+            })
+        } catch (err) {
+            console.log(err)
+            return res.status(500).json({
+                message: "Server error",
+            })
+        }
+    },
+    finishTransactionHandler: async (req, res) => {
+        try {
+            const { transaction_name } = req.params
+
+            await Transaction.update(
+                {
+                    OrderStatusId: 5
+                },
+                {
+                    where: {
+                        transaction_name: transaction_name
+                    }
+                },
+            )
+
+            return res.status(200).json({
+                message: "Order finished",
+            })
         } catch (err) {
             console.log(err)
             return res.status(500).json({
