@@ -180,7 +180,7 @@ const salesReportController = {
 
     getReportWithQuery: async (req, res) => {
         const CategoryId = req.query.CategoryId
-        const WarehouseId = req.query.WarehouseId
+        const WarehouseId = req.query.WarehouseId[0]
         const {
             createdAt,
             product_name = "",
@@ -197,7 +197,7 @@ const salesReportController = {
         console.log("cname", category_name)
         try {
             const { _sortBy = "" } = req.query
-            let sql = `SELECT trx.WarehouseId, pr.CategoryId, pr.id AS productId, ct.category_name, pr.product_name, pr.description, trx_items.price_per_item AS price, trx_items.quantity,
+            let sql = `SELECT  trx.WarehouseId, pr.CategoryId, pr.id AS productId, ct.category_name, pr.product_name, pr.description, trx_items.price_per_item AS price, trx_items.quantity,
                         trx_items.price_per_item * trx_items.quantity AS total, wr.warehouse_name, trx_items.createdAt
                         FROM transactionitems AS trx_items
                         JOIN transactions AS trx ON trx.id = trx_items.TransactionId

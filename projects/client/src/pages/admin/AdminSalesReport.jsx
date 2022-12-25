@@ -14,7 +14,6 @@ import {
     GridItem,
     Input,
     InputGroup,
-    FormControl,
     Button,
 } from "@chakra-ui/react"
 import { useEffect } from "react"
@@ -22,7 +21,6 @@ import { useState } from "react"
 import { CgChevronLeft, CgChevronRight } from "react-icons/cg"
 import { axiosInstance } from "../../api"
 import { useSelector } from "react-redux"
-import { Form, useFormik } from "formik"
 import { TbSearch } from "react-icons/tb"
 
 const AdminSalesReport = () => {
@@ -61,8 +59,6 @@ const AdminSalesReport = () => {
                 },
             })
             setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
-            // setSalesData(response.data.data)
-
             if (page === 1) {
                 setSalesData(response.data.data)
             } else {
@@ -118,16 +114,6 @@ const AdminSalesReport = () => {
         }
     }
 
-    // const fetchProduct = async () => {
-    //     try {
-    //         const response = await axiosInstance.get(`/product/${productId}`)
-    //         setProductData(response.data.data)
-    //         setImageData(response.data.data.Image_Urls)
-    //     } catch (err) {
-    //         console.log(err)
-    //     }
-    // }
-
     const filterWarehouseBtnHandler = ({ target }) => {
         const { value } = target
         setFilterWarehouse(value)
@@ -144,33 +130,11 @@ const AdminSalesReport = () => {
         setFilterMonth(value)
     }
 
-    // const categoryFormikSearch = useFormik({
-    //     initialValues: {
-    //         search: "",
-    //     },
-    //     onSubmit: ({ search }) => {
-    //         setCategorySearch(search)
-    //         setPage(1)
-    //     },
-    // })
-    // const categorySearchBtnHandler = (e) => {
-    //     // const { name, value } = target
-    //     // categoryFormikSearch.setFieldValue(name, value)
-    //     setCategorySearch(e)
-    // }
+    const categorySearchBtnHandler = (e) => {
+        setCategorySearch(e.target.value)
+    }
 
-    // const productFormikSearch = useFormik({
-    //     initialValues: {
-    //         search: "",
-    //     },
-    //     onSubmit: ({ search }) => {
-    //         setProductSearch(search)
-    //         setPage(1)
-    //     },
-    // })
     const productSearchBtnHandler = (e) => {
-        // const { name, value } = target
-        // productFormikSearch.setFieldValue(name, value)
         setProductSearch(e.target.value)
     }
 
@@ -224,7 +188,6 @@ const AdminSalesReport = () => {
 
     useEffect(() => {
         fetchWarehouse()
-        // fetchProduct()
         fetchCategory()
     }, [])
     return (
@@ -254,9 +217,9 @@ const AdminSalesReport = () => {
                                 onChange={sortHandler}
                             >
                                 <Select>
-                                    <option value="">---Sort---</option>
-                                    <option value={"ASC"}>Ascending</option>
-                                    <option value={"DESC"}>Descending</option>
+                                    {/* <option value="">---Sort---</option> */}
+                                    <option value={"ASC"}>ASC</option>
+                                    <option value={"DESC"}>DESC</option>
                                 </Select>
                             </GridItem>
 
@@ -344,14 +307,14 @@ const AdminSalesReport = () => {
                                 justifySelf="center"
                                 border="1px solid #dfe1e3"
                                 borderRadius="8px"
+                                onSubmit={(e) => productSearchBtnHandler(e)}
                             >
                                 <InputGroup>
                                     <Input
-                                        onChange={productSearchBtnHandler}
                                         onKeyDown={handleKeyEnter}
                                         value={productSearch}
                                     />
-                                    {/* <Button
+                                    <Button
                                         borderLeftRadius={"0"}
                                         type="submit"
                                         bgColor={"white"}
@@ -359,7 +322,7 @@ const AdminSalesReport = () => {
                                         borderLeft={"0px"}
                                     >
                                         <TbSearch />
-                                    </Button> */}
+                                    </Button>
                                 </InputGroup>
                             </GridItem>
                         </Grid>
@@ -373,11 +336,8 @@ const AdminSalesReport = () => {
                         <Table variant="simple">
                             <Thead>
                                 <Tr>
-                                    <Th w="100px">
+                                    <Th w="130px">
                                         <Text fontSize="10px">Date</Text>
-                                    </Th>
-                                    <Th w="100px">
-                                        <Text fontSize="10px">Product id</Text>
                                     </Th>
                                     <Th w="100px">
                                         <Text fontSize="10px">Category</Text>
@@ -393,7 +353,7 @@ const AdminSalesReport = () => {
                                     <Th w="100px">
                                         <Text fontSize="10px">Price</Text>
                                     </Th>
-                                    <Th w="100px">
+                                    <Th w="50px">
                                         <Text fontSize="10px">qty</Text>
                                     </Th>
                                     <Th w="100px">
@@ -407,7 +367,7 @@ const AdminSalesReport = () => {
                             <Tbody>
                                 {salesData.map((val) => (
                                     <Tr>
-                                        <Td>
+                                        <Td maxW="130px">
                                             {/* RAW QUERY */}
                                             <Text>
                                                 {val.createdAt.split("T")[0]} /{" "}
@@ -423,21 +383,8 @@ const AdminSalesReport = () => {
                                                     .split(".000Z")}
                                             </Text> */}
                                         </Td>
-                                        <Td>
-                                            {/* RAW QUERY */}
-                                            <Text>
-                                                {
-                                                    val.productId //raw query
-                                                }
-                                            </Text>
 
-                                            {/* <Text>
-                                                {val.TransactionItems.map(
-                                                    (val) => val.ProductId
-                                                )}
-                                            </Text> */}
-                                        </Td>
-                                        <Td>
+                                        <Td maxW="100px">
                                             <Text>
                                                 {/* {val.User.username} */}
 
@@ -461,7 +408,7 @@ const AdminSalesReport = () => {
                                                 {val.description}
                                             </Text>
                                         </Td> */}
-                                        <Td>
+                                        <Td maxW="100px">
                                             <Text>
                                                 {new Intl.NumberFormat(
                                                     "id-ID",
@@ -473,7 +420,7 @@ const AdminSalesReport = () => {
                                                 ).format(val.price)}
                                             </Text>
                                         </Td>
-                                        <Td>
+                                        <Td maxW="50px">
                                             <Text>
                                                 {/* {
                                                     val.Order_status
@@ -485,7 +432,7 @@ const AdminSalesReport = () => {
                                             </Text>
                                         </Td>
 
-                                        <Td>
+                                        <Td maxW="100px">
                                             <Text>
                                                 {/* {val.Warehouse.warehouse_name} */}
 
