@@ -47,6 +47,8 @@ import AdminMutationStock from "./pages/admin/AdminMutationStock"
 import AdminOrderHistory from "./pages/admin/AdminOrderHistory"
 import TransactionList from "./pages/TransactionList/TransactionList"
 import PaymentList from "./pages/TransactionList/PaymentList"
+import AdminSalesReport from "./pages/admin/AdminSalesReport"
+
 
 function App() {
     const [message, setMessage] = useState("")
@@ -245,6 +247,15 @@ function App() {
                     element={
                         <AdminRoute>
                             <AdminOrderHistory />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/sales-report"
+                    element={
+                        <AdminRoute>
+                            <AdminSalesReport />
                         </AdminRoute>
                     }
                 />
