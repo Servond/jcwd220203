@@ -5,8 +5,14 @@ const addressController = require("../controllers/addressController")
 const { verifyToken } = require("../middlewares/authMiddleware")
 const axios = require("axios")
 const { body } = require("express-validator")
+const { validateAddress } = require("../middlewares/addressMiddleware")
 
-router.get("/userAddress", verifyToken, addressController.getAddressById)
+router.get(
+  "/userAddress",
+  verifyToken,
+  validateAddress,
+  addressController.getAddressById
+)
 
 router.post(
   "/addNewAddress",
