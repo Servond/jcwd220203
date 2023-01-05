@@ -6,6 +6,7 @@ import UserInfo from "../../components/profile/UserInfo"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { BsPencil } from "react-icons/bs"
+import { RiLockPasswordLine } from "react-icons/ri"
 import { TbLogout } from "react-icons/tb"
 import { logout } from "../../redux/features/authSlice"
 
@@ -201,6 +202,24 @@ const Profile = () => {
                                         <Text fontSize={"12px"} mt="4px">
                                             Set the delivery address for
                                             groceries
+                                        </Text>
+                                    </Box>
+                                </Box>
+                            </Box>
+                        </Link>
+                        <Link to="/user/profile/change-password">
+                            <Box p="16px 16px 16px 0" ml="16px">
+                                <Box display={"flex"}>
+                                    <Box display={"flex"} alignItems="center">
+                                        <RiLockPasswordLine fontSize={"24px"} />
+                                    </Box>
+
+                                    <Box ml="2">
+                                        <Text fontWeight={"bold"}>
+                                            Password
+                                        </Text>
+                                        <Text fontSize={"12px"} mt="4px">
+                                            Change your password
                                         </Text>
                                     </Box>
                                 </Box>
