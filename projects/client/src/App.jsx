@@ -8,7 +8,7 @@ import { login } from "./redux/features/authSlice"
 import GuestRoute from "./components/GuestRoute"
 import Register from "./pages/Register"
 import RegisterVerification from "./pages/RegisterVerification"
-import { Box } from "@chakra-ui/react"
+import { Box, Spinner, Text } from "@chakra-ui/react"
 import Navbar from "./components/Navbar"
 import Footer from "./components/Footer/Footer"
 import HomePage from "./pages/Home"
@@ -27,7 +27,7 @@ import ResetPasswordConfirmation from "./pages/ResetPasswordConfirmation"
 import RequestResetPassword from "./pages/RequestResetPassword"
 import ManageUserData from "./pages/admin/ManageUserData"
 import ManageAdminData from "./pages/admin/ManageAdminData"
-import AdminCategory from "./pages/admin/AdminCategory"
+import AdminCategory from "./pages/admin/AdminCategory/AdminCategory"
 import NotFound from "./components/404Page"
 import Cart from "./pages/Cart/Cart"
 import ProtectedRoute from "./components/ProtectedRoute"
@@ -36,15 +36,15 @@ import AdminProductDataDetail from "./pages/admin/AdminProductDataDetail"
 import Shipment from "./pages/shipment/Shipment"
 import UpdateStock from "./pages/admin/UpdateStock"
 import WarehouseStock from "./components/admin/WarehouseStock"
-import ChangeAddress from "./components/order/ChangeAddress"
 import Checkout from "./pages/order/Checkout"
-import ShippingComponent from "./components/order/ShippingComponent"
 import ShippingComponent2 from "./components/product/ShippingComponent2"
 import AdminStockChangesReport from "./pages/admin/AdminStockChangesReport"
 import AdminOrder from "./pages/admin/AdminOrder"
 import PaymentProof from "./pages/PaymentProof"
 import AdminMutationStock from "./pages/admin/AdminMutationStock"
 import AdminOrderHistory from "./pages/admin/AdminOrderHistory"
+import TransactionList from "./pages/TransactionList/TransactionList"
+import PaymentList from "./pages/TransactionList/WaitingForPayment/PaymentList"
 import AdminSalesReport from "./pages/admin/AdminSalesReport"
 
 function App() {
@@ -52,7 +52,7 @@ function App() {
     const authSelector = useSelector((state) => state.auth)
 
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             const { data } = await axios.get(
                 `${process.env.REACT_APP_API_BASE_URL}/api/greetings`
             )
@@ -117,6 +117,44 @@ function App() {
         userResetData()
     }, [])
 
+    if (!authCheck) {
+        return (
+            <Box textAlign={"center"}>
+                <Box mt={"240px"}>
+                    <Text p="4" fontWeight={"light"} fontSize="4xl">
+                        <Text
+                            fontSize={"30px"}
+                            fontWeight="bold"
+                            color={"#0095DA"}
+                            display="inline"
+                        >
+                            Shop
+                        </Text>
+                        <Text
+                            pl={"0"}
+                            fontSize={"30px"}
+                            fontWeight="bold"
+                            color={"#F7931E"}
+                            display="inline"
+                        >
+                            edia
+                        </Text>
+                    </Text>
+                    <Spinner
+                        thickness="5px"
+                        speed="0.9s"
+                        emptyColor="#F7931E"
+                        color="#0095DA"
+                        size="xl"
+                    />
+                    <Text mt="70px" fontWeight={"semibold"} fontSize="15px">
+                        Feel the convenience of transactions on Shopedia
+                    </Text>
+                </Box>
+            </Box>
+        )
+    }
+
     return (
         <>
             {authSelector.RoleId === 3 || authSelector.RoleId === 2 ? (
@@ -124,12 +162,12 @@ function App() {
             ) : null}
 
             {location.pathname === "/login" ||
-                location.pathname === "/register" ||
-                location.pathname === "/reset-password-confirmation" ||
-                location.pathname === "/request-reset-password" ||
-                location.pathname === "/cart/shipment" ||
-                authSelector.RoleId === 3 ||
-                authSelector.RoleId === 2 ? null : (
+            location.pathname === "/register" ||
+            location.pathname === "/reset-password-confirmation" ||
+            location.pathname === "/request-reset-password" ||
+            location.pathname === "/cart/shipment" ||
+            authSelector.RoleId === 3 ||
+            authSelector.RoleId === 2 ? null : (
                 <Box>
                     <Navbar />
                 </Box>
@@ -404,6 +442,22 @@ function App() {
                     }
                 />
                 <Route
+                    path="/transaction-list"
+                    element={
+                        <ProtectedRoute>
+                            <TransactionList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/transaction/payment-list"
+                    element={
+                        <ProtectedRoute>
+                            <PaymentList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
                     path="/admin/product"
                     element={
                         <AdminRoute>
@@ -421,16 +475,19 @@ function App() {
                 />
                 {/* Product Route */}
                 <Route path="/product" element={<Product />} />
-                <Route path="/product/:id/:product_name" element={<ProductDetail />} />
+                <Route
+                    path="/product/:id/:product_name"
+                    element={<ProductDetail />}
+                />
             </Routes>
 
             {location.pathname === "/login" ||
-                location.pathname === "/register" ||
-                location.pathname === "/reset-password-confirmation" ||
-                location.pathname === "/request-reset-password" ||
-                location.pathname === "/cart/shipment" ||
-                authSelector.RoleId === 3 ||
-                authSelector.RoleId === 2 ? null : (
+            location.pathname === "/register" ||
+            location.pathname === "/reset-password-confirmation" ||
+            location.pathname === "/request-reset-password" ||
+            location.pathname === "/cart/shipment" ||
+            authSelector.RoleId === 3 ||
+            authSelector.RoleId === 2 ? null : (
                 <Box>
                     <Footer />
                 </Box>
