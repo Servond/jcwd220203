@@ -775,7 +775,7 @@ const ProductDetail = ({ product_name, id }) => {
             {/* Reposive */}
             <ResponsiveProductDetail
                 addToCart={addToCart}
-                addToCartByProductId={addToCartByProductId}
+                // addToCartByProductId={addToCartByProductId}
                 cartItemQuantity={cartItemQuantity}
                 userMustLogin={userMustLogin}
             />
