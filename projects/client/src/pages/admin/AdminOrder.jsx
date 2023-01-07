@@ -287,6 +287,7 @@ const AdminOrder = () => {
 
   const doubleOnClick3 = () => {
     cancelOrderBtnHandler(cancel.id)
+    setSend(null)
     setCancel(null)
     setIsLoading(false)
   }
