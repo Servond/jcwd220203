@@ -42,7 +42,7 @@ const AdminSalesReport = () => {
     const maxItemsPerPage = 10
     const fetchData = async () => {
         try {
-            let url = `/admin/sales-report/get2`
+            let url = `/admin/sales-report/get`
 
             if (authSelector.WarehouseId) {
                 url += `?WarehouseId=${authSelector.WarehouseId}`
@@ -72,33 +72,6 @@ const AdminSalesReport = () => {
         }
     }
 
-    // const fetchData2 = async () => {
-    //     try {
-    //         let url = `/admin/sales-report/get`
-
-    //         if (authSelector.WarehouseId) {
-    //             url += `?WarehouseId=${authSelector.WarehouseId}`
-    //         }
-
-    //         const response = await axiosInstance.get(url, {
-    //             params: {
-    //                 _page: page,
-    //                 _limit: maxItemsPerPage,
-    //                 WarehouseId: filterWarehouse,
-    //                 CategoryId: filterCategory,
-    //                 createdAt: filterMonth,
-    //             },
-    //         })
-    //         setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
-    //         if (page === 1) {
-    //             setSalesData(response.data.data)
-    //         } else {
-    //             setSalesData(response.data.data)
-    //         }
-    //     } catch (err) {
-    //         console.log(err)
-    //     }
-    // }
     const fetchWarehouse = async () => {
         try {
             const response = await axiosInstance.get(
@@ -164,16 +137,8 @@ const AdminSalesReport = () => {
         setPage(page - 1)
         setIsLoading(false)
     }
-    // console.log("trans", transactionData.map((val) => val.WarehouseId)[0])
-    console.log("cat", categoryData)
-    console.log(
-        "sal",
-        salesData.map((val) => val.WarehouseId)
-    )
-    console.log("WR", warehouseData)
     useEffect(() => {
         fetchData()
-        // fetchData2()
     }, [
         filterWarehouse,
         filterCategory,
@@ -214,9 +179,8 @@ const AdminSalesReport = () => {
                                 borderRadius="8px"
                                 onChange={sortHandler}
                             >
-                                <Select>
-                                    {/* <option value="">---Sort---</option> */}
-                                    <option value={"ASC"}>Oldest</option>
+                                <Select placeholder="---Sort---">
+                                    <option value={"ASC"}>Old</option>
                                     <option value={"DESC"}>Latest</option>
                                 </Select>
                             </GridItem>
@@ -272,7 +236,6 @@ const AdminSalesReport = () => {
                                 border="1px solid #dfe1e3"
                                 borderRadius="8px"
                             >
-                                {/* RAW QUERY */}
                                 <Select>
                                     <option value="">---By Warehouse---</option>
                                     {authSelector.WarehouseId ===
@@ -343,9 +306,6 @@ const AdminSalesReport = () => {
                                             Product Name
                                         </Text>
                                     </Th>
-                                    {/* <Th w="200px">
-                                        <Text fontSize="10px">Description</Text>
-                                    </Th> */}
                                     <Th w="130px" fontWeight="bold">
                                         <Text fontSize="10px">Price</Text>
                                     </Th>
@@ -365,7 +325,6 @@ const AdminSalesReport = () => {
                                     salesData.map((val) => (
                                         <Tr>
                                             <Td maxW="150px">
-                                                {/* RAW QUERY */}
                                                 <Text>
                                                     {
                                                         val.createdAt.split(
@@ -377,22 +336,10 @@ const AdminSalesReport = () => {
                                                         .split("T")[1]
                                                         .split(".000Z")}
                                                 </Text>
-
-                                                {/* <Text maxW="150px">
-                                                {val.createdAt.split("T")[0]} /{" "}
-                                                {val.createdAt
-                                                    .split("T")[1]
-                                                    .split(".000Z")}
-                                            </Text> */}
                                             </Td>
 
                                             <Td maxW="100px">
-                                                <Text>
-                                                    {/* {val.User.username} */}
-
-                                                    {/* raw query */}
-                                                    {val.category_name}
-                                                </Text>
+                                                <Text>{val.category_name}</Text>
                                             </Td>
                                             <Td maxW="200px">
                                                 <Text
@@ -402,14 +349,6 @@ const AdminSalesReport = () => {
                                                     {val.product_name}
                                                 </Text>
                                             </Td>
-                                            {/* <Td maxW="200px">
-                                            <Text
-                                                overflow="hidden"
-                                                textOverflow="ellipsis"
-                                            >
-                                                {val.description}
-                                            </Text>
-                                        </Td> */}
                                             <Td maxW="130px">
                                                 <Text>
                                                     {new Intl.NumberFormat(
@@ -423,22 +362,11 @@ const AdminSalesReport = () => {
                                                 </Text>
                                             </Td>
                                             <Td maxW="50px">
-                                                <Text>
-                                                    {/* {
-                                                    val.Order_status
-                                                        .order_status_name
-                                                } */}
-
-                                                    {/* raw query */}
-                                                    {val.quantity}
-                                                </Text>
+                                                <Text>{val.quantity}</Text>
                                             </Td>
 
                                             <Td maxW="130px">
                                                 <Text>
-                                                    {/* {val.Warehouse.warehouse_name} */}
-
-                                                    {/* raw query */}
                                                     {new Intl.NumberFormat(
                                                         "id-ID",
                                                         {
