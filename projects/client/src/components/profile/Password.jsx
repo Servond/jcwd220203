@@ -23,7 +23,7 @@ import { useSelector } from "react-redux"
 import * as Yup from "yup"
 import { axiosInstance } from "../../api"
 
-const UserInfo = () => {
+const Password = () => {
     const [userData, setUserData] = useState([])
     const [showNewPassword, setShowNewPassword] = useState(false)
     const [showPasswordConfirmation, setShowPasswordConfirmation] =
@@ -103,49 +103,44 @@ const UserInfo = () => {
     return (
         <Box
             p="16px 0"
-            display={{ base: "block", md: "block", lg: "flex" }}
-            h="100%"
+            display={{ base: "none", md: "none", lg: "flex" }}
             border="1px solid brown"
             // border="1px solid #dfe1e3"
         >
             {/* Profile Photo */}
             <Box
-                p={{ base: "16px", md: "16px", lg: "16px" }}
-                w={{ base: "150px", md: "150px", lg: "290px" }}
-                h={{ base: "150px", md: "150px", lg: "290px" }}
-                ml={{ base: "auto", md: "170px", lg: 0 }}
+                p="16px"
+                w="290px"
+                // h={{ base: "150px", md: "150px", lg: "290px" }}
+                // ml={{ base: "auto", md: "170px", lg: 0 }}
                 // borderRadius={{ base: "full", md: "full", lg: "8px" }}
                 border="1px solid red"
             >
                 <Box
-                    p={{ base: "10px", md: "10px", lg: "16px" }}
-                    mb={{ base: 0, md: 0, lg: "24px" }}
+                    p="16px"
+                    mb="24px"
                     boxShadow={"rgba(0, 0, 0, 0.24) 0px 3px 8px"}
-                    borderRadius={{ base: "full", md: "full", lg: "8px" }}
-                    w={{ base: "120px", md: "120px", lg: "auto" }}
-                    h={{ base: "120px", md: "120px", lg: "auto" }}
+                    borderRadius="8px"
+                    // w={{ base: "120px", md: "120px", lg: "auto" }}
+                    // h={{ base: "120px", md: "120px", lg: "auto" }}
                     border="1px solid green"
                     // variant={{ base: "unstyled", md: "unstyled", lg: "none" }}
                 >
                     <Avatar
                         src={`${apiImg}/${authSelector.profile_picture}`}
                         name={userData.username}
-                        w={{ base: "100px", md: "100px", lg: "225px" }}
-                        h={{ base: "100px", md: "100px", lg: "225px" }}
-                        borderRadius={{ base: "full", md: "full", lg: "3px" }}
+                        w="225px"
+                        h="225px"
+                        borderRadius="3px"
                         border="1px solid blue"
                     />
                 </Box>
             </Box>
 
             {/* Change Password */}
-            <Box p="16px">
+            <Box p="16px" display={{ base: "none", md: "none", lg: "grid" }}>
                 <Center>
-                    <Text
-                        p="14px 0 55px"
-                        fontWeight={"bold"}
-                        fontSize={{ base: "sm", md: "sm", lg: "xl" }}
-                    >
+                    <Text p="14px 0 55px" fontWeight={"bold"} fontSize="xl">
                         Change Your Password
                     </Text>
                 </Center>
@@ -160,11 +155,7 @@ const UserInfo = () => {
                                     w="300px"
                                     mr="16px"
                                     align="left"
-                                    fontSize={{
-                                        base: "12px",
-                                        md: "12px",
-                                        lg: "xl",
-                                    }}
+                                    fontSize="xl"
                                 >
                                     New Password
                                 </FormLabel>
@@ -209,11 +200,161 @@ const UserInfo = () => {
                                     w="300px"
                                     mr="16px"
                                     align="left"
-                                    fontSize={{
-                                        base: "12px",
-                                        md: "12px",
-                                        lg: "xl",
-                                    }}
+                                    fontSize="xl"
+                                >
+                                    Confirm Password
+                                </FormLabel>
+                                <InputGroup w="100%" display="block">
+                                    <Box w="70%" display="flex">
+                                        <InputGroup>
+                                            <Input
+                                                onChange={formChangeHandler}
+                                                name="confirmPassword"
+                                                value={
+                                                    formik.values
+                                                        .confirmPassword
+                                                }
+                                                type={
+                                                    showPasswordConfirmation
+                                                        ? "text"
+                                                        : "password"
+                                                }
+                                            />
+                                            <InputRightElement width="3rem">
+                                                <Button
+                                                    onClick={
+                                                        toggleNewPasswordConfirmation
+                                                    }
+                                                    variant="ghost"
+                                                >
+                                                    {showPasswordConfirmation ? (
+                                                        <BiShow />
+                                                    ) : (
+                                                        <BiHide />
+                                                    )}
+                                                </Button>
+                                            </InputRightElement>
+                                        </InputGroup>
+                                    </Box>
+
+                                    <FormErrorMessage fontSize={"11px"}>
+                                        {formik.errors.confirmPassword}
+                                    </FormErrorMessage>
+                                </InputGroup>
+                            </HStack>
+                        </FormControl>
+
+                        {/* Button Submit */}
+                        <Center>
+                            <Button
+                                bg="#F7931E"
+                                color="rgba(0,0,0,.54)"
+                                onClick={formik.handleSubmit}
+                                type="submit"
+                            >
+                                Submit
+                            </Button>
+                        </Center>
+                    </Stack>
+                </Box>
+            </Box>
+
+            {/* Responsive */}
+            <Box
+                p="16px"
+                w="290px"
+                display={{ base: "block", md: "block", lg: "none" }}
+                // h={{ base: "150px", md: "150px", lg: "290px" }}
+                // ml={{ base: "auto", md: "170px", lg: 0 }}
+                // borderRadius={{ base: "full", md: "full", lg: "8px" }}
+                border="1px solid red"
+                h="auto"
+            >
+                <Box
+                    p="16px"
+                    mb="24px"
+                    boxShadow={"rgba(0, 0, 0, 0.24) 0px 3px 8px"}
+                    borderRadius="8px"
+                    // w={{ base: "120px", md: "120px", lg: "auto" }}
+                    // h={{ base: "120px", md: "120px", lg: "auto" }}
+                    border="1px solid green"
+                    // variant={{ base: "unstyled", md: "unstyled", lg: "none" }}
+                >
+                    <Avatar
+                        src={`${apiImg}/${authSelector.profile_picture}`}
+                        name={userData.username}
+                        w="225px"
+                        h="225px"
+                        borderRadius="3px"
+                        border="1px solid blue"
+                    />
+                </Box>
+            </Box>
+
+            {/* Change Password */}
+            <Box p="16px" display={{ base: "block", md: "block", lg: "none" }}>
+                <Center>
+                    <Text p="14px 0 55px" fontWeight={"bold"} fontSize="xl">
+                        Change Your Password
+                    </Text>
+                </Center>
+
+                {/* Form */}
+                <Box fontSize="13px" alignItems="flex-start">
+                    <Stack spacing="10">
+                        {/* Password */}
+                        <FormControl isInvalid={formik.errors.password}>
+                            <HStack>
+                                <FormLabel
+                                    w="300px"
+                                    mr="16px"
+                                    align="left"
+                                    fontSize="xl"
+                                >
+                                    New Password
+                                </FormLabel>
+                                <InputGroup w="100%" display="block">
+                                    <Box display="flex" w="70%">
+                                        <InputGroup>
+                                            <Input
+                                                onChange={formChangeHandler}
+                                                name="password"
+                                                value={formik.values.password}
+                                                type={
+                                                    showNewPassword
+                                                        ? "text"
+                                                        : "password"
+                                                }
+                                            />
+                                            <InputRightElement width="3rem">
+                                                <Button
+                                                    onClick={toggleNewPassword}
+                                                    variant="ghost"
+                                                >
+                                                    {showNewPassword ? (
+                                                        <BiShow />
+                                                    ) : (
+                                                        <BiHide />
+                                                    )}
+                                                </Button>
+                                            </InputRightElement>
+                                        </InputGroup>
+                                    </Box>
+                                    <FormErrorMessage fontSize={"11px"}>
+                                        {formik.errors.password}
+                                    </FormErrorMessage>
+                                </InputGroup>
+                            </HStack>
+                        </FormControl>
+
+                        {/* Change Password */}
+                        <FormControl isInvalid={formik.errors.confirmPassword}>
+                            <HStack>
+                                <FormLabel
+                                    w="300px"
+                                    mr="16px"
+                                    align="left"
+                                    fontSize="xl"
                                 >
                                     Confirm Password
                                 </FormLabel>
@@ -275,4 +416,4 @@ const UserInfo = () => {
     )
 }
 
-export default UserInfo
+export default Password

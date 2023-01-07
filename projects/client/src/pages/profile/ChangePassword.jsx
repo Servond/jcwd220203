@@ -128,8 +128,15 @@ const ChangePassword = () => {
                             Password
                         </Box>
                     </Box>
-                    <Box pt="8px" pb="8px">
-                        <Password />
+                    <Box
+                        pt="8px"
+                        pb="8px"
+                        h="auto"
+                        display={{ base: "block", md: "block", lg: "none" }}
+                    >
+                        <Password
+                            display={{ base: "block", md: "block", lg: "none" }}
+                        />
                     </Box>
                 </Box>
             </Box>
