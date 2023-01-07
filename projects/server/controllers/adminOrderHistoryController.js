@@ -173,8 +173,22 @@ const adminOrderHistoryController = {
 
     getByWarehouseId: async (req, res) => {
         try {
-            const { WarehouseId, _limit = 10, _page = 1 } = req.query
-            if (WarehouseId) {
+            const {
+                WarehouseId,
+                transaction_name = "",
+                _sortBy = "",
+                _sortDir = "ASC",
+                _limit = 10,
+                _page = 1,
+            } = req.query
+            if (
+                WarehouseId ||
+                transaction_name ||
+                _sortBy == "createdAt" ||
+                _sortDir ||
+                _limit ||
+                _page
+            ) {
                 const test2 = await Transaction.findAndCountAll({
                     include: [
                         {
@@ -189,10 +203,17 @@ const adminOrderHistoryController = {
                         { model: User },
                         { model: Order_status },
                     ],
-                    where: { WarehouseId },
+                    where: {
+                        [Op.or]: {
+                            WarehouseId,
+                            transaction_name: {
+                                [Op.like]: `%${transaction_name}%`,
+                            },
+                        },
+                    },
                     limit: Number(_limit),
                     offset: (_page - 1) * _limit,
-                    order: [["createdAt", "DESC"]],
+                    order: [[_sortBy, _sortDir]],
                 })
 
                 return res.status(200).json({
@@ -215,9 +236,12 @@ const adminOrderHistoryController = {
                     { model: User },
                     { model: Order_status },
                 ],
+                // where: {
+                //     transaction_name: { [Op.like]: `%${transaction_name}%` },
+                // },
                 limit: Number(_limit),
                 offset: (_page - 1) * _limit,
-                order: [["createdAt", "DESC"]],
+                order: [[_sortBy, _sortDir]],
             })
 
             return res.status(200).json({
