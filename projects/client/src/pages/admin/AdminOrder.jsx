@@ -25,7 +25,12 @@ import {
 import { useFormik } from "formik"
 import React, { useEffect } from "react"
 import { useState } from "react"
-import { TbSearch } from "react-icons/tb"
+import {
+  TbArrowWaveLeftDown,
+  TbCircleCheck,
+  TbCircleMinus,
+  TbSearch,
+} from "react-icons/tb"
 import { axiosInstance } from "../../api"
 import Alert from "../../components/profile/Alert"
 import RejectForm from "../order/RejectForm"
@@ -43,8 +48,12 @@ import { useSelector } from "react-redux"
 const AdminOrder = () => {
   const [order, setOrder] = useState([])
   const [approve, setApprove] = useState(null)
+  const [send, setSend] = useState(null)
   const [reject, setReject] = useState(null)
+  const [cancel, setCancel] = useState(null)
+  const [deliver, setDeliver] = useState(null)
   const [modalImage, setModalImage] = useState(null)
+  console.log(modalImage)
   const [currentSearch, setCurrentSearch] = useState("")
   const [totalCount, setTotalCount] = useState(0)
   const [sortBy, setSortBy] = useState("id")
@@ -124,7 +133,7 @@ const AdminOrder = () => {
       console.log(error.response)
     }
   }
-  
+
   const fetchWarehouse = async () => {
     try {
       const response = await axiosInstance.get("/adminOrder/findWarehouse")
@@ -136,18 +145,86 @@ const AdminOrder = () => {
 
   const approveBtnHandler = async () => {
     try {
-      await axiosInstance.patch(`/adminOrder/approvePayment/${approve.id}`)
-
-      fetchOrder()
+      const response = await axiosInstance.patch(
+        `/adminOrder/approvePayment/${approve.id}`
+      )
 
       toast({
         title: "Payment Approved",
         status: "success",
+        description: response.data.message,
       })
+      fetchOrder()
     } catch (error) {
       console.log(error.response)
       toast({
         title: "Payment Approved Failed",
+        status: "error",
+        description: error.response.data.message,
+      })
+    }
+  }
+
+  const sendOrderBtnHandler = async () => {
+    try {
+      const response = await axiosInstance.patch(
+        `/adminOrder/sendOrder/${send.id}`
+      )
+
+      toast({
+        title: "Order Send",
+        status: "success",
+        description: response.data.message,
+      })
+      fetchOrder()
+    } catch (error) {
+      console.log(error.response)
+      toast({
+        title: "Send Order Failed",
+        status: "error",
+        description: error.response.data.message,
+      })
+    }
+  }
+
+  const cancelOrderBtnHandler = async () => {
+    try {
+      const response = await axiosInstance.patch(
+        `/adminOrder/cancelOrder/${cancel.id}`
+      )
+
+      toast({
+        title: "Cancel Order",
+        status: "success",
+        description: response.data.message,
+      })
+      fetchOrder()
+    } catch (error) {
+      console.log(error.response)
+      toast({
+        title: "Cancel Order Failed",
+        status: "error",
+        description: error.response.data.message,
+      })
+    }
+  }
+
+  const deliverOrderBtnHandler = async () => {
+    try {
+      const response = await axiosInstance.patch(
+        `/adminOrder/deliverOrder/${deliver.id}`
+      )
+
+      toast({
+        title: "Order Deliver",
+        status: "success",
+        description: response.data.message,
+      })
+      fetchOrder()
+    } catch (error) {
+      console.log(error.response)
+      toast({
+        title: "Deliver Order Failed",
         status: "error",
         description: error.response.data.message,
       })
@@ -208,6 +285,21 @@ const AdminOrder = () => {
     onCloseAlert()
   }
 
+  const doubleOnClick2 = () => {
+    sendOrderBtnHandler(send.id)
+    setSend(null)
+  }
+
+  const doubleOnClick3 = () => {
+    cancelOrderBtnHandler(cancel.id)
+    setCancel(null)
+  }
+
+  const doubleOnClick4 = () => {
+    deliverOrderBtnHandler(deliver.id)
+    setDeliver(null)
+  }
+
   const nextPage = () => {
     setPage(page + 1)
   }
@@ -219,27 +311,32 @@ const AdminOrder = () => {
   const orderStatusHandler = ({ target }) => {
     const { value } = target
     setOrderSort(value)
+    setIsLoading(false)
   }
 
   const paymentStatusHandler = ({ target }) => {
     const { value } = target
     setPaymentSort(value)
+    setIsLoading(false)
   }
 
   const paymentMethodHandler = ({ target }) => {
     const { value } = target
     setPaymentMethod(value)
+    setIsLoading(false)
   }
 
   const warehouseHandler = ({ target }) => {
     const { value } = target
     setWarehouseSort(value)
+    setIsLoading(false)
   }
 
   const sortHandler = ({ target }) => {
     const { value } = target
     setSortBy(value.split(" ")[0])
     setSortDir(value.split(" ")[1])
+    setIsLoading(false)
   }
 
   useEffect(() => {
@@ -263,7 +360,7 @@ const AdminOrder = () => {
     fetchWarehouse()
   }, [])
   return (
-    <Box ml="220px" p="24px" bgColor={"var(--NN50,#F0F3F7);"} h="100vh">
+    <Box ml="220px" p="24px" bgColor={"var(--NN50,#F0F3F7);"} height="100%">
       <Box mb="16px">
         <Text fontSize={"2xl"} fontWeight="bold" color={"#F7931E"}>
           Order List
@@ -482,21 +579,20 @@ const AdminOrder = () => {
             <Th p={"10px"}>Total Price</Th>
             <Th p={"10px"}>User</Th>
             {authSelector.RoleId === 3 ? <Th p={"10px"}>Warehouse</Th> : null}
+            <Th p={"10px"}>Action</Th>
           </Tr>
         </Thead>
         <Tbody>
           {isLoading &&
             order.map((val) => {
               return (
-                <Tr>
+                <Tr height={"140px"}>
                   <Td p={"10px "}>{val.transaction_name}</Td>
                   <Td p={"10px "}>{val.Order_status?.order_status_name}</Td>
                   <Td p={"10px "}>{val.Payment_status?.payment_status_name}</Td>
                   <Td p={"10px "}>{val.payment_method}</Td>
                   <Td p={"10px "}>
-                    {moment(val.payment_date).format(
-                      "dddd, DD MMMM YYYY, HH:mm:ss"
-                    )}
+                    {moment(val.payment_date).format("DD MMMM YYYY, HH:mm:ss")}
                   </Td>
                   <Td p={"10px "}>
                     {val.payment_proof ? (
@@ -509,44 +605,224 @@ const AdminOrder = () => {
                       <Text>Not Uploaded</Text>
                     )}
                   </Td>
-
                   <Td p={"10px "}>Rp. {val.total_price.toLocaleString()}</Td>
                   <Td p={"10px "}>{val.User.username}</Td>
                   {authSelector.RoleId === 3 ? (
-                    <Td>{val.Warehouse.warehouse_name}</Td>
+                    <Td>{val.Warehouse?.warehouse_name}</Td>
                   ) : null}
                   <Td p={"10px "}>
                     {val?.PaymentStatusId == 2 ? (
-                      <Box display={"flex"} fontSize="40px" gap="4px">
-                        <Link>
-                          <AiFillCheckCircle
-                            type="button"
-                            onClick={() => setApprove(val)}
-                            color="#0095DA"
-                          />
-                        </Link>
-                        <Link>
-                          <AiFillCloseCircle
-                            onClick={() => setReject(val)}
-                            color="#F7931E"
-                          />
-                        </Link>
+                      <>
+                        <Text textAlign={"center"} fontSize="12px">
+                          Approve Payment?
+                        </Text>
+                        <Box
+                          display={"flex"}
+                          fontSize="40px"
+                          gap="4px"
+                          mx="auto"
+                          justifyContent={"center"}
+                        >
+                          <Link>
+                            <TbCircleCheck
+                              type="button"
+                              onClick={() => setApprove(val)}
+                              color="#0095DA"
+                            />
+                          </Link>
+                          <Link>
+                            <TbCircleMinus
+                              onClick={() => setReject(val)}
+                              color="#F7931E"
+                            />
+                          </Link>
+                        </Box>
+                      </>
+                    ) : null}
+                    {val?.PaymentStatusId == 3 && val?.OrderStatusId == 2 ? (
+                      <Box>
+                        <Text textAlign={"center"} fontSize="12px">
+                          Send Order?
+                        </Text>
+                        <Box
+                          display={"flex"}
+                          fontSize="40px"
+                          gap="4px"
+                          mx="auto"
+                          justifyContent={"center"}
+                        >
+                          <Link>
+                            <TbCircleCheck
+                              type="button"
+                              onClick={() => setSend(val)}
+                              color="lightgreen"
+                            />
+                          </Link>
+                          <Link>
+                            <TbCircleMinus
+                              onClick={() => setCancel(val)}
+                              color="red"
+                            />
+                          </Link>
+                        </Box>
+                      </Box>
+                    ) : null}
+                    {val?.PaymentStatusId == 3 && val?.OrderStatusId == 3 ? (
+                      <Box>
+                        <Text textAlign={"center"} fontSize="12px">
+                          Deliver Order?
+                        </Text>
+                        <Box
+                          display={"flex"}
+                          fontSize="40px"
+                          gap="4px"
+                          mx="auto"
+                          justifyContent={"center"}
+                        >
+                          <Link>
+                            <TbCircleCheck
+                              type="button"
+                              onClick={() => setDeliver(val)}
+                              color="lightgreen"
+                            />
+                          </Link>
+                        </Box>
                       </Box>
                     ) : null}
                   </Td>
                 </Tr>
               )
             })}
+          {isLoading === false ? (
+            <Tr>
+              <Td p="10px">
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  borderRadius="8px"
+                />
+              </Td>
+              <Td p="10px">
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  borderRadius="8px"
+                />
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  borderRadius="8px"
+                  mt="2"
+                />
+              </Td>
+              <Td p="10px">
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  borderRadius="8px"
+                />
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  borderRadius="8px"
+                  mt="2"
+                />
+              </Td>
+              <Td p="10px">
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  w="60%"
+                  borderRadius="8px"
+                />
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  w="70%"
+                  borderRadius="8px"
+                  mt="2"
+                />
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  borderRadius="8px"
+                  mt="2"
+                />
+              </Td>
+              <Td p="10px">
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  w="100%"
+                  borderRadius="8px"
+                />
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  w="45%"
+                  borderRadius="8px"
+                  mt="2"
+                />
+              </Td>
+              <Td p="10px">
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="120px"
+                  borderRadius="8px"
+                  mt="2"
+                />
+              </Td>
+              <Td p="10px">
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  w="30%"
+                  borderRadius="8px"
+                  mt="2"
+                />
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  borderRadius="8px"
+                  mt="2"
+                />
+              </Td>
+              <Td p="10px">
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  borderRadius="8px"
+                  mt="2"
+                />
+              </Td>
+              <Td p="10px">
+                <Skeleton
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  height="20px"
+                  borderRadius="8px"
+                  mt="2"
+                />
+              </Td>
+              <Td p="10px"></Td>
+            </Tr>
+          ) : null}
         </Tbody>
       </Table>
-      {isLoading === false ? (
-        <Skeleton
-          startColor="#bab8b8"
-          endColor="#d4d2d2"
-          height="100px"
-          borderRadius="8px"
-        />
-      ) : null}
       {!order.length && isLoading === true ? (
         <Box p="10px" bgColor={"#E5F9F6"}>
           <Box mx="auto">
@@ -562,7 +838,7 @@ const AdminOrder = () => {
 
       <RejectForm
         formik={formik}
-        header={"send message to user"}
+        header={"Reject Payment"}
         isOpen={reject}
         onClose={() => setReject(null)}
         onOpen={onOpenAlert}
@@ -570,7 +846,7 @@ const AdminOrder = () => {
 
       <Alert
         header={"Payment reject"}
-        body={"Is data that you entered is correct"}
+        body={"Reject this Payment?"}
         cancelRef={cancelRef}
         isOpen={isOpenAlert}
         leftButton={"Cancel"}
@@ -582,13 +858,49 @@ const AdminOrder = () => {
 
       <Alert
         header={"Payment approve"}
-        body={"Is data that you entered is correct"}
+        body={"Approve this payment?"}
         cancelRef={cancelRef}
         isOpen={approve}
         leftButton={"Cancel"}
         onClose={() => setApprove(null)}
         rightButton={"Approve Payment"}
         onSubmit={() => doubleOnClick()}
+        color={"#0095DA"}
+      />
+
+      <Alert
+        header={"Send Order"}
+        body={"Send the order?"}
+        cancelRef={cancelRef}
+        isOpen={send}
+        leftButton={"Cancel"}
+        onClose={() => setSend(null)}
+        rightButton={"Send"}
+        onSubmit={() => doubleOnClick2()}
+        color={"#0095DA"}
+      />
+
+      <Alert
+        header={"Cancel Order"}
+        body={"Cancel the order?"}
+        cancelRef={cancelRef}
+        isOpen={cancel}
+        leftButton={"Cancel"}
+        onClose={() => setCancel(null)}
+        rightButton={"Cancel Order"}
+        onSubmit={() => doubleOnClick3()}
+        color={"#0095DA"}
+      />
+
+      <Alert
+        header={"Deliver Order"}
+        body={"Deliver the order?"}
+        cancelRef={cancelRef}
+        isOpen={deliver}
+        leftButton={"Cancel"}
+        onClose={() => setDeliver(null)}
+        rightButton={"Deliver Order"}
+        onSubmit={() => doubleOnClick4()}
         color={"#0095DA"}
       />
 

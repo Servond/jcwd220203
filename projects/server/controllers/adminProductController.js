@@ -6,6 +6,8 @@ const Product = db.Product;
 const adminProductController = {
   getProduct: async (req, res) => {
     try {
+      const _sortBy = req.query._sortBy
+      const _sortDir = req.query._sortDir
       const page = parseInt(req.query._page) || 0;
       const limit = parseInt(req.query._limit) || 5;
       const search = req.query._keywordHandler || "";
@@ -29,6 +31,7 @@ const adminProductController = {
             { description: { [Op.like]: "%" + search + "%" } },
           ],
         },
+        order: [[_sortBy, _sortDir]],
         include: [{ model: db.Image_Url }, { model: db.Category }],
         offset: offset,
         limit: limit,
@@ -51,13 +54,14 @@ const adminProductController = {
 
   addProduct: async (req, res) => {
     try {
-      const { product_name, description, price, CategoryId } = req.body;
+      const { product_name, description, product_weight, price, CategoryId } = req.body;
       const image_url = `http://localhost:8000/public/${req.file.filename}`;
 
       const addProductData = await Product.create({
         product_name,
         description,
         price,
+        product_weight,
         CategoryId,
       });
       await db.Image_Url.create({
@@ -74,7 +78,6 @@ const adminProductController = {
         });
       }
       
-      console.log("test berhasil ga");
       return res.status(200).json({
         message: "Successfully added product data",
         data: addProductData,
@@ -128,12 +131,13 @@ const adminProductController = {
 
   patchProductDetail: async (req, res) => {
     try {
-      const { product_name, description, price, CategoryId } = req.body;
+      const { product_name, description, product_weight, price, CategoryId } = req.body;
 
       await Product.update(
         {
           product_name,
           description,
+          product_weight,
           price,
           CategoryId,
         },

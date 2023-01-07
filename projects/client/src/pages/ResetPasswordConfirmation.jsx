@@ -33,14 +33,9 @@ const ResetPasswordConfirmation = () => {
 
     const [passwordMatch, setPasswordMatch] = useState(false)
 
-    const [passwordFalse, setPasswordFalse] = useState(false)
+    const [passwordContain, setPasswordContain] = useState(false)
 
     const resetSelector = useSelector((state) => state.reset)
-
-    const passwordNotMatch = () => {
-        setPasswordMatch(true)
-        setPasswordFalse(true)
-    }
 
     const dispatch = useDispatch()
 
@@ -85,6 +80,17 @@ const ResetPasswordConfirmation = () => {
 
             } catch (err) {
                 console.log(err)
+
+                if (err.response.data.message === "Password doesn't match") {
+                    setPasswordMatch(true)
+                }
+
+                if (err.response.data.message === "Password Must Contain 8 Characters, 1 Uppercase, 1 Lowercase, 1 Number and 1 Special Case Character") {
+                    setPasswordContain(true)
+                }
+
+                console.log(err.response.data.message)
+
                 toast({
                     title: "Reset Password Failed",
                     status: "error",
@@ -95,10 +101,6 @@ const ResetPasswordConfirmation = () => {
         validationSchema: Yup.object({
             newPassword: Yup.string()
                 .required(8)
-                .matches(
-                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-                    "Must Contain 8 Characters, 1 Uppercase, 1 Lowercase, 1 Number and 1 Special Case Character"
-                ),
         }),
         validateOnChange: false,
     })
@@ -108,11 +110,19 @@ const ResetPasswordConfirmation = () => {
         formik.setFieldValue(name, value)
     }
 
+    console.log(passwordContain)
     useEffect(() => {
         if (!localStorage.getItem("reset_token")) {
             navigate("/request-reset-password");
         }
-    }, [])
+        if (formik.values.confirmNewPassword === formik.values.newPassword) {
+            setPasswordMatch(false)
+        }
+
+        if (formik.values.newPassword.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/)) {
+            setPasswordContain(false)
+        }
+    }, [formik])
 
     return (
         <Box >
@@ -126,21 +136,20 @@ const ResetPasswordConfirmation = () => {
             {/* reset password box */}
             <Box display={'flex'} fontSize="14px" justifyContent={'center'} mt={'50px'}>
                 <Box
-                    w="500px"
+                    w={{ lg: "480px", base: "410px" }}
                     boxShadow={"0 0 10px 3px rgb(0 0 0 / 10%)"}
-                    // border="1px solid var(--N75,#0095DA)"
                     borderRadius={"10px"}
                     p="24px 40px 32px "
                     textAlign={"center"}
                     bgColor={'white'}
                 >
                     <Text fontSize="22px" fontWeight={"bold"} textAlign={'left'} color={'#0095DA'}
-                        fontFamily="Open Sauce One',sans-serif"
+                        fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}
                     >
                         New Password
                     </Text>
                     <Box mt="8px" fontSize={"14px"} textAlign="left" color={'#9d9db7'}>
-                        <Text display={"inline"} mr="1" color={'#31353b'}>
+                        <Text display={"inline"} mr="1" color={'#31353b'} fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}>
                             Create a strong password for an account with e-mail reset <span style={{ color: "#F7931E" }}>{resetSelector.email}</span>
                         </Text>
                     </Box>
@@ -158,6 +167,7 @@ const ResetPasswordConfirmation = () => {
                                         focusBorderColor='#F7931E'
                                         placeholder={'New Password'}
                                         variant='flushed'
+                                        fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}
                                     />
                                     <InputRightElement width={'4.5rem'}>
                                         <Button
@@ -172,10 +182,19 @@ const ResetPasswordConfirmation = () => {
                                         </Button>
                                     </InputRightElement>
                                 </InputGroup>
-                                {passwordFalse ? (
-                                    <FormErrorMessage fontSize={'11px'}>{formik.errors.newPassword}</FormErrorMessage>
+                                {passwordContain === true ? (
+                                    <Text fontSize={"11px"}
+                                        fontFamily={"Open Sauce One, sans-serif"}
+                                        color={"#EF144A"}
+                                        m={"4px 0px 0px"}
+                                        lineHeight={"18px"}
+                                        textAlign={'start'}
+                                        pl={'2px'}
+                                    >
+                                        Password Must Contain 8 Characters, 1 Uppercase, 1 Lowercase, 1 Number and 1 Special Case Character
+                                    </Text>
                                 ) : (
-                                    <Text fontSize={'11px'} color={'#31353b'} textAlign={'left'}>
+                                    <Text fontSize={'11px'} color={'#31353b'} textAlign={'left'} fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}>
                                         Must Contain 8 Characters, 1 Uppercase, 1 Lowercase, 1 Number and 1 Special Case Character
                                     </Text>
                                 )}
@@ -189,7 +208,7 @@ const ResetPasswordConfirmation = () => {
                                             type={showConfirmNewPassword ? 'text' : 'password'}
                                             onChange={formChangeHandler}
                                             focusBorderColor='#F7931E'
-                                            // border={"1px solid #e2e8f0"}
+                                            fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}
                                             placeholder={'Retype New Password'}
                                             variant='flushed'
                                         />
@@ -219,7 +238,7 @@ const ResetPasswordConfirmation = () => {
                             borderRadius={'10px'}
                             bgColor={'#FFE0C4'}
                         >
-                            <Text textAlign={'justify'} color={'black'} fontSize={'12px'} p={'10px 16px 12px 12px'}>
+                            <Text textAlign={'justify'} color={'black'} fontSize={'12px'} p={'10px 16px 12px 12px'} fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}>
                                 Once the password has been changed, please log in again with the new password on all your devices.
                             </Text>
                         </Box>
@@ -228,13 +247,16 @@ const ResetPasswordConfirmation = () => {
                             w="100%"
                             bgColor={"#0095DA"}
                             _hover={false}
-                            m="16px 0"
+                            mt="16px"
                             color={"white"}
-                            isDisabled={!formik.values.newPassword}
+                            isDisabled={formik.values.newPassword && formik.values.confirmNewPassword ? false : true}
                             type={'submit'}
-                            onClick={passwordNotMatch}
+                            // onClick={passwordNotMatch}
+                            borderRadius={'8px'}
                         >
-                            <Text fontWeight={"bold"}>CONFIRM</Text>
+                            <Text fontWeight={"bold"} fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}>
+                                Confirm Change
+                            </Text>
                         </Button>
                     </form>
                 </Box>

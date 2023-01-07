@@ -27,8 +27,9 @@ import {
   AlertIcon,
   AlertTitle,
   Image,
-  Avatar,
   Select,
+  InputGroup,
+  Textarea,
 } from "@chakra-ui/react";
 import { axiosInstance } from "../../api/index";
 import { useEffect, useRef, useState } from "react";
@@ -37,7 +38,8 @@ import * as Yup from "yup";
 import { Link } from "react-router-dom";
 import { CgChevronLeft, CgChevronRight } from "react-icons/cg";
 import { TbCameraPlus } from "react-icons/tb";
-import upload from "../../assets/upload.png"
+import upload from "../../assets/upload.png";
+import { TbSearch } from "react-icons/tb";
 
 const AdminProductData = () => {
   const [data, setData] = useState({});
@@ -56,6 +58,9 @@ const AdminProductData = () => {
   const inputFileRef = useRef();
 
   const [category, setCategory] = useState({});
+  const [totalCount, setTotalCount] = useState(0);
+  const [sortBy, setSortBy] = useState("id");
+  const [sortDir, setSortDir] = useState("ASC");
 
   const fetchProductData = async () => {
     try {
@@ -64,19 +69,19 @@ const AdminProductData = () => {
           _keywordHandler: keyword,
           _page: pages,
           _limit: maxItemsPage,
+          _sortBy: sortBy,
+          _sortDir: sortDir,
         },
       });
       setData(productData.data.data);
+      setTotalCount(productData.data.totalRows);
       setAdmin(productData.data.data);
-      console.log(productData.data.data);
-      // console.warn(productData.data.data.Image_Urls);
-      // console.warn(data.Image_Urls);
+
       setRows(productData.data.totalRows - maxItemsPage);
       setMaxPage(Math.ceil(productData.data.totalRows / maxItemsPage));
 
       const categoryRes = await axiosInstance.get("/admin/product/category");
       setCategory(categoryRes.data.data);
-      console.log(category);
 
       setIsLoading(true);
     } catch (error) {
@@ -85,8 +90,6 @@ const AdminProductData = () => {
   };
 
   const renderCategory = () => {
-    console.log(isLoading);
-    console.warn(category);
     return Array.from(category).map((val) => {
       return (
         <option value={val.id} key={val.id.toString()}>
@@ -117,7 +120,6 @@ const AdminProductData = () => {
       console.log(error);
     }
   };
-  // console.log(data.Image_Urls[0]);
   const renderProductData = () => {
     return data.map((val) => {
       return (
@@ -132,6 +134,7 @@ const AdminProductData = () => {
           </Td>
           <Td>{val.product_name || "null"}</Td>
           <Td>{val.description || "null"}</Td>
+          <Td>{val.product_weight || "null"}</Td>
           <Td>
             {val.price
               ? val.price.toLocaleString("in-ID", {
@@ -181,9 +184,10 @@ const AdminProductData = () => {
 
   const formikAddProduct = useFormik({
     initialValues: {
-      image_url:{},
+      image_url: {},
       product_name: "",
       description: "",
+      product_weight: "",
       price: "",
       CategoryId: "",
     },
@@ -191,6 +195,7 @@ const AdminProductData = () => {
       image_url,
       product_name,
       description,
+      product_weight,
       price,
       CategoryId,
     }) => {
@@ -198,7 +203,6 @@ const AdminProductData = () => {
         const data = new FormData();
 
         if (image_url) {
-          console.log(image_url)
           data.append("image_url", image_url);
         }
         if (product_name) {
@@ -206,7 +210,9 @@ const AdminProductData = () => {
         }
         if (description) {
           data.append("description", description);
-          console.log(description)
+        }
+        if (product_weight) {
+          data.append("product_weight", product_weight);
         }
         if (price) {
           data.append("price", price);
@@ -214,10 +220,7 @@ const AdminProductData = () => {
         if (CategoryId) {
           data.append("CategoryId", CategoryId);
         }
-        console.warn(data.image_url)
-        const response = await axiosInstance.post("/admin/product/", 
-          data
-        );
+        const response = await axiosInstance.post("/admin/product/", data);
 
         toast({
           title: "Registration Success",
@@ -227,6 +230,7 @@ const AdminProductData = () => {
         formikAddProduct.setFieldValue("image_url", "");
         formikAddProduct.setFieldValue("product_name", "");
         formikAddProduct.setFieldValue("description", "");
+        formikAddProduct.setFieldValue("product_weight", "");
         formikAddProduct.setFieldValue("price", "");
         formikAddProduct.setFieldValue("CategoryId", "");
         fetchProductData();
@@ -242,6 +246,7 @@ const AdminProductData = () => {
     validationSchema: Yup.object({
       product_name: Yup.string().required().min(3),
       description: Yup.string().required().min(3),
+      product_weight: Yup.number().required(),
       price: Yup.number().required().min(3),
       CategoryId: Yup.number().required(),
     }),
@@ -253,72 +258,35 @@ const AdminProductData = () => {
     formikAddProduct.setFieldValue(name, value);
   };
 
-  const editFormik = useFormik({
-    initialValues: {
-      product_name: "",
-      description: "",
-      price: "",
-    },
-    onSubmit: async (values) => {
-      try {
-        let editedWarehouse = {
-          product_name: values.product_name,
-          description: values.description,
-          price: values.price,
-          // UserId: values.UserId,
-        };
-
-        await axiosInstance.patch(
-          `/warehouse/${openedEdit.id}`,
-          editedWarehouse
-        );
-
-        toast({ title: "Warehouse edited", status: "success" });
-        editFormik.setFieldValue("product_name", "");
-        editFormik.setFieldValue("description", "");
-        editFormik.setFieldValue("price", "");
-        fetchProductData();
-        setOpenedEdit(null);
-      } catch (err) {
-        console.log(err);
-        toast({ title: "Server error while editing", status: "error" });
-      }
-    },
-    validationSchema: Yup.object({
-      product_name: Yup.string().required().min(3),
-      description: Yup.string().required().min(3),
-      price: Yup.number().required().min(3),
-      // UserId: Yup.number().required(),
-    }),
-    validateOnChange: false,
-  });
-
+  
   const onCloseModal = () => {
     formikAddProduct.handleSubmit();
     onCloseAddNewProduct();
   };
+
+  const sortCategoryHandler = ({ target }) => {
+    const { value } = target;
+    setSortBy(value.split(" ")[0]);
+    setSortDir(value.split(" ")[1]);
+  };
+
   useEffect(() => {
     fetchProductData();
     // fetchCategory();
-  }, [openedEdit, pages, setPages, keyword]);
-
-  useEffect(() => {
-    if (openedEdit) {
-      console.log(openedEdit.id);
-      editFormik.setFieldValue("product_name", openedEdit.product_name);
-      editFormik.setFieldValue("description", openedEdit.description);
-      editFormik.setFieldValue("price", openedEdit.price);
-      editFormik.setFieldValue("CategoryId", openedEdit.CategoryId);
-    }
-  }, [openedEdit]);
+  }, [openedEdit, pages, keyword, sortBy, sortDir]);
 
   return (
     <>
-      <Box marginLeft="250px" marginTop="65px">
+      <Box marginLeft="250px" marginTop="25px">
         <HStack justifyContent="space-between">
-          <Text fontSize={"2xl"} fontWeight="bold" color={"#0095DA"}>
-            Product Data
-          </Text>
+          <Box>
+            <Text fontSize={"2xl"} fontWeight="bold" color={"#F7931E"}>
+              Product Data
+            </Text>
+            <Text fontSize={"2xl"} fontWeight="bold" color={"#0095DA"}>
+              Total Products:{totalCount}
+            </Text>
+          </Box>
           <br />
           <Button
             bgColor={"#F7931E"}
@@ -329,26 +297,58 @@ const AdminProductData = () => {
             Add New Product
           </Button>
         </HStack>
-        <HStack mt="5px">
-          <FormControl>
-            <Input
-              name="input"
-              value={keywordHandler}
-              onChange={(event) => setKeywordHandler(event.target.value)}
-            />
-          </FormControl>
+        <HStack mt="5px" justifyContent="right">
+          <Box gap="4" display={"flex"}>
+            <Text my="auto">Sort</Text>
+            <Select
+              onChange={sortCategoryHandler}
+              fontSize={"15px"}
+              fontWeight="normal"
+              fontFamily="serif"
+              width={"250px"}
+              color={"#6D6D6F"}
+              _placeholder="Sort By"
+            >
+              <option value="ID ASC" selected>
+                ID Ascending
+              </option>
+              <option value="ID DESC">ID Descending</option>
+              <option value="createdAt DESC">Latest</option>
+              <option value="createdAt ASC">Old</option>
+            </Select>
 
-          <Button onClick={searchKey} mr={0} bgColor="#F7931E" color="white">
-            Search
-          </Button>
+            {/* <form onSubmit={formikSearch.handleSubmit}> */}
+            <FormControl>
+              <InputGroup textAlign={"right"}>
+                <Input
+                  type="text"
+                  placeholder="Search Product Name or Desc"
+                  name="search"
+                  w="250px"
+                  onChange={(event) => setKeywordHandler(event.target.value)}
+                  borderRightRadius="0"
+                  value={keywordHandler}
+                />
+
+                <Button
+                  borderLeftRadius={"0"}
+                  type="submit"
+                  onClick={searchKey}
+                >
+                  <TbSearch />
+                </Button>
+              </InputGroup>
+            </FormControl>
+          </Box>
         </HStack>
-        <Table>
+        <Table variant='striped' colorScheme='teal'>
           <Thead>
             <Tr>
               <Th w="10px">ID</Th>
               <Th w="100px">Photo Profile</Th>
               <Th w="150px">Name</Th>
               <Th w="450px">Description</Th>
+              <Th>Weight (Grams)</Th>
               <Th>Price</Th>
               <Th>Category</Th>
               <Th>Action</Th>
@@ -357,12 +357,9 @@ const AdminProductData = () => {
           <Tbody>{isLoading && renderProductData()}</Tbody>
         </Table>
       </Box>
-      <Text>
-        Page: {pages + 1} of {maxPage}
-      </Text>
+    
       <Grid templateColumns={"repeat(3, 1fr"} mt={15}>
-        <GridItem />
-        <GridItem />
+      <GridItem />
         <GridItem>
           {!admin.length ? (
             <Alert status="warning" ml="275px">
@@ -370,7 +367,7 @@ const AdminProductData = () => {
               <AlertTitle>No post found</AlertTitle>
             </Alert>
           ) : null}
-          <HStack justifyContent={"end"} gap={"2px"}>
+          <HStack justifyContent={"center"} gap={"2px"} paddingLeft="65px">
             {pages + 1 === 1 ? null : (
               <CgChevronLeft onClick={prevPage} color={"#9E7676"}>
                 {""}
@@ -384,6 +381,8 @@ const AdminProductData = () => {
             )}
           </HStack>
         </GridItem>
+        <GridItem />
+        
       </Grid>
 
       {/* Modal Add New Admin */}
@@ -411,12 +410,7 @@ const AdminProductData = () => {
                     border="3px solid"
                     color={"#0095DA"}
                     mx="auto"
-                    src={
-                      selectedImage
-                        ? selectedImage
-                        : upload
-
-                    }
+                    src={selectedImage ? selectedImage : upload}
                   />
                   <Button
                     borderRadius={"50%"}
@@ -439,7 +433,7 @@ const AdminProductData = () => {
                     fontWeight="bold"
                     bgColor={"white"}
                     onChange={(e) => {
-                      console.log(e.target.files[0].File)
+                      console.log(e.target.files[0].File);
                       formikAddProduct.setFieldValue(
                         "image_url",
                         e.target.files[0]
@@ -474,13 +468,26 @@ const AdminProductData = () => {
 
               <FormLabel mt={"15px"}>Description</FormLabel>
               <FormControl isInvalid={formikAddProduct.errors.description}>
+                <Textarea 
+                value={formikAddProduct.values.description}
+                name="description"
+                onChange={formChangeHandler}
+                />
+                
+                <FormErrorMessage>
+                  {formikAddProduct.errors.description}
+                </FormErrorMessage>
+              </FormControl>
+
+              <FormLabel mt={"15px"}>Weight in Grams</FormLabel>
+              <FormControl isInvalid={formikAddProduct.errors.product_weight}>
                 <Input
-                  value={formikAddProduct.values.description}
-                  name="description"
+                  value={formikAddProduct.values.product_weight}
+                  name="product_weight"
                   onChange={formChangeHandler}
                 />
                 <FormErrorMessage>
-                  {formikAddProduct.errors.description}
+                  {formikAddProduct.errors.product_weight}
                 </FormErrorMessage>
               </FormControl>
 

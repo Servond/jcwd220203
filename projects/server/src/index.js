@@ -13,7 +13,7 @@ const profileRoute = require("../routes/profileRoute")
 const authRoute = require("../routes/authRoute")
 const adminWarehouseRoute = require("../routes/adminWarehouseRoute.js")
 const userDataRoute = require("../routes/userDataRoute")
-const adminRoute = require("../routes/adminRoute")
+const adminCategoriesRoute = require("../routes/adminCategoriesRoute")
 const addressRoute = require("../routes/addressRoute")
 const stockRoute = require("../routes/stockRoute")
 const productRoute = require("../routes/productRoute.js")
@@ -25,7 +25,8 @@ const addressCheckoutRoute = require("../routes/addressCheckoutRoute")
 const userProfileRoute = require("../routes/userProfileRoute")
 const transactionsRoute = require("../routes/transactionsRoute")
 const exportRoute = require("../routes/exportRoute")
-
+const stockMutationRoute = require("../routes/stockMutationRoute")
+const salesReportRoute = require("../routes/salesReportRoute")
 const adminOrderRoute = require("../routes/adminOrderRoute")
 const adminOrderHistoryRoute = require("../routes/adminOrderHistoryRoute")
 const PORT = process.env.PORT || 8000
@@ -46,12 +47,12 @@ app.use(express.json())
 
 // ===========================
 // NOTE : Add your routes here
-app.use("/admin", adminRoute)
 
+app.use("/admin", verifyToken, adminCategoriesRoute)
 app.use("/userData", userDataRoute)
 app.use("/product", productRoute)
 app.use("/categories", categoryRoute)
-app.use("/carts", cartsRoute)
+app.use("/carts", verifyToken, cartsRoute)
 app.use("/transactions", verifyToken, transactionsRoute)
 app.use("/auth", authRoute)
 app.use("/shipment", shipmentRoute)
@@ -68,7 +69,9 @@ app.use("/checkoutAddress", addressCheckoutRoute)
 app.use("/user-profile", verifyToken, userProfileRoute)
 app.use("/export", verifyToken, exportRoute)
 app.use("/adminOrder", verifyToken, adminOrderRoute)
+app.use("/stock-mutation", verifyToken, stockMutationRoute)
 app.use("/admin/order-history", adminOrderHistoryRoute)
+app.use("/admin/sales-report", salesReportRoute)
 
 app.get("/api", (req, res) => {
     res.send(`Hello, this is my API`)

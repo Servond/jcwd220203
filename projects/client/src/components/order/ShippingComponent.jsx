@@ -3,6 +3,7 @@ import {
   Text,
   Button,
   GridItem,
+  CircularProgress,
 } from "@chakra-ui/react";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
@@ -11,7 +12,7 @@ import { MdKeyboardArrowUp } from "react-icons/md";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import moment from "moment"
 
-const ShippingComponent = ({ shippingFeePay, selectedCourir, productWeight, shippingError, setShippingError }) => {
+const ShippingComponent = ({ closestWarehouseTransaction, shippingFeePay, selectedCourir, productWeight, shippingError, setShippingError }) => {
   const [userData, setUserData] = useState({});
   const [warehouseData, setWarehouseData] = useState({});
   const [courirDuration, setCourirDuration] = useState("");
@@ -21,9 +22,12 @@ const ShippingComponent = ({ shippingFeePay, selectedCourir, productWeight, ship
   const [shippingCourir, setShippingCourir] = useState("")
   const [shippingDetails, setShippingDetails] = useState(false)
   const [shippingDate, setShippingDate] = useState("")
+  const [closestWarehouse, setClosestWarehouse] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   shippingFeePay(shippingFee)
   selectedCourir(courirDuration)
+  closestWarehouseTransaction(closestWarehouse)
 
   const fetchUserData = async () => {
     try {
@@ -39,7 +43,7 @@ const ShippingComponent = ({ shippingFeePay, selectedCourir, productWeight, ship
     try {
       const fetchWarehouse = await axiosInstance.get(
         "/shipment/warehouseAddress"
-      );
+      )
       setWarehouseData(fetchWarehouse.data.data);
     } catch (error) {
       console.log(error);
@@ -63,14 +67,14 @@ const ShippingComponent = ({ shippingFeePay, selectedCourir, productWeight, ship
         }
 
         const response = await axiosInstance.post("/shipment/query", costForm)
-
+        setClosestWarehouse(closestCity[0].warehouse.id)
         setResults(response)
-
+        setIsLoading(true)
       } catch (error) {
         console.log("Server error creating cost query")
       }
     },
-  });
+  })
 
   const shipmentButton = () => {
     setOpenSelect(false)
@@ -81,8 +85,8 @@ const ShippingComponent = ({ shippingFeePay, selectedCourir, productWeight, ship
       return (
         <Box value={val.cost[0].value} cursor={'pointer'} _hover={{ bgColor: "#E5F9F6" }} onClick={() => setShippingFee(val.cost[0].value)} >
           <Box onClick={shipmentButton} h={'56px'} >
-            <Box h={'56px'} onClick={() => setShippingDate(Number(val.cost[0].etd) === 1 ? "tomorrow" : moment().add('days', Number(val.cost[0].etd)).format("DD MMM"))}>
-              <Box h={'56px'} onClick={() => setCourirDuration(`${val.service} at ${Number(val.cost[0].etd) === 1 ? "tomorrow" : moment().add('days', Number(val.cost[0].etd)).format("DD MMM")}`)}>
+            <Box h={'56px'} onClick={() => setShippingDate(Number(val.cost[0].etd) === 1 ? "tomorrow" : moment().add('days', Number(val.cost[0].etd)).format("D MMM"))}>
+              <Box h={'56px'} onClick={() => setCourirDuration(`${val.service} at ${Number(val.cost[0].etd) === 1 ? "tomorrow" : moment().add('days', Number(val.cost[0].etd)).format("DD MMM YYYY")}`)}>
                 <Box h={'56px'} p={'12px 15px'} alignItems={'center'} onClick={() => setShippingCourir(val.service)}>
                   <Box display={'flex'} justifyContent={'space-between'} fontSize={'12px'}>
                     <Text
@@ -119,7 +123,7 @@ const ShippingComponent = ({ shippingFeePay, selectedCourir, productWeight, ship
                     fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}
                   >
                     <Text>
-                      Estimated arrival {Number(val.cost[0].etd) === 1 ? "tomorrow" : moment().add('days', Number(val.cost[0].etd)).format("DD MMM")}
+                      Estimated arrival {Number(val.cost[0].etd) === 1 ? "tomorrow" : moment().add('days', Number(val.cost[0].etd)).format("D MMM")}
                     </Text>
                   </Box>
                 </Box>
@@ -131,8 +135,6 @@ const ShippingComponent = ({ shippingFeePay, selectedCourir, productWeight, ship
       )
     })
   }
-
-
 
   function distanceBetweenTwoPlace(
     firstLat,
@@ -172,12 +174,12 @@ const ShippingComponent = ({ shippingFeePay, selectedCourir, productWeight, ship
       warehouseData[i].latitude,
       warehouseData[i].longitude,
       "K"
-    );
+    )
     tempDist.push(tempNum)
     chooseOne.push({
       warehouse: warehouseData[i],
       distance: tempNum,
-    });
+    })
 
   }
   const minDist = Math.min(...tempDist)
@@ -196,15 +198,14 @@ const ShippingComponent = ({ shippingFeePay, selectedCourir, productWeight, ship
     }
   }
 
-
   useEffect(() => {
-    fetchWarehouseData();
-    fetchUserData();
-  }, []);
+    fetchWarehouseData()
+    fetchUserData()
+  }, [])
 
   return (
     <>
-      <GridItem w={'305.99px'} mt={'10px'}>
+      <GridItem w={'305.99px'} mt={'10px'} display={{ lg: 'inline', base: 'none' }}>
         <Button
           border={'1px solid #0095DA'}
           h={'40px'}
@@ -252,24 +253,31 @@ const ShippingComponent = ({ shippingFeePay, selectedCourir, productWeight, ship
             border={'1px solid #e6e6e6'}
             borderRadius={'8px'}
           >
-            {mapCosts()}
+            {isLoading &&
+              mapCosts()}
+            {isLoading === false ? (
+              <Box w={'300px'} h={'168px'} display={'flex'} justifyContent={'center'} alignItems={'center'} alignContent={'center'}>
+                <CircularProgress isIndeterminate color='#F7931E' thickness='16px' size='60px' />
+              </Box>
+            ) : (
+              null
+            )}
+
           </Box>
         ) : null}
         {shippingFee && shippingDetails === true ? (
-          <Box w={'300px'} h={'48.19px'} border={'1px solid #e4e6e9'} mt={'10px'} p={'5px'} borderRadius={'8px'} bgColor={'#E5F9F6'}>
+          <Box w={'300px'} border={'1px solid #e4e6e9'} mt={'10px'} p={'10px 10px'} borderRadius={'8px'} bgColor={'#E5F9F6'}>
             <Box
               display={'flex'}
               justifyContent={'space-between'}
               fontSize={'12px'}
               fontFamily={'Open Sauce One, sans-serif'}
-              color={'#0000008A'}
               lineHeight={'1.3'}
+              color={'#31353BF5'}
+              fontWeight={700}
             >
-              <Text
-                color={'#31353BAD'}
-                fontWeight={700}
-              >
-                {shippingCourir}
+              <Text>
+                {`Tiki ${shippingCourir === 'ECO' ? 'Economy' : shippingCourir === 'REG' ? 'Regular' : 'Overnight'}`}
               </Text>
               <Text>
                 {new Intl.NumberFormat("id-ID", {
@@ -279,21 +287,110 @@ const ShippingComponent = ({ shippingFeePay, selectedCourir, productWeight, ship
               </Text>
             </Box>
             <Text
+              color={'#31353BF5'}
               m={'8px 0px 0px'}
               fontSize={'12px'}
               fontFamily={'Open Sauce One, sans-serif'}
-              color={'#0000008A'}
               lineHeight={'1.3'}
             >
               Estimated arrival {shippingDate}
             </Text>
           </Box>
         ) : null}
-
       </GridItem>
-    </>
 
-  );
-};
+      {/* mobile responsive */}
+      <Box display={{ lg: "none", base: "inline" }}>
+        <Box w={'500px'} p={'16px'}>
+          <Button
+            border={'1px solid #0095DA'}
+            h={'40px'}
+            width={'100%'}
+            lineHeight={'20px'}
+            height={'40px'}
+            fontWeight={700}
+            borderRadius={'8px'}
+            fontFamily={'Open Sauce One, sans-serif'}
+            fontSize={'13px'}
+            bgColor={'#fff'}
+            color={'#0095DA'}
+            display={'flex'}
+            alignItems={'center'}
+            onClick={openSelectButton}
+            justifyContent={'space-between'}
+            _hover={'none'}
+            _active={'none'}
+          >
+            <Text>
+              {!shippingFee ? "Choose Shipping Duration" : shippingCourir}
+            </Text>
+            <Box >
+              {openSelect === true ? <MdKeyboardArrowUp style={{ fontSize: "25px", marginRight: "-8px" }} /> : <MdKeyboardArrowDown style={{ fontSize: "25px", marginRight: "-8px" }} />}
+            </Box>
+          </Button>
+          {shippingError === true ?
+            <Text fontSize={'12px'} lineHeight={'1.4'} color={'#D6001C'} fontFamily={'Open Sauce One, sans-serif'} marginTop={'6px'}>
+              Shipping duration is required*
+            </Text>
+            : null}
+          {openSelect === true ? (
+            <Box
+              w={{ lg: '300px', base: '100%' }}
+              h={'168px'}
+              border={'1px solid #e6e6e6'}
+              borderRadius={'8px'}
+            >
+              {isLoading &&
+                mapCosts()}
+              {isLoading === false ? (
+                <Box w={'500px'} h={'120px'} display={'flex'} justifyContent={'center'} alignItems={'center'} alignContent={'center'}>
+                  <CircularProgress isIndeterminate color='#F7931E' thickness='16px' size='30px' />
+                </Box>
+              ) : (
+                null
+              )}
+
+            </Box>
+          ) : null}
+          {shippingFee && shippingDetails === true ? (
+            <Box w={'100%'} border={'1px solid #e4e6e9'} mt={'10px'} p={'10px 10px 10px 10px'} borderRadius={'8px'} bgColor={'#E5F9F6'}>
+              <Box
+                display={'flex'}
+                justifyContent={'flex-start'}
+                fontSize={'12px'}
+                fontFamily={'Open Sauce One, sans-serif'}
+                lineHeight={'1.3'}
+                w={'500px'}
+                color={'#31353BF5'}
+                fontWeight={700}
+              >
+                <Text>
+                  {`Tiki ${shippingCourir === 'ECO' ? 'Economy' : shippingCourir === 'REG' ? 'Regular' : 'Overnight'}`}
+                </Text>
+                <Text
+                  pl={'5px'}
+                >
+                  ({new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  }).format(shippingFee).split(",")[0]})
+                </Text>
+              </Box>
+              <Text
+                m={'8px 0px 0px'}
+                fontSize={'12px'}
+                fontFamily={'Open Sauce One, sans-serif'}
+                color={'#31353BF5'}
+                lineHeight={'1.3'}
+              >
+                Estimated arrival {shippingDate}
+              </Text>
+            </Box>
+          ) : null}
+        </Box>
+      </Box>
+    </>
+  )
+}
 
 export default ShippingComponent;

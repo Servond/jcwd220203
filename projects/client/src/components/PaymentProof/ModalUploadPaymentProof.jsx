@@ -6,7 +6,7 @@ const ModalUploadPaymentProof = ({ doubleOnClick, selectedImage, setSelectImage,
     return (
         <Modal isOpen={paymentIsOpen} onOpen={paymentOnOpen} onClose={paymentOnClose}>
             <ModalOverlay />
-            <ModalContent mt={selectImage ? '100px' : '145px'} w={'550px'} borderRadius={'10px'}>
+            <ModalContent mt={{ lg: selectImage ? '100px' : '145px', base: selectImage ? '60px' : '105px' }} w={'550px'} borderRadius={'10px'}>
                 <ModalCloseButton />
                 <ModalBody pt={'25px'} pb={'32px'} pr={'25px'} pl={'25px'} mt={'10px'}>
                     <Box>
@@ -24,15 +24,16 @@ const ModalUploadPaymentProof = ({ doubleOnClick, selectedImage, setSelectImage,
                         </Text>
                         <Box
                             m={'8px 0px'}
-                            p={'8px 16px'}
+                            p={'8px 25px'}
                             bgColor={'#E5F9F6'}
                             borderRadius={'10px'}
                             display={'flex'}
                             flexDir={'row'}
+                            justifyContent={'center'}
                         >
-                            <IoAlertCircleSharp style={{ color: '#0095DA', fontSize: '30px', marginLeft: '-5px' }} />
+                            <IoAlertCircleSharp style={{ color: '#F7931E', fontSize: '30px', marginLeft: '-5px' }} />
                             <Text
-                                pl={'5px'}
+                                pl={'15px'}
                                 fontSize={'13px'}
                                 lineHeight={'16px'}
                                 fontWeight={'unset'}
