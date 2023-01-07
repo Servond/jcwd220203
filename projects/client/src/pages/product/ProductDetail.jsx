@@ -302,7 +302,11 @@ const ProductDetail = ({ product_name, id }) => {
                 w="468px"
                 h="48px"
               >
-                <Text fontSize="14" fontFamily="sans-serif">
+                <Text
+                  fontSize="14"
+                  fontFamily="sans-serif"
+                  whiteSpace={"pre-line"}
+                >
                   {productDetail.description}
                 </Text>
               </Stack>
