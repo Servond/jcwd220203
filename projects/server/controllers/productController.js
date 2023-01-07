@@ -9,6 +9,7 @@ const productController = {
     getAllProduct: async (req, res) => {
         try {
             const {
+                category_name = "",
                 product_name = "",
                 CategoryId = "",
                 _sortBy = "id",
@@ -23,10 +24,16 @@ const productController = {
                         limit: Number(_limit),
                         offset: (_page - 1) * _limit,
                         include: [{ model: Category }, { model: Image_Url }],
+
                         order: [[_sortBy, _sortDir]],
                         where: {
-                            product_name: {
-                                [Op.like]: `%${product_name}%`,
+                            [Op.or]: {
+                                product_name: {
+                                    [Op.like]: `%${product_name}%`,
+                                },
+                                category_name: {
+                                    [Op.like]: `%${category_name}%`,
+                                },
                             },
                         },
                     })
@@ -41,10 +48,16 @@ const productController = {
                     limit: Number(_limit),
                     offset: (_page - 1) * _limit,
                     include: [{ model: Category }, { model: Image_Url }],
+
                     order: [[_sortBy, _sortDir]],
                     where: {
-                        product_name: {
-                            [Op.like]: `%${product_name}%`,
+                        [Op.or]: {
+                            product_name: {
+                                [Op.like]: `%${product_name}%`,
+                            },
+                            category_name: {
+                                [Op.like]: `%${category_name}%`,
+                            },
                         },
 
                         CategoryId,

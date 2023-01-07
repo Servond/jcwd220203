@@ -55,11 +55,11 @@ const Product = () => {
             })
             setTotalCount(response.data.dataCount)
             setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
-
+            console.log("res", response.data.data)
             if (page === 1) {
-                setProducts(response.data.data)
+                setProducts(response.data.data.Products)
             } else {
-                setProducts(response.data.data)
+                setProducts(response.data.data.Products)
             }
             setIsLoading(true)
         } catch (err) {
@@ -85,7 +85,6 @@ const Product = () => {
             console.log(err)
         }
     }
-    console.log("pr", products)
     const renderProduct = () => {
         return products.map((val) => {
             return (
@@ -116,6 +115,13 @@ const Product = () => {
     const filterBtnHandler = ({ target }) => {
         const { value } = target
         setFilter(value)
+
+        const params = {}
+        if (searchParam.get("name")) {
+            params["name"] = searchParam.get("name")
+        }
+
+        setSearchParam(value)
     }
     const nextPageBtnHandler = () => {
         setPage(page + 1)
@@ -148,17 +154,23 @@ const Product = () => {
         setFilter(false)
         window.location.reload(false)
     }
-
+    console.log("pr", products)
     useEffect(() => {
         for (let entry of searchParam.entries()) {
             if (entry[0] === "name") {
                 setSearchValue(entry[1])
             }
-            if (entry[0] === "product_name" || entry[0] === "price") {
+            if (
+                entry[0] === "product_name" ||
+                entry[0] === "price" ||
+                entry[0] === "category_name"
+            ) {
                 setSortBy(entry[0])
                 setSortDir(entry[1])
+                setFilter(entry[0])
             }
         }
+
         fetchProduct()
         fetchCategory()
     }, [page, sortBy, sortDir, filter, searchValue, catPage])
