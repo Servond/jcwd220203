@@ -8,9 +8,9 @@ import { login } from "./redux/features/authSlice"
 import GuestRoute from "./components/GuestRoute"
 import Register from "./pages/Register"
 import RegisterVerification from "./pages/RegisterVerification"
-import { Box } from "@chakra-ui/react"
-import Navbar from "./components/Navbar"
-import Footer from "./components/Footer/Footer"
+import { Box, Spinner, Text } from "@chakra-ui/react"
+import Navbar from "./components/HomePage/Navbar/Navbar"
+import Footer from "./components/HomePage/Footer/Footer"
 import HomePage from "./pages/Home"
 import AdminDashboard from "./pages/admin/AdminDashboard"
 import "./AdminDashboard.css"
@@ -27,17 +27,25 @@ import ResetPasswordConfirmation from "./pages/ResetPasswordConfirmation"
 import RequestResetPassword from "./pages/RequestResetPassword"
 import ManageUserData from "./pages/admin/ManageUserData"
 import ManageAdminData from "./pages/admin/ManageAdminData"
-import AdminCategory from "./pages/admin/AdminCategory"
+import AdminCategory from "./pages/admin/AdminCategory/AdminCategory"
 import NotFound from "./components/404Page"
-import Cart from "./pages/Cart"
+import Cart from "./pages/Cart/Cart"
 import ProtectedRoute from "./components/ProtectedRoute"
 import AdminProductData from "./pages/admin/AdminProductData"
 import AdminProductDataDetail from "./pages/admin/AdminProductDataDetail"
 import Shipment from "./pages/shipment/Shipment"
 import UpdateStock from "./pages/admin/UpdateStock"
 import WarehouseStock from "./components/admin/WarehouseStock"
-import ChangeAddress from "./components/order/ChangeAddress"
 import Checkout from "./pages/order/Checkout"
+import ShippingComponent2 from "./components/product/ShippingComponent2"
+import AdminStockChangesReport from "./pages/admin/AdminStockChangesReport"
+import AdminOrder from "./pages/admin/AdminOrder"
+import PaymentProof from "./pages/PaymentProof"
+import AdminMutationStock from "./pages/admin/AdminMutationStock"
+import AdminOrderHistory from "./pages/admin/AdminOrderHistory"
+import TransactionList from "./pages/TransactionList/TransactionList"
+import PaymentList from "./pages/TransactionList/WaitingForPayment/PaymentList"
+import AdminSalesReport from "./pages/admin/AdminSalesReport"
 
 function App() {
     const [message, setMessage] = useState("")
@@ -108,6 +116,44 @@ function App() {
         keepUserLoggedIn()
         userResetData()
     }, [])
+
+    if (!authCheck) {
+        return (
+            <Box textAlign={"center"}>
+                <Box mt={"240px"}>
+                    <Text p="4" fontWeight={"light"} fontSize="4xl">
+                        <Text
+                            fontSize={"30px"}
+                            fontWeight="bold"
+                            color={"#0095DA"}
+                            display="inline"
+                        >
+                            Shop
+                        </Text>
+                        <Text
+                            pl={"0"}
+                            fontSize={"30px"}
+                            fontWeight="bold"
+                            color={"#F7931E"}
+                            display="inline"
+                        >
+                            edia
+                        </Text>
+                    </Text>
+                    <Spinner
+                        thickness="5px"
+                        speed="0.9s"
+                        emptyColor="#F7931E"
+                        color="#0095DA"
+                        size="xl"
+                    />
+                    <Text mt="70px" fontWeight={"semibold"} fontSize="15px">
+                        Feel the convenience of transactions on Shopedia
+                    </Text>
+                </Box>
+            </Box>
+        )
+    }
 
     return (
         <>
@@ -231,6 +277,23 @@ function App() {
                         </AdminRoute>
                     }
                 />
+                <Route
+                    path="/admin/order-history"
+                    element={
+                        <AdminRoute>
+                            <AdminOrderHistory />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/sales-report"
+                    element={
+                        <AdminRoute>
+                            <AdminSalesReport />
+                        </AdminRoute>
+                    }
+                />
 
                 {/* Profiling Route */}
                 <Route
@@ -266,6 +329,14 @@ function App() {
                     }
                 />
                 <Route
+                    path="/shipment-component"
+                    element={
+                        <ProtectedRoute>
+                            <ShippingComponent2 />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
                     path="/cart/shipment"
                     element={
                         <ProtectedRoute>
@@ -289,7 +360,119 @@ function App() {
                         </AdminRoute>
                     }
                 />
-
+                <Route
+                    path="/admin/report/stock"
+                    element={
+                        <AdminRoute>
+                            <AdminStockChangesReport />
+                        </AdminRoute>
+                    }
+                />
+                <Route
+                    path="/admin/stock-mutation"
+                    element={
+                        <AdminRoute>
+                            <AdminMutationStock />
+                        </AdminRoute>
+                    }
+                />
+                <Route
+                    path="/admin/order"
+                    element={
+                        <AdminRoute>
+                            <AdminOrder />
+                        </AdminRoute>
+                    }
+                />
+                {/* Profiling Route */}
+                <Route
+                    path="/user/profile"
+                    element={
+                        <ProtectedRoute>
+                            <Profile />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/user/profile/change-password"
+                    element={
+                        <ProtectedRoute>
+                            <ChangePassword />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/user/profile/address"
+                    element={
+                        <ProtectedRoute>
+                            <AddressList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/shipment"
+                    element={
+                        <ProtectedRoute>
+                            <Shipment />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/shipment-component"
+                    element={
+                        <ProtectedRoute>
+                            <ShippingComponent2 />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/cart/shipment"
+                    element={
+                        <ProtectedRoute>
+                            <Checkout />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/payment/thank-you/shopedia/:transaction_name"
+                    element={
+                        <ProtectedRoute>
+                            <PaymentProof />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/transaction-list"
+                    element={
+                        <ProtectedRoute>
+                            <TransactionList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/transaction/payment-list"
+                    element={
+                        <ProtectedRoute>
+                            <PaymentList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/product"
+                    element={
+                        <AdminRoute>
+                            <AdminProductData />
+                        </AdminRoute>
+                    }
+                />
+                <Route
+                    path="/admin/product/detail/:id"
+                    element={
+                        <AdminRoute>
+                            <AdminProductDataDetail />
+                        </AdminRoute>
+                    }
+                />
                 {/* Product Route */}
                 <Route path="/product" element={<Product />} />
                 <Route

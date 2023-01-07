@@ -4,15 +4,30 @@ const router = express.Router()
 const addressController = require("../controllers/addressController")
 const { verifyToken } = require("../middlewares/authMiddleware")
 const axios = require("axios")
+const { validateAddress } = require("../middlewares/validatorMiddleware")
 
 router.get("/userAddress", verifyToken, addressController.getAddressById)
-router.post("/addNewAddress", verifyToken, addressController.addNewAddress)
-router.patch("/updateAddress/:id", verifyToken, addressController.updateAddress)
+
+router.post(
+  "/addNewAddress",
+  verifyToken,
+  validateAddress,
+  addressController.addNewAddress
+)
+
+router.patch(
+  "/updateAddress/:id",
+  verifyToken,
+  validateAddress,
+  addressController.updateAddress
+)
+
 router.delete(
   "/deleteAddress/:id",
   verifyToken,
   addressController.deleteAddress
 )
+
 router.patch("/setDefault/:id", verifyToken, addressController.setAsDefault)
 
 // Config Defaults Axios dengan Detail Akun Rajaongkir

@@ -1,10 +1,8 @@
 import {
   Box,
   Button,
-  FormControl,
+  Grid,
   Image,
-  Input,
-  InputGroup,
   Select,
   Table,
   Tbody,
@@ -20,19 +18,22 @@ import { useFormik } from "formik"
 import React, { useState } from "react"
 import { useEffect } from "react"
 import { IoIosAlert } from "react-icons/io"
-import { TbSearch } from "react-icons/tb"
 import { useParams } from "react-router-dom"
 import { axiosInstance } from "../../api"
 import EditStock from "./EditStock"
 import * as Yup from "yup"
 import Alert from "../profile/Alert"
 import { useSelector } from "react-redux"
+import { BiEdit } from "react-icons/bi"
+import { RiDeleteBin2Fill } from "react-icons/ri"
+import LoadingWarehouseStock from "../loading/LoadingWarehouseStock"
+import Search from "../Search"
+import Pagination from "./Pagination"
 
 const WarehouseStock = ({}) => {
   const authSelector = useSelector((state) => state.auth)
   const [data, setData] = useState([])
   const params = useParams()
-  console.log(params)
   const [sortBy, setSortBy] = useState("product_name")
   const [sortDir, setSortDir] = useState("ASC")
   const [maxPage, setMaxPage] = useState(1)
@@ -44,6 +45,7 @@ const WarehouseStock = ({}) => {
   const [deleteAlert, setDeleteAlert] = useState(null)
   const [filter, setFilter] = useState(0)
   const [category, setCategory] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     onOpen: onOpenAlert,
@@ -54,10 +56,11 @@ const WarehouseStock = ({}) => {
   const doubleOnClick1 = () => {
     editFormik.handleSubmit()
     onCloseAlert()
+    setIsLoading(false)
   }
 
   const fetchWarehouseData = async () => {
-    const maxItemsPerPage = 8
+    const maxItemsPerPage = 4
     try {
       if (authSelector.RoleId === 2) {
         const response = await axiosInstance.get(
@@ -111,67 +114,20 @@ const WarehouseStock = ({}) => {
       } else {
         setData(response.data.data)
       }
+      setIsLoading(true)
     } catch (error) {
       console.log(error)
     }
   }
 
-  const renderProduct = () => {
-    return data.map((val) => {
-      return (
-        <Tr h="auto" key={val.id.toString()}>
-          <Td w="100px">
-            <Image src={val.Product.Image_Urls[0].image_url} />
-          </Td>
-          <Td w="400px">{val.Product.product_name}</Td>
-          <Td w="150px">{val.Product.Category.category_name}</Td>
-          <Td>Rp. {val.Product.price.toLocaleString()}</Td>
-          <Td>{val.stock}</Td>
-          <Td w="100px">
-            <Button
-              color={"white"}
-              mb="2"
-              w="120px"
-              bgColor="#F7931E"
-              _hover={false}
-              onClick={() => setOpenedEdit(val)}
-            >
-              Update Stock
-            </Button>
-            <Button
-              mb="2"
-              color={"white"}
-              w="120px"
-              bgColor="#0095DA"
-              _hover={false}
-              p="0 10px"
-            >
-              <Text overflow={"hidden"} textOverflow="ellipsis">
-                Download Journal
-              </Text>
-            </Button>
-            <Button
-              color={"white"}
-              bgColor="#F7931E"
-              _hover={false}
-              onClick={() => setDeleteAlert(val)}
-            >
-              <Text overflow={"hidden"} textOverflow="ellipsis">
-                Delete Stock
-              </Text>
-            </Button>
-          </Td>
-        </Tr>
-      )
-    })
-  }
-
   const nextPage = () => {
     setPage(page + 1)
+    setIsLoading(false)
   }
 
   const previousPage = () => {
     setPage(page - 1)
+    setIsLoading(false)
   }
 
   const sortCategoryHandler = ({ target }) => {
@@ -179,6 +135,7 @@ const WarehouseStock = ({}) => {
 
     setSortBy(value.split(" ")[0])
     setSortDir(value.split(" ")[1])
+    setIsLoading(false)
   }
 
   const formikSearch = useFormik({
@@ -188,10 +145,11 @@ const WarehouseStock = ({}) => {
     onSubmit: ({ search }) => {
       setCurrentSearch(search)
       setPage(1)
+      setIsLoading(false)
     },
   })
 
-  const searchAdminHandler = ({ target }) => {
+  const searchHandler = ({ target }) => {
     const { name, value } = target
     formikSearch.setFieldValue(name, value)
   }
@@ -258,12 +216,14 @@ const WarehouseStock = ({}) => {
   const doubleOnClick2 = () => {
     setDeleteAlert(null)
     deleteAdminHandler(deleteAlert.id)
+    setIsLoading(false)
   }
 
   const filterBookHandler = ({ target }) => {
     const { value } = target
 
     setFilter(value)
+    setIsLoading(false)
   }
 
   const fetchAllCategory = async () => {
@@ -298,82 +258,114 @@ const WarehouseStock = ({}) => {
     }
   }, [openedEdit])
   return (
-    <Box ml="230px">
-      <Box p="20px 0" display={"flex"} justifyContent="space-between" mr="4">
-        <Box display={"flex"} gap="4" my={"auto"}>
-          <Text fontSize={"2xl"} fontWeight="bold" color={"#F7931E"}>
-            Update Stock Warehouse {params.id}
-          </Text>
-        </Box>
-
-        <Box gap="4" display={"flex"}>
-          <Text my="auto">Filter</Text>
-          <Select
-            onChange={filterBookHandler}
-            fontSize={"15px"}
-            fontWeight="normal"
-            fontFamily="serif"
-            width={"137px"}
-            color={"#6D6D6F"}
-            _placeholder="Filter"
-          >
-            <option selected>All</option>
-            {renderCategory()}
-          </Select>
-          <Text my="auto">Sort</Text>
-          <Select
-            onChange={sortCategoryHandler}
-            fontSize={"15px"}
-            fontWeight="normal"
-            fontFamily="serif"
-            width={"137px"}
-            color={"#6D6D6F"}
-            _placeholder="Sort By"
-          >
-            <option value="product_name ASC" selected>
-              Name A-Z
-            </option>
-            <option value="product_name DESC">Name Z-A</option>
-            <option value="stock DESC">most stock</option>
-            <option value="stock ASC">least stock</option>
-          </Select>
-
-          <form onSubmit={formikSearch.handleSubmit}>
-            <FormControl>
-              <InputGroup textAlign={"right"}>
-                <Input
-                  type={"text"}
-                  placeholder="Search by product name"
-                  name="search"
-                  w="200px"
-                  onChange={searchAdminHandler}
-                  _placeholder={"halo"}
-                  borderRightRadius="0"
-                  value={formikSearch.values.search}
-                />
-
-                <Button borderLeftRadius={"0"} type="submit">
-                  <TbSearch />
-                </Button>
-              </InputGroup>
-            </FormControl>
-          </form>
-        </Box>
+    <Box ml="220px" p="24px" bgColor={"var(--NN50,#F0F3F7);"} h="100vh">
+      <Box mb="16px">
+        <Text fontSize={"2xl"} fontWeight="bold" color={"#F7931E"}>
+          Update Stock Warehouse {params.id}
+        </Text>
       </Box>
-      <Table>
+      <Grid gap="4" templateColumns={"repeat(3, 1fr)"} mt="4" mb="4">
+        <Select
+          onChange={filterBookHandler}
+          fontSize={"15px"}
+          bgColor="white"
+          color={"#6D6D6F"}
+        >
+          <option selected>All</option>
+          {renderCategory()}
+        </Select>
+
+        <Select
+          onChange={sortCategoryHandler}
+          fontSize={"15px"}
+          bgColor="white"
+          color={"#6D6D6F"}
+        >
+          <option value="product_name ASC" selected>
+            Name A-Z
+          </option>
+          <option value="product_name DESC">Name Z-A</option>
+          <option value="stock DESC">most stock</option>
+          <option value="stock ASC">least stock</option>
+        </Select>
+
+        <Search
+          formikSearch={formikSearch}
+          searchHandler={searchHandler}
+          placeholder="Search by product name"
+          width={"100%"}
+        />
+      </Grid>
+      <Table
+        variant={"striped"}
+        colorScheme={"blue"}
+        bgColor="white"
+        borderRadius="8px"
+        boxShadow={"rgba(0, 0, 0, 0.24) 0px 3px 8px"}
+      >
         <Thead>
           <Tr>
-            <Th>Image</Th>
-            <Th>Product Name</Th>
-            <Th>Category</Th>
-            <Th>Price</Th>
-            <Th>Stock</Th>
-            <Th>Option</Th>
+            <Th p="10px">Image</Th>
+            <Th p="10px">Product Name</Th>
+            <Th p="10px">Category</Th>
+            <Th p="10px">Price</Th>
+            <Th p="10px">Stock</Th>
+            <Th p="10px">Option</Th>
           </Tr>
         </Thead>
-        <Tbody>{renderProduct()}</Tbody>
+        <Tbody>
+          {isLoading &&
+            data.map((val) => {
+              return (
+                <Tr h="auto" key={val.id.toString()}>
+                  <Td p="10px" w="100px">
+                    <Image src={val.Product.Image_Urls[0].image_url} />
+                  </Td>
+                  <Td
+                    p="10px"
+                    w="500px"
+                    overflow={"hidden"}
+                    textOverflow="ellipsis"
+                  >
+                    {val.Product.product_name}
+                  </Td>
+                  <Td p="10px">{val.Product.Category.category_name}</Td>
+                  <Td p="10px" fontWeight={"660"} w="200px">
+                    Rp. {val.Product.price.toLocaleString("id-ID")}
+                  </Td>
+                  <Td p="10px">{val.stock}</Td>
+                  <Td p="10px" w="100px">
+                    <Box display={"flex"} gap="2">
+                      <Button
+                        color={"white"}
+                        bgColor="#F7931E"
+                        _hover={false}
+                        _active={false}
+                        onClick={() => setOpenedEdit(val)}
+                        title="Update Stock"
+                      >
+                        <BiEdit fontSize={"17px"} />
+                      </Button>
+                      <Button
+                        color={"white"}
+                        bgColor="#0095DA"
+                        _hover={false}
+                        _active={false}
+                        title="Delete Stock"
+                        onClick={() => setDeleteAlert(val)}
+                        disabled={val.stock === 0}
+                      >
+                        <RiDeleteBin2Fill fontSize={"17px"} />
+                      </Button>
+                    </Box>
+                  </Td>
+                </Tr>
+              )
+            })}
+          {isLoading === false ? <LoadingWarehouseStock /> : null}
+        </Tbody>
       </Table>
-      {!data.length ? (
+      {!data.length && isLoading === true ? (
         <Box p="10px" bgColor={"#E5F9F6"}>
           <Box mx="auto">
             <Box display={"flex"} mx="auto" w="170px">
@@ -385,26 +377,15 @@ const WarehouseStock = ({}) => {
           </Box>
         </Box>
       ) : null}
-      <Box p="20px">
-        <Box>
-          {page === 1 ? null : (
-            <Button onClick={previousPage} disabled={page === 1 ? true : null}>
-              {"<"}
-            </Button>
-          )}
-          {page >= maxPage ? null : (
-            <Button
-              onClick={nextPage}
-              ml="10px"
-              disabled={page >= maxPage ? true : null}
-            >
-              {">"}
-            </Button>
-          )}
-        </Box>
-      </Box>
 
-      {/* Edit modal */}
+      <Pagination
+        maxPage={maxPage}
+        nextPage={nextPage}
+        page={page}
+        previousPage={previousPage}
+      />
+
+      {/* Modal update */}
       <EditStock
         editFormik={editFormik}
         isOpen={openedEdit}
@@ -415,7 +396,7 @@ const WarehouseStock = ({}) => {
         onCloseMod={() => setOpenedEdit(null)}
       />
 
-      {/* Alert edit modal */}
+      {/* Alert update stock modal */}
       <Alert
         body={"Is stock that you entered correct?"}
         cancelRef={cancelRef}
@@ -428,6 +409,7 @@ const WarehouseStock = ({}) => {
         rightButton={"Update Stock"}
       />
 
+      {/* Alert delete Stock */}
       <Alert
         body={`Are you sure to delete?`}
         cancelRef={cancelRef}

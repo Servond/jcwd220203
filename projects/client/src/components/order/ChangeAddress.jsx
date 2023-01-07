@@ -1,6 +1,9 @@
 import {
   Box,
   Button,
+  FormControl,
+  Input,
+  InputGroup,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -19,8 +22,9 @@ import { useFormik } from "formik"
 import * as Yup from "yup"
 import Alert from "../profile/Alert"
 import EditForm from "../profile/EditForm"
+import { TbSearch } from "react-icons/tb"
 
-const ChangeAddress = () => {
+const ChangeAddress = ({ defaultAddressUser }) => {
   const { onOpen, isOpen, onClose } = useDisclosure()
   const {
     onOpen: onOpenAddNewAddress,
@@ -44,19 +48,24 @@ const ChangeAddress = () => {
   const toast = useToast()
   const [address, setAddress] = useState([])
   const [allAddress, setAllAddress] = useState([])
-  const [defaultAlert, setDefaultAlert] = useState(null)
   const [selectedNewProvince, setSelectedNewProvince] = useState(0)
   const [selectedNewCity, setSelectedNewCity] = useState(0)
   const [selectedEditProvince, setSelectedEditProvince] = useState(0)
   const [selectedEditCity, setSelectedEditCity] = useState(0)
+  console.log(selectedEditCity)
+  console.log(selectedEditProvince)
   const [openedEdit, setOpenedEdit] = useState(null)
-  console.log(openedEdit)
+  const [currentSearch, setCurrentSearch] = useState("")
+  const [defaultAddressId, setDefaultAddressId] = useState(0)
+  defaultAddressUser(defaultAddressId)
+
   const fetchAddress = async () => {
     try {
       const response = await axiosInstance.get(
         "/checkoutAddress/defaultAddress"
       )
       setAddress(response.data.data)
+      setDefaultAddressId(response.data.data.id)
     } catch (error) {
       console.log(error.response)
     }
@@ -64,9 +73,13 @@ const ChangeAddress = () => {
 
   const fetchAllAddress = async () => {
     try {
-      const response = await axiosInstance.get("/checkoutAddress/allAddress")
+      const response = await axiosInstance.get("/checkoutAddress/allAddress", {
+        params: {
+          recipients_name: currentSearch,
+          full_address: currentSearch,
+        },
+      })
       setAllAddress(response.data.data)
-      console.log(response)
     } catch (error) {
       console.log(error.response)
     }
@@ -175,8 +188,6 @@ const ChangeAddress = () => {
       recipients_name,
       phone_number,
       address_labels,
-      province,
-      city,
       districts,
       full_address,
     }) => {
@@ -246,13 +257,27 @@ const ChangeAddress = () => {
     onCloseAlert()
   }
 
+  const formikSearch = useFormik({
+    initialValues: {
+      search: "",
+    },
+    onSubmit: ({ search }) => {
+      setCurrentSearch(search)
+    },
+  })
+
+  const searchAdminHandler = ({ target }) => {
+    const { name, value } = target
+    formikSearch.setFieldValue(name, value)
+  }
+
   useEffect(() => {
     fetchAddress()
   }, [])
 
   useEffect(() => {
     fetchAllAddress()
-  }, [isOpen])
+  }, [isOpen, currentSearch])
 
   useEffect(() => {
     if (openedEdit) {
@@ -265,51 +290,188 @@ const ChangeAddress = () => {
   }, [openedEdit])
   return (
     <>
-      <Box borderBottom="1px solid var(--N100,#DBDEE2)">
-        <Text fontSize={"14px"} fontWeight="bold" pb="14px">
-          Shipping Address
-        </Text>
-      </Box>
-      <Box pb="15px" pt="10px">
-        <Box>
-          <Box display={"flex"} mb="4px">
-            <Text fontWeight={"bold"} mr="2px">
-              {address.recipients_name}
-            </Text>
-            <Text mr="1">{address.address_labels} </Text>
+      <Box display={{ lg: "inline", base: "none" }}>
+        <Box borderBottom="1px solid #fcd4a5">
+          <Text
+            fontSize={"14px"}
+            fontFamily={"Open Sauce One, sans-serif"}
+            fontWeight={700}
+            color={"#31353B"}
+            pb="14px"
+          >
+            Shipping Address
+          </Text>
+        </Box>
+        <Box pb="20px" pt="20px">
+          <Box>
+            <Box display={"flex"} mb="4px">
+              <Text
+                fontWeight={"bolder"}
+                mr="2px"
+                fontSize={"13px"}
+                color={"#31353B"}
+                lineHeight={"1.4"}
+                fontFamily={"Open Sauce One, sans-serif"}
+              >
+                {address.recipients_name}
+              </Text>
+              <Text
+                mr="2px"
+                color={"#31353B"}
+                lineHeight={"1.4"}
+                fontFamily={"Open Sauce One, sans-serif"}
+                fontSize={"13px"}
+              >
+                {`(${address.address_labels})`}
+              </Text>
+              <Box
+                display={"inline-flex"}
+                alignItems={"center"}
+                fontWeight={700}
+                lineHeight={"16px"}
+                fontSize="10px"
+                backgroundColor="#E5F9F6"
+                p="0 8px"
+                borderRadius={"3px"}
+                color="#0095DA"
+                w={"52.2px"}
+                h={"20px"}
+                fontFamily={"Open Sauce One, sans-serif"}
+                m={"0px"}
+                justifyContent={"center"}
+                ml={"2px"}
+              >
+                Main
+              </Box>
+            </Box>
+            <Box>
+              <Text
+                color={"#31353B"}
+                lineHeight={"1.4"}
+                fontFamily={"Open Sauce One, sans-serif"}
+                fontSize={"13px"}
+                mb="4px"
+              >
+                {address.phone_number}
+              </Text>
+            </Box>
             <Box
-              fontWeight={"bold"}
-              fontSize="10px"
-              backgroundColor="#E5F9F6"
-              p="0 8px"
-              my="auto"
-              borderRadius={"3px"}
-              color="#0095DA"
+              fontFamily={"Open Sauce One, sans-serif"}
+              fontSize={"13px"}
+              color={"#0000008A"}
+              wordBreak={"break-word"}
+              lineHeight={"1.4"}
             >
-              Main
+              <Text>{address.full_address}</Text>
+              <Text>
+                {address.districts}, {address.city}, {address.province}
+              </Text>
             </Box>
           </Box>
-          <Box mb="4px">
-            <Text>{address.phone_number}</Text>
-          </Box>
-          <Box>
-            <Text>{address.full_address}</Text>
-            <Text>
-              {address.districts}, {address.city}, {address.province}
-            </Text>
-          </Box>
+        </Box>
+        <Box borderTop="1px solid #fcd4a5" p={"25px 0px 10px"}>
+          <Button
+            p="0 17px"
+            mb="18px"
+            border="1px solid #0095DA"
+            bgColor={"white"}
+            onClick={onOpen}
+            fontSize={"14px"}
+            fontFamily={"Open Sauce One, sans-serif"}
+            color={"#0095DA"}
+            _hover={"none"}
+            display={"flex"}
+            alignContent={"center"}
+          >
+            <Text fontWeight={"bold"}>Choose Another Address</Text>
+          </Button>
         </Box>
       </Box>
-      <Box borderTop="1px solid var(--N100,#DBDEE2)" pt="15px" pb="5">
-        <Button
-          p="0 16px"
-          mb="10px"
-          border="1px solid var(--N100,#DBDEE2)"
-          bgColor={"white"}
-          onClick={onOpen}
+
+      {/* mobile responsive */}
+      <Box display={{ lg: "none", base: "inline" }}>
+        <Box
+          w={"500px"}
+          mt={"6px"}
+          display={"flex"}
+          flexDir={"column"}
+          boxShadow={"rgb(0 0 0 / 15%) 0px 1px 3px 0px"}
         >
-          <Text fontWeight={"bold"}>Choose Another Address</Text>
-        </Button>
+          <Box m={"16px"}>
+            <Text
+              fontSize={"14px"}
+              color={"#31353BF5"}
+              fontFamily={"Open Sauce One, sans-serif"}
+              fontWeight={700}
+              lineHeight={"18px"}
+            >
+              Shipping Destination
+            </Text>
+          </Box>
+          <Box
+            w={"500px"}
+            p={"16px"}
+            display={"flex"}
+            flexDir={"column"}
+            gap={"1px"}
+          >
+            <Box
+              display={"flex"}
+              flexDir={"row"}
+              justifyContent={"flex-start"}
+              color={"#31353BF5"}
+              fontSize={"12px"}
+              fontFamily={"Open Sauce One, sans-serif"}
+              lineHeight={"16px"}
+            >
+              <Text fontWeight={700}>{address.recipients_name}</Text>
+              <Text pl={"3px"}>{`(${address.address_labels})`}</Text>
+            </Box>
+            <Text
+              color={"#31353BAD"}
+              fontSize={"12px"}
+              fontFamily={"Open Sauce One, sans-serif"}
+              lineHeight={"16px"}
+              fontWeight={400}
+            >
+              {address.phone_number}
+            </Text>
+            <Text
+              fontSize={"11px"}
+              color={"#31353BAD"}
+              fontFamily={"Open Sauce One, sans-serif"}
+              lineHeight={"14px"}
+              fontWeight={400}
+            >
+              {address.full_address},{address.districts}, {address.city},{" "}
+              {address.province}
+            </Text>
+            <Button
+              mt={"12px"}
+              border="1px solid #0095DA"
+              bgColor={"white"}
+              onClick={onOpen}
+              fontSize={"14px"}
+              fontFamily={"Open Sauce One, sans-serif"}
+              color={"#0095DA"}
+              _hover={"none"}
+              display={"flex"}
+              alignContent={"center"}
+              w={"187.2px"}
+              h={"32px"}
+            >
+              <Text
+                fontSize={"12px"}
+                fontFamily={"Open Sauce One, sans-serif"}
+                fontWeight={"600"}
+                lineHeight={"16px"}
+              >
+                Choose Another Address
+              </Text>
+            </Button>
+          </Box>
+        </Box>
+        <Box h={"6px"} bgColor={"#edeff1"} />
       </Box>
 
       <Modal
@@ -338,6 +500,26 @@ const ChangeAddress = () => {
             p="24px 40px"
             fontSize={"14px"}
           >
+            <form onSubmit={formikSearch.handleSubmit}>
+              <FormControl>
+                <InputGroup textAlign={"right"}>
+                  <Input
+                    type={"text"}
+                    placeholder="Search by recipient's address or name"
+                    name="search"
+                    mb="24px"
+                    onChange={searchAdminHandler}
+                    _placeholder={"halo"}
+                    borderRightRadius="0"
+                    value={formikSearch.values.search}
+                  />
+
+                  <Button borderLeftRadius={"0"} type="submit">
+                    <TbSearch />
+                  </Button>
+                </InputGroup>
+              </FormControl>
+            </form>
             <Box
               p="20px"
               fontSize={"16px"}

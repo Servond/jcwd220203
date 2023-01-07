@@ -17,10 +17,10 @@ router.post("/detail/:id", upload({
     filePrefix: "product",
   }).single("image_url"), adminProductController.addImages)
 
-// router.post("/image", adminProductController.addImage)
 router.get("/detail/:id", adminProductController.getProductDetail)
 router.patch("/detail/:id", adminProductController.patchProductDetail)
 router.delete("/detail/:id", adminProductController.deleteProductDetail)
 router.get("/detail/images/:id", adminProductController.getPictures)
+router.delete("/detail/images/:id", adminProductController.deletePictures)
 
 module.exports = router

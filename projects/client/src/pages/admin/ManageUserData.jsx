@@ -2,9 +2,7 @@ import {
   Avatar,
   Box,
   Button,
-  FormControl,
-  Input,
-  InputGroup,
+  Grid,
   Select,
   Table,
   Tbody,
@@ -18,9 +16,11 @@ import { useFormik } from "formik"
 import { useEffect } from "react"
 import { useState } from "react"
 import { IoIosAlert } from "react-icons/io"
-import { TbSearch } from "react-icons/tb"
 import { axiosInstance } from "../../api"
 import AddressModal from "../../components/admin/AddressModal"
+import Pagination from "../../components/admin/Pagination"
+import LoadingManageUser from "../../components/loading/LoadingManageUser"
+import Search from "../../components/Search"
 
 const ManageUserData = () => {
   const [userData, setUserData] = useState([])
@@ -31,6 +31,7 @@ const ManageUserData = () => {
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
   const [openedAddress, setOpenedAddress] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const nextPage = () => {
     setPage(page + 1)
@@ -41,7 +42,7 @@ const ManageUserData = () => {
   }
 
   const fetchUserData = async () => {
-    const maxItemsPerPage = 8
+    const maxItemsPerPage = 5
     try {
       const response = await axiosInstance.get("/userData/getAllUser", {
         params: {
@@ -55,40 +56,17 @@ const ManageUserData = () => {
 
       setTotalCount(response.data.dataCount)
       setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
-
       if (page === 1) {
         setUserData(response.data.data)
       } else {
         setUserData(response.data.data)
       }
+      setIsLoading(true)
     } catch (error) {
       console.log(error)
     }
   }
   const apiImg = process.env.REACT_APP_IMAGE_URL
-
-  const renderUser = () => {
-    return userData.map((val) => {
-      return (
-        <Tr h="auto">
-          <Td p="5px" w={"100px"}>
-            <Avatar
-              size={"lg"}
-              borderRadius={"0"}
-              name={val.username}
-              src={`${apiImg}/${val.profile_picture}`}
-            />
-          </Td>
-          <Td p="5px">{val.username || "null"}</Td>
-          <Td p="5px">{val.email}</Td>
-          <Td p="5px">{val.phone_number || "null"}</Td>
-          <Td p="5px" maxW={"200px"}>
-            <Button onClick={() => setOpenedAddress(val)}>Details</Button>
-          </Td>
-        </Tr>
-      )
-    })
-  }
 
   const formikSearch = useFormik({
     initialValues: {
@@ -97,10 +75,11 @@ const ManageUserData = () => {
     onSubmit: ({ search }) => {
       setCurrentSearch(search)
       setPage(1)
+      setIsLoading(false)
     },
   })
 
-  const searchAdminHandler = ({ target }) => {
+  const searchHandler = ({ target }) => {
     const { name, value } = target
     formikSearch.setFieldValue(name, value)
   }
@@ -109,77 +88,97 @@ const ManageUserData = () => {
 
     setSortBy(value.split(" ")[0])
     setSortDir(value.split(" ")[1])
+    setIsLoading(false)
   }
 
   useEffect(() => {
     fetchUserData()
   }, [currentSearch, page, sortDir, sortBy, openedAddress])
   return (
-    <Box marginLeft={"230px"}>
-      <Box p="20px 0" display={"flex"} justifyContent="space-between" mr="4">
-        <Box display={"flex"} gap="4" my={"auto"}>
-          <Text fontSize={"2xl"} fontWeight="bold" color={"#F7931E"}>
-            User Data
-          </Text>
-          <Text fontSize={"2xl"} fontWeight="bold" color={"#0095DA"}>
-            Total User:{totalCount}
-          </Text>
-        </Box>
-
-        <Box gap="4" display={"flex"}>
-          <Text my="auto">Sort</Text>
-          <Select
-            onChange={sortCategoryHandler}
-            fontSize={"15px"}
-            fontWeight="normal"
-            fontFamily="serif"
-            width={"137px"}
-            color={"#6D6D6F"}
-            _placeholder="Sort By"
-          >
-            <option value="username ASC" selected>
-              Name A-Z
-            </option>
-            <option value="username DESC">Name Z-A</option>
-            <option value="createdAt DESC">Latest</option>
-            <option value="createdAt ASC">Old</option>
-          </Select>
-
-          <form onSubmit={formikSearch.handleSubmit}>
-            <FormControl>
-              <InputGroup textAlign={"right"}>
-                <Input
-                  type={"text"}
-                  placeholder="Search by username"
-                  name="search"
-                  w="200px"
-                  onChange={searchAdminHandler}
-                  _placeholder={"halo"}
-                  borderRightRadius="0"
-                  value={formikSearch.values.search}
-                />
-
-                <Button borderLeftRadius={"0"} type="submit">
-                  <TbSearch />
-                </Button>
-              </InputGroup>
-            </FormControl>
-          </form>
-        </Box>
+    <Box ml="220px" p="24px" bgColor={"var(--NN50,#F0F3F7);"} h="100vh">
+      <Box mb="16px">
+        <Text fontSize={"2xl"} fontWeight="bold" color={"#F7931E"}>
+          User Data({userData.length})
+        </Text>
       </Box>
-      <Table>
+
+      <Grid gap="4" templateColumns={"repeat(2, 1fr)"} mt="4" mb="4">
+        <Select
+          onChange={sortCategoryHandler}
+          fontSize={"15px"}
+          color={"#6D6D6F"}
+          bgColor={"white"}
+        >
+          <option value="username ASC" selected>
+            Name A-Z
+          </option>
+          <option value="username DESC">Name Z-A</option>
+          <option value="createdAt DESC">Latest</option>
+          <option value="createdAt ASC">Old</option>
+        </Select>
+
+        <Search
+          formikSearch={formikSearch}
+          searchHandler={searchHandler}
+          placeholder="Search by username"
+          width={"100%"}
+        />
+      </Grid>
+
+      <Table
+        variant={"striped"}
+        colorScheme={"blue"}
+        bgColor="white"
+        borderRadius="8px"
+        boxShadow={"rgba(0, 0, 0, 0.24) 0px 3px 8px"}
+      >
         <Thead>
           <Tr>
-            <Th p="5px">Photo Profile</Th>
-            <Th p="5px">Username</Th>
-            <Th p="5px">Email</Th>
-            <Th p="5px">Phone Number</Th>
-            <Th p="5px">Address</Th>
+            <Th p="10px" w="64px">
+              Photo Profile
+            </Th>
+            <Th p="10px">Username</Th>
+            <Th p="10px">Email</Th>
+            <Th p="10px">Phone Number</Th>
+            <Th p="10px" w="100px">
+              Address
+            </Th>
           </Tr>
         </Thead>
-        <Tbody>{renderUser()}</Tbody>
+        <Tbody>
+          {isLoading &&
+            userData.map((val) => {
+              return (
+                <Tr>
+                  <Td p="10px" w={"64px"}>
+                    <Avatar
+                      size={"lg"}
+                      borderRadius={"0"}
+                      name={val.username}
+                      src={`${apiImg}/${val.profile_picture}`}
+                    />
+                  </Td>
+                  <Td p="10px">{val.username || "null"}</Td>
+                  <Td p="10px">{val.email}</Td>
+                  <Td p="10px">{val.phone_number || "null"}</Td>
+                  <Td p="10px" w={"100px"}>
+                    <Button
+                      onClick={() => setOpenedAddress(val)}
+                      _hover={false}
+                      _active={false}
+                      color="white"
+                      bgColor="#0095DA"
+                    >
+                      Details
+                    </Button>
+                  </Td>
+                </Tr>
+              )
+            })}
+          {isLoading === false ? <LoadingManageUser /> : null}
+        </Tbody>
       </Table>
-      {!userData.length ? (
+      {!userData.length && isLoading === true ? (
         <Box p="10px" bgColor={"#E5F9F6"}>
           <Box mx="auto">
             <Box display={"flex"} mx="auto" w="170px">
@@ -191,43 +190,19 @@ const ManageUserData = () => {
           </Box>
         </Box>
       ) : null}
-      <Box p="20px">
-        <Box>
-          {page === 1 ? null : (
-            <Button onClick={previousPage} disabled={page === 1 ? true : null}>
-              {"<"}
-            </Button>
-          )}
-          {page >= maxPage ? null : (
-            <Button
-              onClick={nextPage}
-              ml="10px"
-              disabled={page >= maxPage ? true : null}
-            >
-              {">"}
-            </Button>
-          )}
-        </Box>
-      </Box>
+
+      <Pagination
+        maxPage={maxPage}
+        nextPage={nextPage}
+        page={page}
+        previousPage={previousPage}
+      />
 
       <AddressModal
-        color={"#F7931E"}
         header="Details Address"
         isOpen={openedAddress}
         onClose={() => setOpenedAddress(null)}
-        val={openedAddress?.Addresses?.map((val) => {
-          if (!val) {
-            return "halo"
-          } else {
-            return (
-              <>
-                <Text>Receptients Name: {val.recipients_name} </Text>
-                <Text>Full Address: {val.full_address}</Text>
-                <Text>Phone Number:{val.phone_number}</Text>
-              </>
-            )
-          }
-        })}
+        val={openedAddress?.Addresses?.map((val) => val)}
       />
     </Box>
   )

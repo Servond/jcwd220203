@@ -24,6 +24,12 @@ const authController = {
         })
       }
 
+      if (findUserByEmail.is_verify === false) {
+        return res.status(400).json({
+          message: "Unverified user",
+        })
+      }
+
       const passwordValid = bcrypt.compareSync(
         password,
         findUserByEmail.password
@@ -31,7 +37,7 @@ const authController = {
 
       if (!passwordValid) {
         return res.status(400).json({
-          message: "password invalid",
+          message: "Password invalid",
         })
       }
 
@@ -42,7 +48,7 @@ const authController = {
       })
 
       return res.status(201).json({
-        message: "Login user",
+        message: "User logged in",
         data: findUserByEmail,
         token: token,
       })
@@ -157,11 +163,15 @@ const authController = {
         },
       })
 
-      console.log(findUserByEmail)
-
       if (!findUserByEmail) {
         return res.status(400).json({
           message: "Email not found",
+        })
+      }
+
+      if (findUserByEmail.is_verify === false) {
+        return res.status(400).json({
+          message: "Unverified user",
         })
       }
 
@@ -223,6 +233,12 @@ const authController = {
           id: decodedToken.id,
         },
       })
+
+      if (!newPassword.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/)) {
+        return res.status(500).json({
+          message: "Password Must Contain 8 Characters, 1 Uppercase, 1 Lowercase, 1 Number and 1 Special Case Character",
+        })
+      }
 
       if (newPassword !== confirmNewPassword) {
         return res.status(500).json({
