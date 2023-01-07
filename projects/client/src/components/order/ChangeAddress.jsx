@@ -48,11 +48,12 @@ const ChangeAddress = ({ defaultAddressUser }) => {
   const toast = useToast()
   const [address, setAddress] = useState([])
   const [allAddress, setAllAddress] = useState([])
-  const [defaultAlert, setDefaultAlert] = useState(null)
   const [selectedNewProvince, setSelectedNewProvince] = useState(0)
   const [selectedNewCity, setSelectedNewCity] = useState(0)
   const [selectedEditProvince, setSelectedEditProvince] = useState(0)
   const [selectedEditCity, setSelectedEditCity] = useState(0)
+  console.log(selectedEditCity)
+  console.log(selectedEditProvince)
   const [openedEdit, setOpenedEdit] = useState(null)
   const [currentSearch, setCurrentSearch] = useState("")
   const [defaultAddressId, setDefaultAddressId] = useState(0)
@@ -292,60 +293,74 @@ const ChangeAddress = ({ defaultAddressUser }) => {
     <>
       <Box borderBottom="1px solid #fcd4a5">
         <Text
-          fontSize={'14px'}
-          fontFamily={'Open Sauce One, sans-serif'}
+          fontSize={"14px"}
+          fontFamily={"Open Sauce One, sans-serif"}
           fontWeight={700}
-          color={'#31353B'}
-          pb="14px">
+          color={"#31353B"}
+          pb="14px"
+        >
           Shipping Address
         </Text>
       </Box>
       <Box pb="20px" pt="20px">
         <Box>
           <Box display={"flex"} mb="4px">
-            <Text fontWeight={'bolder'} mr="2px" fontSize={'13px'} color={'#31353B'} lineHeight={'1.4'} fontFamily={'Open Sauce One, sans-serif'}>
+            <Text
+              fontWeight={"bolder"}
+              mr="2px"
+              fontSize={"13px"}
+              color={"#31353B"}
+              lineHeight={"1.4"}
+              fontFamily={"Open Sauce One, sans-serif"}
+            >
               {address.recipients_name}
             </Text>
-            <Text mr="2px" color={'#31353B'} lineHeight={'1.4'} fontFamily={'Open Sauce One, sans-serif'} fontSize={'13px'}>
+            <Text
+              mr="2px"
+              color={"#31353B"}
+              lineHeight={"1.4"}
+              fontFamily={"Open Sauce One, sans-serif"}
+              fontSize={"13px"}
+            >
               {`(${address.address_labels})`}
             </Text>
             <Box
-              display={'inline-flex'}
-              alignItems={'center'}
+              display={"inline-flex"}
+              alignItems={"center"}
               fontWeight={700}
-              lineHeight={'16px'}
+              lineHeight={"16px"}
               fontSize="10px"
               backgroundColor="#E5F9F6"
               p="0 8px"
               borderRadius={"3px"}
               color="#0095DA"
-              w={'52.2px'}
-              h={'20px'}
-              fontFamily={'Open Sauce One, sans-serif'}
-              m={'0px'}
-              justifyContent={'center'}
-              ml={'2px'}
+              w={"52.2px"}
+              h={"20px"}
+              fontFamily={"Open Sauce One, sans-serif"}
+              m={"0px"}
+              justifyContent={"center"}
+              ml={"2px"}
             >
               Main
             </Box>
           </Box>
           <Box>
             <Text
-              color={'#31353B'}
-              lineHeight={'1.4'}
-              fontFamily={'Open Sauce One, sans-serif'}
-              fontSize={'13px'}
+              color={"#31353B"}
+              lineHeight={"1.4"}
+              fontFamily={"Open Sauce One, sans-serif"}
+              fontSize={"13px"}
               mb="4px"
             >
               {address.phone_number}
             </Text>
           </Box>
           <Box
-            fontFamily={'Open Sauce One, sans-serif'}
-            fontSize={'13px'}
-            color={'#0000008A'}
-            wordBreak={'break-word'}
-            lineHeight={'1.4'}
+            fontFamily={"Open Sauce One, sans-serif"}
+            fontSize={"13px"}
+            color={"#0000008A"}
+            wordBreak={"break-word"}
+            lineHeight={"1.4"}
           >
             <Text>{address.full_address}</Text>
             <Text>
@@ -354,19 +369,19 @@ const ChangeAddress = ({ defaultAddressUser }) => {
           </Box>
         </Box>
       </Box>
-      <Box borderTop="1px solid #fcd4a5" p={'25px 0px 10px'}>
+      <Box borderTop="1px solid #fcd4a5" p={"25px 0px 10px"}>
         <Button
           p="0 17px"
           mb="18px"
           border="1px solid #0095DA"
           bgColor={"white"}
           onClick={onOpen}
-          fontSize={'14px'}
-          fontFamily={'Open Sauce One, sans-serif'}
-          color={'#0095DA'}
-          _hover={'none'}
-          display={'flex'}
-          alignContent={'center'}
+          fontSize={"14px"}
+          fontFamily={"Open Sauce One, sans-serif"}
+          color={"#0095DA"}
+          _hover={"none"}
+          display={"flex"}
+          alignContent={"center"}
         >
           <Text fontWeight={"bold"}>Choose Another Address</Text>
         </Button>
