@@ -166,6 +166,7 @@ const HomeProduct = () => {
           </Grid>
         </Box>
       </Box>
+      
       <Box display={{ lg: "none", md: "block", base: "block" }}>
         <Box p="16px 16px 8px">
           <Box display={"flex"} justifyContent="space-between">
@@ -179,6 +180,7 @@ const HomeProduct = () => {
             </Link>
           </Box>
         </Box>
+        
         {/* Responsive */}
         <Box
           display={{ lg: "none", md: "flex", base: "flex" }}
