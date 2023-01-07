@@ -117,6 +117,7 @@ const adminOrderHistoryController = {
                         JOIN total_stocks as ts ON ts.ProductId = pr.id
                         JOIN warehouses as wr ON wr.id = ts.WarehouseId
                         JOIN payment_statuses as ps ON ps.id = trx.PaymentStatusId `
+
             if (WarehouseId) {
                 query += `WHERE wr.id = ${WarehouseId} `
             }
@@ -127,37 +128,37 @@ const adminOrderHistoryController = {
             const test = await db.sequelize.query(query)
             const test0 = test[0]
 
-            const transformArr = (orig) => {
-                var newArr = [],
-                    types = {},
-                    i,
-                    j,
-                    cur
-                for (i = 0, j = orig.length; i < j; i++) {
-                    cur = orig[i]
-                    if (!(cur.TransactionId in types)) {
-                        types[cur.TransactionId] = {
-                            TransactionId: cur.TransactionId,
-                            product_names: [],
-                            prices: [],
-                            qtys: [],
-                            descriptions: [],
-                            productIds: [],
-                            usernames: [],
-                        }
-                        newArr.push(types[cur.TransactionId])
-                    }
-                    types[cur.TransactionId].product_names.push(
-                        cur.product_name
-                    )
-                    types[cur.TransactionId].prices.push(cur.price)
-                    types[cur.TransactionId].qtys.push(cur.qty)
-                    types[cur.TransactionId].descriptions.push(cur.description)
-                    types[cur.TransactionId].productIds.push(cur.productId)
-                    types[cur.TransactionId].usernames.push(cur.username)
-                }
-                return newArr
-            }
+            // const transformArr = (orig) => {
+            //     var newArr = [],
+            //         types = {},
+            //         i,
+            //         j,
+            //         cur
+            //     for (i = 0, j = orig.length; i < j; i++) {
+            //         cur = orig[i]
+            //         if (!(cur.TransactionId in types)) {
+            //             types[cur.TransactionId] = {
+            //                 TransactionId: cur.TransactionId,
+            //                 product_names: [],
+            //                 prices: [],
+            //                 qtys: [],
+            //                 descriptions: [],
+            //                 productIds: [],
+            //                 usernames: [],
+            //             }
+            //             newArr.push(types[cur.TransactionId])
+            //         }
+            //         types[cur.TransactionId].product_names.push(
+            //             cur.product_name
+            //         )
+            //         types[cur.TransactionId].prices.push(cur.price)
+            //         types[cur.TransactionId].qtys.push(cur.qty)
+            //         types[cur.TransactionId].descriptions.push(cur.description)
+            //         types[cur.TransactionId].productIds.push(cur.productId)
+            //         types[cur.TransactionId].usernames.push(cur.username)
+            //     }
+            //     return newArr
+            // }
 
             return res.status(200).json({
                 message: "Filtered",
