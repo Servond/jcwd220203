@@ -33,6 +33,7 @@ const Product = () => {
     const [searchParam, setSearchParam] = useSearchParams()
     const [catPage, setCatPage] = useState(1)
     const [catTotalCount, setCatTotalCount] = useState(0)
+    const [isLoading, setIsLoading] = useState(false)
 
     const catPerRow = 5
     const [next, setNext] = useState(catPerRow)
@@ -60,6 +61,7 @@ const Product = () => {
             } else {
                 setProducts(response.data.data)
             }
+            setIsLoading(true)
         } catch (err) {
             console.log(err)
         }
@@ -89,6 +91,7 @@ const Product = () => {
                 <ProductItem
                     key={val.id.toString()}
                     product_name={val.product_name}
+                    image_url={val.Image_Urls[0].image_url}
                     price={val.price}
                     id={val.id}
                 />
@@ -300,7 +303,7 @@ const Product = () => {
                                 gap="4"
                                 templateColumns="repeat(5,1fr)"
                             >
-                                {renderProduct()}
+                                {isLoading && renderProduct()}
                             </Grid>
                             <HStack justifyContent="end" gap="2px">
                                 {page === 1 ? null : (

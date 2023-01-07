@@ -1,4 +1,15 @@
-import { Box, Text, Grid, GridItem, HStack } from "@chakra-ui/react"
+import {
+    Box,
+    Center,
+    Text,
+    Grid,
+    GridItem,
+    Heading,
+    Flex,
+    HStack,
+    Spacer,
+    Button,
+} from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { axiosInstance } from "../../api"
@@ -41,6 +52,7 @@ const HomeProduct = () => {
                 <ProductItem
                     key={val.id.toString()}
                     product_name={val.product_name}
+                    image_url={val.Image_Urls[0].image_url}
                     price={val.price}
                     id={val.id}
                 />
@@ -66,9 +78,66 @@ const HomeProduct = () => {
     }, [])
     return (
         <>
-            {/* Product Recommendation */}
-            <Box m="24px 0" display="block" mx="auto" w="1100px" h="400px">
+            {/* Category Selection */}
+            {/* <Box
+                // border="1px solid red"
+                mx="auto"
+                mt="20px"
+                w="1100px"
+                h="230px"
+                display="block"
+                borderBottom="1px solid #dfe1e3"
+            >
                 <Box
+                    border="1px solid #dfe1e3"
+                    borderRadius="12px"
+                    boxShadow="1px 1px 6px 1px #e0e0e0"
+                    display="block"
+                >
+                    <Box
+                        // border="1px solid blue"
+                        display="block"
+                        fontSize="20px"
+                        fontWeight="800px"
+                        textAlign="left"
+                        p="16px"
+                        // borderBottom="1px solid #dfe1e3"
+                        // w="156.062px"
+                    >
+                        <Text>Selected Category</Text>
+                    </Box> */}
+
+            {/* Category Card */}
+            {/* <Grid
+                        // border="1px solid green"
+                        display="grid"
+                        p="1px 0"
+                        pl="16px"
+                        pr="16px"
+                        gap="2"
+                        mb="-20px"
+                        templateColumns="repeat(5,1fr)"
+                        // boxShadow={"rgba(0, 0, 0, 0.24) 0px 3px 8px"}
+                        borderRadius="8px"
+                    >
+                        {renderCategory()} */}
+            {/* 1 */}
+            {/* <GridItem p="16px" mb="24px"></GridItem>
+                    </Grid>
+                </Box>
+            </Box> */}
+
+            {/* Product Recommendation */}
+            <Box
+                m="24px 0"
+                // border="1px solid red"
+                mx="auto"
+                w="1100px"
+                h="400px"
+                display={{ lg: "block", md: "none", base: "none" }}
+            >
+                <Box
+                    // border="1px solid blue"
                     display="flex"
                     fontSize="20px"
                     fontWeight="800px"
@@ -91,11 +160,33 @@ const HomeProduct = () => {
                 </Box>
 
                 {/* Content */}
-                <Box display="grid" justifyItems="center">
+                <Box justifyItems="center" display={"grid"}>
                     <Grid templateColumns="repeat(6,1fr)" gap="4">
                         {renderProduct()}
                     </Grid>
                 </Box>
+            </Box>
+
+            <Box p="16px 16px 8px">
+                <Box display={"flex"} justifyContent="space-between">
+                    <Text fontSize={"20px"} fontWeight="bold">
+                        Recommended Products
+                    </Text>
+                    <Link to="/product">
+                        <Text color="#0095DA" fontSize="14px">
+                            See all
+                        </Text>
+                    </Link>
+                </Box>
+            </Box>
+            {/* Responsive */}
+            <Box
+                display={{ lg: "none", md: "flex", base: "flex" }}
+                overflowX="scroll"
+                p="12px"
+                gap="4"
+            >
+                {renderProduct()}
             </Box>
         </>
     )
