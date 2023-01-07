@@ -6,8 +6,8 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react"
-import { BiUser } from "react-icons/bi"
-import { Link } from "react-router-dom"
+import { BiArrowBack, BiUser } from "react-icons/bi"
+import { Link, useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 import AddressCard from "../../components/profile/AddressCard"
 import { axiosInstance } from "../../api/index"
@@ -31,6 +31,7 @@ const AddressList = () => {
   console.log(selectedEditCity)
   console.log(selectedEditProvince)
   const [openedEdit, setOpenedEdit] = useState(null)
+  console.log(openedEdit?.id)
   const [address, setAddress] = useState([])
   const [deleteAlert, setDeleteAlert] = useState(null)
   const [defaultAlert, setDefaultAlert] = useState(null)

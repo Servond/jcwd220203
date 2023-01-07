@@ -44,6 +44,7 @@ const AdminOrder = () => {
   const [cancel, setCancel] = useState(null)
   const [deliver, setDeliver] = useState(null)
   const [modalImage, setModalImage] = useState(null)
+  console.log(modalImage)
   const [currentSearch, setCurrentSearch] = useState("")
   const [totalCount, setTotalCount] = useState(0)
   const [sortBy, setSortBy] = useState("id")
