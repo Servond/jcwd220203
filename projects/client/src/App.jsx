@@ -9,8 +9,8 @@ import GuestRoute from "./components/GuestRoute"
 import Register from "./pages/Register"
 import RegisterVerification from "./pages/RegisterVerification"
 import { Box, Spinner, Text } from "@chakra-ui/react"
-import Navbar from "./components/Navbar"
-import Footer from "./components/Footer/Footer"
+import Navbar from "./components/HomePage/Navbar/Navbar"
+import Footer from "./components/HomePage/Footer/Footer"
 import HomePage from "./pages/Home"
 import AdminDashboard from "./pages/admin/AdminDashboard"
 import "./AdminDashboard.css"
@@ -47,13 +47,12 @@ import TransactionList from "./pages/TransactionList/TransactionList"
 import PaymentList from "./pages/TransactionList/WaitingForPayment/PaymentList"
 import AdminSalesReport from "./pages/admin/AdminSalesReport"
 
-
 function App() {
     const [message, setMessage] = useState("")
     const authSelector = useSelector((state) => state.auth)
 
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             const { data } = await axios.get(
                 `${process.env.REACT_APP_API_BASE_URL}/api/greetings`
             )
@@ -163,12 +162,12 @@ function App() {
             ) : null}
 
             {location.pathname === "/login" ||
-                location.pathname === "/register" ||
-                location.pathname === "/reset-password-confirmation" ||
-                location.pathname === "/request-reset-password" ||
-                location.pathname === "/cart/shipment" ||
-                authSelector.RoleId === 3 ||
-                authSelector.RoleId === 2 ? null : (
+            location.pathname === "/register" ||
+            location.pathname === "/reset-password-confirmation" ||
+            location.pathname === "/request-reset-password" ||
+            location.pathname === "/cart/shipment" ||
+            authSelector.RoleId === 3 ||
+            authSelector.RoleId === 2 ? null : (
                 <Box>
                     <Navbar />
                 </Box>
@@ -476,16 +475,19 @@ function App() {
                 />
                 {/* Product Route */}
                 <Route path="/product" element={<Product />} />
-                <Route path="/product/:id/:product_name" element={<ProductDetail />} />
+                <Route
+                    path="/product/:id/:product_name"
+                    element={<ProductDetail />}
+                />
             </Routes>
 
             {location.pathname === "/login" ||
-                location.pathname === "/register" ||
-                location.pathname === "/reset-password-confirmation" ||
-                location.pathname === "/request-reset-password" ||
-                location.pathname === "/cart/shipment" ||
-                authSelector.RoleId === 3 ||
-                authSelector.RoleId === 2 ? null : (
+            location.pathname === "/register" ||
+            location.pathname === "/reset-password-confirmation" ||
+            location.pathname === "/request-reset-password" ||
+            location.pathname === "/cart/shipment" ||
+            authSelector.RoleId === 3 ||
+            authSelector.RoleId === 2 ? null : (
                 <Box>
                     <Footer />
                 </Box>

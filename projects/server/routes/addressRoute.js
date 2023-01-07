@@ -4,8 +4,7 @@ const router = express.Router()
 const addressController = require("../controllers/addressController")
 const { verifyToken } = require("../middlewares/authMiddleware")
 const axios = require("axios")
-const { body } = require("express-validator")
-const { validateAddress } = require("../middlewares/addressMiddleware")
+const { validateAddress } = require("../middlewares/validatorMiddleware")
 
 router.get("/userAddress", verifyToken, addressController.getAddressById)
 
@@ -19,13 +18,7 @@ router.post(
 router.patch(
   "/updateAddress/:id",
   verifyToken,
-  body("recipients_name", "minimum 3").isLength({ min: 3 }).isString(),
-  body("phone_number", "minimum 9").isLength({ min: 9 }).isNumeric,
-  body("address_labels", "minimum 15").isLength({ min: 15 }).isAlphanumeric(),
-  body("province").isNumeric(),
-  body("city").isNumeric(),
-  body("districts").isNumeric(),
-  body("full_address", "minimum 10").isLength({ min: 10 }),
+  validateAddress,
   addressController.updateAddress
 )
 
