@@ -26,7 +26,7 @@ router.patch(
     "/finish-order/:transaction_name",
     transactionsController.finishTransactionHandler
 )
-
+router.get("/testing", transactionsController.testingController)
 router.patch(
     "/cancel-unpaid-transaction/:transaction_name",
     transactionsController.cancelUnpaidTransactionHandler

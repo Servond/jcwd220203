@@ -9,8 +9,8 @@ import GuestRoute from "./components/GuestRoute"
 import Register from "./pages/Register"
 import RegisterVerification from "./pages/RegisterVerification"
 import { Box, Flex, Spinner, Text } from "@chakra-ui/react"
-import Navbar from "./components/Navbar"
-import Footer from "./components/Footer/Footer"
+import Navbar from "./components/HomePage/Navbar/Navbar"
+import Footer from "./components/HomePage/Footer/Footer"
 import HomePage from "./pages/Home"
 import AdminDashboard from "./pages/admin/AdminDashboard"
 import "./AdminDashboard.css"
@@ -27,7 +27,7 @@ import ResetPasswordConfirmation from "./pages/ResetPasswordConfirmation"
 import RequestResetPassword from "./pages/RequestResetPassword"
 import ManageUserData from "./pages/admin/ManageUserData"
 import ManageAdminData from "./pages/admin/ManageAdminData"
-import AdminCategory from "./pages/admin/AdminCategory"
+import AdminCategory from "./pages/admin/AdminCategory/AdminCategory"
 import NotFound from "./components/404Page"
 import Cart from "./pages/Cart/Cart"
 import ProtectedRoute from "./components/ProtectedRoute"
@@ -46,7 +46,7 @@ import PaymentProof from "./pages/PaymentProof"
 import AdminMutationStock from "./pages/admin/AdminMutationStock"
 import AdminOrderHistory from "./pages/admin/AdminOrderHistory"
 import TransactionList from "./pages/TransactionList/TransactionList"
-import PaymentList from "./pages/TransactionList/PaymentList"
+import PaymentList from "./pages/TransactionList/WaitingForPayment/PaymentList"
 import AdminSalesReport from "./pages/admin/AdminSalesReport"
 
 function App() {
@@ -54,7 +54,7 @@ function App() {
     const authSelector = useSelector((state) => state.auth)
 
     useEffect(() => {
-        ;(async () => {
+        ; (async () => {
             const { data } = await axios.get(
                 `${process.env.REACT_APP_API_BASE_URL}/api/greetings`
             )
@@ -164,12 +164,12 @@ function App() {
             ) : null}
 
             {location.pathname === "/login" ||
-            location.pathname === "/register" ||
-            location.pathname === "/reset-password-confirmation" ||
-            location.pathname === "/request-reset-password" ||
-            location.pathname === "/cart/shipment" ||
-            authSelector.RoleId === 3 ||
-            authSelector.RoleId === 2 ? null : (
+                location.pathname === "/register" ||
+                location.pathname === "/reset-password-confirmation" ||
+                location.pathname === "/request-reset-password" ||
+                location.pathname === "/cart/shipment" ||
+                authSelector.RoleId === 3 ||
+                authSelector.RoleId === 2 ? null : (
                 <Box>
                     <Navbar />
                 </Box>
@@ -473,13 +473,13 @@ function App() {
             </Routes>
 
             {location.pathname === "/login" ||
-            location.pathname === "/register" ||
-            location.pathname === "/reset-password-confirmation" ||
-            location.pathname === "/request-reset-password" ||
-            location.pathname === "/cart/shipment" ||
-            authSelector.RoleId === 3 ||
-            authSelector.RoleId === 2 ? null : (
-                <Box>
+                location.pathname === "/register" ||
+                location.pathname === "/reset-password-confirmation" ||
+                location.pathname === "/request-reset-password" ||
+                location.pathname === "/cart/shipment" ||
+                authSelector.RoleId === 3 ||
+                authSelector.RoleId === 2 ? null : (
+                <Box h={'auto'}>
                     <Footer />
                 </Box>
             )}

@@ -7,7 +7,7 @@ const categoryController = {
         try {
             const { category_name = "", _limit = 50, _sortBy = "id", _sortDir = "ASC", _sortProductBy = "id", _sortProductDir = "ASC", _productLimit = 50 } = req.query
 
-            if (category_name || _sortProductBy === "nama" || _sortProductBy === "harga" || _sortProductBy === "createdAt") {
+            if (category_name || _sortProductBy === "product_name" || _sortProductBy === "price" || _sortProductBy === "createdAt") {
                 const getCategoriesByName = await Category.findAndCountAll({
                     limit: Number(_limit),
                     order: [[_sortBy, _sortDir]],

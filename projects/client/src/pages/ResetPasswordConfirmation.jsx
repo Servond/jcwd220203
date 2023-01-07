@@ -33,13 +33,10 @@ const ResetPasswordConfirmation = () => {
 
     const [passwordMatch, setPasswordMatch] = useState(false)
 
-    const [passwordFalse, setPasswordFalse] = useState(false)
-
     const resetSelector = useSelector((state) => state.reset)
 
     const passwordNotMatch = () => {
         setPasswordMatch(true)
-        setPasswordFalse(true)
     }
 
     const dispatch = useDispatch()
@@ -85,6 +82,7 @@ const ResetPasswordConfirmation = () => {
 
             } catch (err) {
                 console.log(err)
+
                 toast({
                     title: "Reset Password Failed",
                     status: "error",
@@ -97,7 +95,7 @@ const ResetPasswordConfirmation = () => {
                 .required(8)
                 .matches(
                     /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-                    "Must Contain 8 Characters, 1 Uppercase, 1 Lowercase, 1 Number and 1 Special Case Character"
+                    "Must Contain 8 Characters, 1 Uppercase, 1 Lowercase, 1 Number and 1 Special Case Character*"
                 ),
         }),
         validateOnChange: false,
@@ -111,6 +109,9 @@ const ResetPasswordConfirmation = () => {
     useEffect(() => {
         if (!localStorage.getItem("reset_token")) {
             navigate("/request-reset-password");
+        }
+        if (formik.values.confirmNewPassword === formik.values.newPassword) {
+            setPasswordMatch(false)
         }
     }, [])
 
@@ -126,9 +127,8 @@ const ResetPasswordConfirmation = () => {
             {/* reset password box */}
             <Box display={'flex'} fontSize="14px" justifyContent={'center'} mt={'50px'}>
                 <Box
-                    w="500px"
+                    w={{ lg: "480px", base: "410px" }}
                     boxShadow={"0 0 10px 3px rgb(0 0 0 / 10%)"}
-                    // border="1px solid var(--N75,#0095DA)"
                     borderRadius={"10px"}
                     p="24px 40px 32px "
                     textAlign={"center"}
@@ -173,8 +173,16 @@ const ResetPasswordConfirmation = () => {
                                         </Button>
                                     </InputRightElement>
                                 </InputGroup>
-                                {passwordFalse ? (
-                                    <FormErrorMessage fontSize={'11px'}>{formik.errors.newPassword}</FormErrorMessage>
+                                {formik.errors.newPassword && !formik.values.newPassword.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/) ? (
+                                    <FormErrorMessage fontSize={"11px"}
+                                        fontFamily={"Open Sauce One, sans-serif"}
+                                        color={"#EF144A"}
+                                        m={"4px 0px 0px"}
+                                        lineHeight={"18px"}
+                                        textAlign={'start'}
+                                        pl={'2px'}>
+                                        {formik.errors.newPassword}
+                                    </FormErrorMessage>
                                 ) : (
                                     <Text fontSize={'11px'} color={'#31353b'} textAlign={'left'} fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}>
                                         Must Contain 8 Characters, 1 Uppercase, 1 Lowercase, 1 Number and 1 Special Case Character
@@ -231,9 +239,10 @@ const ResetPasswordConfirmation = () => {
                             _hover={false}
                             mt="16px"
                             color={"white"}
-                            isDisabled={!formik.values.newPassword}
+                            isDisabled={formik.values.newPassword && formik.values.confirmNewPassword ? false : true}
                             type={'submit'}
                             onClick={passwordNotMatch}
+                            borderRadius={'8px'}
                         >
                             <Text fontWeight={"bold"} fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}>
                                 Confirm Change

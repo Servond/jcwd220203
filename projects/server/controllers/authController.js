@@ -37,7 +37,7 @@ const authController = {
 
       if (!passwordValid) {
         return res.status(400).json({
-          message: "password invalid",
+          message: "Password invalid",
         })
       }
 
@@ -48,7 +48,7 @@ const authController = {
       })
 
       return res.status(201).json({
-        message: "Login user",
+        message: "User logged in",
         data: findUserByEmail,
         token: token,
       })
