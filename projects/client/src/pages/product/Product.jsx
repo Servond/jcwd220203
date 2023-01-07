@@ -85,6 +85,7 @@ const Product = () => {
             console.log(err)
         }
     }
+    console.log("pr", products)
     const renderProduct = () => {
         return products.map((val) => {
             return (

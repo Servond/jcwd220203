@@ -167,26 +167,39 @@ const HomeProduct = () => {
                 </Box>
             </Box>
 
-            <Box p="16px 16px 8px">
-                <Box display={"flex"} justifyContent="space-between">
-                    <Text fontSize={"20px"} fontWeight="bold">
-                        Recommended Products
-                    </Text>
-                    <Link to="/product">
-                        <Text color="#0095DA" fontSize="14px">
-                            See all
-                        </Text>
-                    </Link>
-                </Box>
-            </Box>
             {/* Responsive */}
-            <Box
-                display={{ lg: "none", md: "flex", base: "flex" }}
-                overflowX="scroll"
-                p="12px"
-                gap="4"
-            >
-                {renderProduct()}
+            <Box>
+                <Box
+                    p="16px 16px 8px"
+                    display={{ lg: "none", md: "flex", base: "flex" }}
+                >
+                    <Box
+                        display={"flex"}
+                        justifyContent="space-between"
+                        w="100%"
+                    >
+                        <Text fontSize={"20px"} fontWeight="bold">
+                            Recommended Products
+                        </Text>
+                        <Link to="/product">
+                            <Text
+                                color="#0095DA"
+                                fontSize="14px"
+                                textAlign="flex-end"
+                            >
+                                See all
+                            </Text>
+                        </Link>
+                    </Box>
+                </Box>
+                <Box
+                    display={{ lg: "none", md: "flex", base: "flex" }}
+                    overflowX="scroll"
+                    p="12px"
+                    gap="4"
+                >
+                    {renderProduct()}
+                </Box>
             </Box>
         </>
     )

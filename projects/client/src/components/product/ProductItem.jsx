@@ -41,10 +41,7 @@ const ProductItem = ({ product_name, id, price, image_url }) => {
         setProductId(id)
         navigate(`/product/${id}/${product_name}`)
     }
-    //   useEffect(() => {
-    //     fetchProductById()
-    //     fetchProductImage()
-    //   }, [productId])
+    // useEffect(() => {}, [productId])
     return (
         <>
             <Box onClick={() => productBtnHandler()}>
