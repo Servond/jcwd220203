@@ -37,14 +37,15 @@ var productController = {
               limit: Number(_limit),
               offset: (_page - 1) * _limit,
               include: [{
-                model: Category
+                model: Category,
+                required: true
               }, {
                 model: Image_Url
               }],
               order: [[_sortBy, _sortDir]],
               where: _defineProperty({}, Op.or, {
                 product_name: _defineProperty({}, Op.like, "%".concat(product_name, "%")),
-                category_name: _defineProperty({}, Op.like, "%".concat(category_name, "%"))
+                "$Category.category_name$": _defineProperty({}, Op.like, "%".concat(category_name, "%"))
               })
             }));
 
@@ -62,14 +63,15 @@ var productController = {
               limit: Number(_limit),
               offset: (_page - 1) * _limit,
               include: [{
-                model: Category
+                model: Category,
+                required: true
               }, {
                 model: Image_Url
               }],
               order: [[_sortBy, _sortDir]],
               where: (_where2 = {}, _defineProperty(_where2, Op.or, {
                 product_name: _defineProperty({}, Op.like, "%".concat(product_name, "%")),
-                category_name: _defineProperty({}, Op.like, "%".concat(category_name, "%"))
+                "$Category.category_name$": _defineProperty({}, Op.like, "%".concat(category_name, "%"))
               }), _defineProperty(_where2, "CategoryId", CategoryId), _where2)
             }));
 

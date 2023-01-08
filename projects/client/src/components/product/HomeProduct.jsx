@@ -29,7 +29,7 @@ const HomeProduct = () => {
                 <ProductItem
                     key={val.id.toString()}
                     product_name={val.product_name}
-                    image_url={val.Image_Urls[0].image_url}
+                    image_url={val.Image_Urls[0]?.image_url}
                     price={val.price}
                     id={val.id}
                 />

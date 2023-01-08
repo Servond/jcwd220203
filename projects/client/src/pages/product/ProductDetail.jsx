@@ -194,7 +194,7 @@ const ProductDetail = ({ product_name, id }) => {
                 mx="auto"
                 mt="120px"
                 w="1150px"
-                h="700px"
+                // h="700px"
                 // p="10px 24px"
                 display={{ lg: "block", md: "none", base: "none" }}
                 // borderBottom="1px solid #dfe1e3"
@@ -260,6 +260,7 @@ const ProductDetail = ({ product_name, id }) => {
                             w="468px"
                             h="700px"
                             display="block"
+                            mx="auto"
                         >
                             <Box display="grid" gap="20px">
                                 {/* Product Name */}
