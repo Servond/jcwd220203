@@ -1,14 +1,14 @@
 import {
-    Box,
-    Center,
-    Text,
-    Grid,
-    GridItem,
-    Heading,
-    Flex,
-    HStack,
-    Spacer,
-    Button,
+  Box,
+  Center,
+  Text,
+  Grid,
+  GridItem,
+  Heading,
+  Flex,
+  HStack,
+  Spacer,
+  Button,
 } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
@@ -17,72 +17,69 @@ import CategoryList from "./CategoryList"
 import ProductItem from "./ProductItem"
 
 const HomeProduct = () => {
-    const [products, setProducts] = useState([])
-    const [category, setCategory] = useState([])
+  const [products, setProducts] = useState([])
+  const [category, setCategory] = useState([])
 
-    const fetchProduct = async () => {
-        try {
-            const maxItemsPerPage = 6
-            const response = await axiosInstance.get(`/product`, {
-                params: {
-                    _limit: maxItemsPerPage,
-                },
-            })
-            setProducts(response.data.data)
-        } catch (err) {
-            console.log(err)
-        }
+  const fetchProduct = async () => {
+    try {
+      const maxItemsPerPage = 6
+      const response = await axiosInstance.get(`/product`, {
+        params: {
+          _limit: maxItemsPerPage,
+        },
+      })
+      setProducts(response.data.data)
+    } catch (err) {
+      console.log(err)
     }
+  }
 
-    const fetchCategory = async () => {
-        try {
-            const maxItemsPerPage = 10
-            const response = await axiosInstance.get(`/product/category`, {
-                _limit: maxItemsPerPage,
-            })
-            setCategory(response.data.data)
-        } catch (err) {
-            console.log(err)
-        }
+  const fetchCategory = async () => {
+    try {
+      const maxItemsPerPage = 10
+      const response = await axiosInstance.get(`/product/category`, {
+        _limit: maxItemsPerPage,
+      })
+      setCategory(response.data.data)
+    } catch (err) {
+      console.log(err)
     }
+  }
 
-    const renderProduct = () => {
-        return products.map((val) => {
-            return (
-                <ProductItem
-                    key={val.id.toString()}
-                    product_name={val.product_name}
-                    // description={val.description}
-                    price={val.price}
-                    // category_name={val.category_name}
-                    // stock={val.stock}
-                    // image_url={val.image_url}
-                    id={val.id}
-                />
-            )
-        })
-    }
+  const renderProduct = () => {
+    return products.map((val) => {
+      return (
+        <ProductItem
+          key={val.id.toString()}
+          product_name={val.product_name}
+          image_url={val.Image_Urls[0].image_url}
+          price={val.price}
+          id={val.id}
+        />
+      )
+    })
+  }
 
-    const renderCategory = () => {
-        return category.map((val) => {
-            return (
-                <CategoryList
-                    key={val.id.toString()}
-                    category_name={val.category_name}
-                    id={val.id}
-                />
-            )
-        })
-    }
+  const renderCategory = () => {
+    return category.map((val) => {
+      return (
+        <CategoryList
+          key={val.id.toString()}
+          category_name={val.category_name}
+          id={val.id}
+        />
+      )
+    })
+  }
 
-    useEffect(() => {
-        fetchProduct()
-        fetchCategory()
-    }, [])
-    return (
-        <>
-            {/* Category Selection */}
-            {/* <Box
+  useEffect(() => {
+    fetchProduct()
+    fetchCategory()
+  }, [])
+  return (
+    <>
+      {/* Category Selection */}
+      {/* <Box
                 // border="1px solid red"
                 mx="auto"
                 mt="20px"
@@ -110,8 +107,8 @@ const HomeProduct = () => {
                         <Text>Selected Category</Text>
                     </Box> */}
 
-            {/* Category Card */}
-            {/* <Grid
+      {/* Category Card */}
+      {/* <Grid
                         // border="1px solid green"
                         display="grid"
                         p="1px 0"
@@ -124,53 +121,78 @@ const HomeProduct = () => {
                         borderRadius="8px"
                     >
                         {renderCategory()} */}
-            {/* 1 */}
-            {/* <GridItem p="16px" mb="24px"></GridItem>
+      {/* 1 */}
+      {/* <GridItem p="16px" mb="24px"></GridItem>
                     </Grid>
                 </Box>
             </Box> */}
 
-            {/* Product Recommendation */}
-            <Box
-                m="24px 0"
-                // border="1px solid red"
-                display="block"
-                mx="auto"
-                w="1100px"
-                h="400px"
-            >
-                <Box
-                    // border="1px solid blue"
-                    display="flex"
-                    fontSize="20px"
-                    fontWeight="800px"
-                    textAlign="left"
-                    p="16px"
-                    position="relative"
-                    mb="16px"
-                >
-                    <HStack>
-                        <Text>Recommended Products</Text>
-                    </HStack>
+      {/* Product Recommendation */}
+      <Box
+        m="24px 0"
+        // border="1px solid red"
+        mx="auto"
+        w="1100px"
+        h="400px"
+        display={{ lg: "block", md: "none", base: "none" }}
+      >
+        <Box
+          // border="1px solid blue"
+          display="flex"
+          fontSize="20px"
+          fontWeight="800px"
+          textAlign="left"
+          p="16px"
+          position="relative"
+          mb="16px"
+        >
+          <HStack>
+            <Text>Recommended Products</Text>
+          </HStack>
 
-                    <HStack pl="10px">
-                        <Link to="/product">
-                            <Text color="#0095DA" fontSize="14px">
-                                See all
-                            </Text>
-                        </Link>
-                    </HStack>
-                </Box>
+          <HStack pl="10px">
+            <Link to="/product">
+              <Text color="#0095DA" fontSize="14px">
+                See all
+              </Text>
+            </Link>
+          </HStack>
+        </Box>
 
-                {/* Content */}
-                <Box display="grid" justifyItems="center">
-                    <Grid templateColumns="repeat(6,1fr)" gap="4">
-                        {renderProduct()}
-                    </Grid>
-                </Box>
-            </Box>
-        </>
-    )
+        {/* Content */}
+        <Box justifyItems="center" display={"grid"}>
+          <Grid templateColumns="repeat(6,1fr)" gap="4">
+            {renderProduct()}
+          </Grid>
+        </Box>
+      </Box>
+      
+      <Box display={{ lg: "none", md: "block", base: "block" }}>
+        <Box p="16px 16px 8px">
+          <Box display={"flex"} justifyContent="space-between">
+            <Text fontSize={"20px"} fontWeight="bold">
+              Recommended Products
+            </Text>
+            <Link to="/product">
+              <Text color="#0095DA" fontSize="14px">
+                See all
+              </Text>
+            </Link>
+          </Box>
+        </Box>
+        
+        {/* Responsive */}
+        <Box
+          display={{ lg: "none", md: "flex", base: "flex" }}
+          overflowX="scroll"
+          p="12px"
+          gap="4"
+        >
+          {renderProduct()}
+        </Box>
+      </Box>
+    </>
+  )
 }
 
 export default HomeProduct

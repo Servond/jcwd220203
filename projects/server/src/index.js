@@ -52,7 +52,7 @@ app.use("/admin", verifyToken, adminCategoriesRoute)
 app.use("/userData", userDataRoute)
 app.use("/product", productRoute)
 app.use("/categories", categoryRoute)
-app.use("/carts", cartsRoute)
+app.use("/carts", verifyToken, cartsRoute)
 app.use("/transactions", verifyToken, transactionsRoute)
 app.use("/auth", authRoute)
 app.use("/shipment", shipmentRoute)
@@ -72,6 +72,8 @@ app.use("/adminOrder", verifyToken, adminOrderRoute)
 app.use("/stock-mutation", verifyToken, stockMutationRoute)
 app.use("/admin/order-history", adminOrderHistoryRoute)
 app.use("/admin/sales-report", salesReportRoute)
+
+app.use("/product", productRoute)
 
 app.get("/api", (req, res) => {
     res.send(`Hello, this is my API`)
