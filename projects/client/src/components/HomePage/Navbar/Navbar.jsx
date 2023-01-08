@@ -115,6 +115,10 @@ const Navbar = ({ onChange, onKeyDown }) => {
         }
     }
 
+    const refreshPage = () => {
+        window.location.reload(false)
+    }
+
     const renderCategory = () => {
         return showCategory.map((val) => {
             return (
@@ -145,7 +149,8 @@ const Navbar = ({ onChange, onKeyDown }) => {
             location.pathname === "/transaction-list" ||
             location.pathname === "/user/profile" ||
             location.pathname === "/user/profile/change-password" ||
-            location.pathname === "/user/profile/address"
+            location.pathname === "/user/profile/address" ||
+            location.pathname === "/transaction/payment-list"
         ) {
             navigate("/login")
         }
