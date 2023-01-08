@@ -12,6 +12,7 @@ import {
     Text,
     Flex,
     Center,
+    CircularProgress,
 } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
@@ -132,7 +133,7 @@ const Product = () => {
 
         setSearchParam(value)
     }
-    console.log("FFF")
+
     const nextPageBtnHandler = () => {
         setPage(page + 1)
     }
@@ -193,7 +194,6 @@ const Product = () => {
                 mx="auto"
                 mt="90px"
                 w="1100px"
-                // h="1600px"
                 display={{ base: "none", md: "none", lg: "block" }}
             >
                 {/* Filter and Search */}
@@ -310,7 +310,21 @@ const Product = () => {
 
                     {/* Product */}
                     <Box borderRadius="12px" w="912px" display="grid">
-                        {!products.length ? (
+                        {isLoading === false ? (
+                            <Box
+                                display={"grid"}
+                                justifyContent={"center"}
+                                alignItems={"center"}
+                                alignContent={"center"}
+                            >
+                                <CircularProgress
+                                    isIndeterminate
+                                    color="#0095DA"
+                                    thickness="160px"
+                                    size="100px"
+                                />
+                            </Box>
+                        ) : !products.length ? (
                             <Alert status="warning">
                                 <AlertIcon />
                                 <AlertTitle textAlign="center">
@@ -430,7 +444,21 @@ const Product = () => {
                     <Center>
                         {/* Product */}
                         <Box borderRadius="12px" mt="110px" w="500px">
-                            {!products.length ? (
+                            {isLoading === false ? (
+                                <Box
+                                    display={"flex"}
+                                    justifyContent={"center"}
+                                    alignItems={"center"}
+                                    alignContent={"center"}
+                                >
+                                    <CircularProgress
+                                        isIndeterminate
+                                        color="#0095DA"
+                                        thickness="160px"
+                                        size="100px"
+                                    />
+                                </Box>
+                            ) : !products.length ? (
                                 <Alert status="warning">
                                     <AlertIcon />
                                     <AlertTitle textAlign="center">
@@ -454,7 +482,8 @@ const Product = () => {
                 </Box>
 
                 {/* Page */}
-                <Box gap="2px" mb="10px">
+
+                <Box gap="2px" mb="10px" w="500px">
                     <Center>
                         {page === 1 ? null : (
                             <CgChevronLeft

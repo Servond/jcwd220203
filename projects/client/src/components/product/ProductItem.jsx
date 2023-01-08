@@ -2,49 +2,17 @@ import { Box, Image, Text } from "@chakra-ui/react"
 import { useEffect } from "react"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { axiosInstance } from "../../api"
 
 const ProductItem = ({ product_name, id, price, image_url }) => {
-    // const [productData, setProductData] = useState({
-    //     product_name: "",
-    //     price: 0,
-    //     category_name: "",
-    //     stock: 0,
-    //     id: "",
-    // })
     const [productId, setProductId] = useState(0)
-    const [imageProduct, setImageProduct] = useState([])
-    const [isLoading, setIsLoading] = useState(false)
 
     const navigate = useNavigate()
-
-    // const fetchProductById = async () => {
-    //     try {
-    //         const response = await axiosInstance.get(`/product/${id}`)
-    //         setProductData(response.data.data)
-    //         setIsLoading(true)
-    //     } catch (err) {
-    //         console.log(err)
-    //     }
-    // }
-
-    // const fetchProductImage = async () => {
-    //     try {
-    //         const response = await axiosInstance.get(`/product/image/${id}`)
-    //         setImageProduct(response.data.data)
-    //     } catch (err) {
-    //         console.log(err)
-    //     }
-    // }
 
     const productBtnHandler = () => {
         setProductId(id)
         navigate(`/product/${id}/${product_name}`)
     }
-    useEffect(() => {
-        // fetchProductById()
-        // fetchProductImage()
-    }, [productId])
+    useEffect(() => {}, [productId])
     return (
         <>
             <Box onClick={() => productBtnHandler()}>

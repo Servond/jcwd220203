@@ -190,14 +190,10 @@ const ProductDetail = ({ product_name, id }) => {
     return (
         <>
             <Box
-                // border="1px solid red"
                 mx="auto"
                 mt="120px"
                 w="1150px"
-                // h="700px"
-                // p="10px 24px"
                 display={{ lg: "block", md: "none", base: "none" }}
-                // borderBottom="1px solid #dfe1e3"
             >
                 {isLoading === false ? (
                     <Box
