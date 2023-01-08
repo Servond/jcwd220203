@@ -1,4 +1,19 @@
-import { Box, Button, Text, HStack, Avatar, useToast } from "@chakra-ui/react"
+import {
+    Box,
+    Button,
+    Text,
+    HStack,
+    Avatar,
+    useToast,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalCloseButton,
+    ModalBody,
+    ModalFooter,
+    useDisclosure,
+} from "@chakra-ui/react"
 
 import { BiArrowBack, BiStore, BiUser } from "react-icons/bi"
 
@@ -12,10 +27,12 @@ import { logout } from "../../redux/features/authSlice"
 
 const Profile = () => {
     const authSelector = useSelector((state) => state.auth)
+    const { isOpen, onOpen, onClose } = useDisclosure()
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const toast = useToast()
     const location = useLocation()
+    const apiImg = process.env.REACT_APP_IMAGE_URL
 
     const refreshPage = () => {
         window.location.reload(false)
@@ -166,7 +183,12 @@ const Profile = () => {
                 </Box>
 
                 <Box p="16px" display={"flex"} mt="52px ">
-                    <Avatar w={"64px"} h="64px" name={authSelector.username} />
+                    <Avatar
+                        w={"64px"}
+                        h="64px"
+                        name={authSelector.username}
+                        src={`${apiImg}/${authSelector.profile_picture}`}
+                    />
                     <Box ml="16px" w="175px">
                         <Text fontWeight={"bold"}>{authSelector.username}</Text>
                         <Text>{authSelector.phone_number}</Text>
@@ -179,7 +201,7 @@ const Profile = () => {
                         variant="link"
                         cursor="pointer"
                     >
-                        <BsPencil fontSize={"20px"} />
+                        <BsPencil onClick={onOpen} fontSize={"20px"} />
                     </Box>
                 </Box>
 
@@ -242,6 +264,18 @@ const Profile = () => {
                     </Box>
                 </Box>
             </Box>
+
+            {/* Modal */}
+            <Modal isOpen={isOpen} onClose={onClose} size="xs" isCentered>
+                <ModalOverlay />
+                <ModalContent h="500px">
+                    <ModalHeader fontSize="12px">Edit User Info</ModalHeader>
+                    <ModalCloseButton size="sm" mt="5px" />
+                    <ModalBody>
+                        <UserInfo />
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
         </>
     )
 }

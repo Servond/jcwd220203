@@ -131,7 +131,6 @@ const ChangePassword = () => {
                     <Box
                         pt="8px"
                         pb="8px"
-                        h="auto"
                         display={{ base: "block", md: "block", lg: "none" }}
                     >
                         <Password />
