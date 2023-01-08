@@ -134,9 +134,7 @@ const ChangePassword = () => {
                         h="auto"
                         display={{ base: "block", md: "block", lg: "none" }}
                     >
-                        <Password
-                            display={{ base: "block", md: "block", lg: "none" }}
-                        />
+                        <Password />
                     </Box>
                 </Box>
             </Box>
