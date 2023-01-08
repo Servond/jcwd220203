@@ -2,6 +2,8 @@ import {
     Box,
     Button,
     Center,
+    CircularProgress,
+    Flex,
     FormControl,
     FormErrorMessage,
     FormLabel,
@@ -23,6 +25,7 @@ import ImageCard from "./ImageCard"
 
 const UserInfo = ({ onClick }) => {
     const [userData, setUserData] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
     const toast = useToast()
 
     const authSelector = useSelector((state) => state.auth)
@@ -32,6 +35,7 @@ const UserInfo = ({ onClick }) => {
                 `user-profile/get/${authSelector.id}`
             )
             setUserData(response.data.data)
+            setIsLoading(true)
         } catch (err) {
             console.log(err)
         }
@@ -116,104 +120,161 @@ const UserInfo = ({ onClick }) => {
                 display={{ base: "none", md: "none", lg: "flex" }}
                 border="1px solid #dfe1e3"
             >
-                <ImageCard userData={userData} btnSubmit={btnSubmit} />
-
-                {/* Change Personal Info */}
-                <Box p="16px">
-                    <Center>
-                        <Text p="14px 0 55px" fontWeight={"bold"} fontSize="xl">
-                            Change Your Info
-                        </Text>
-                    </Center>
-
-                    {/* Form */}
-                    <Box fontSize="13px" alignItems="flex-start">
-                        <Stack spacing="10">
-                            {/* Name */}
-                            <FormControl isInvalid={formik.errors.username}>
-                                <HStack>
-                                    <FormLabel w="300px" mr="16px" align="left">
-                                        Name
-                                    </FormLabel>
-                                    <InputGroup w="100%" display="block">
-                                        <Box display="flex" w="70%">
-                                            <Input
-                                                onChange={formChangeHandler}
-                                                name="username"
-                                                defaultValue={userData.username}
-                                            />
-                                        </Box>
-
-                                        <FormErrorMessage>
-                                            {formik.errors.username}
-                                        </FormErrorMessage>
-                                    </InputGroup>
-                                </HStack>
-                            </FormControl>
-
-                            {/* Phone Number */}
-                            <FormControl isInvalid={formik.errors.phone_number}>
-                                <HStack>
-                                    <FormLabel w="300px" mr="16px" align="left">
-                                        Phone Number
-                                    </FormLabel>
-                                    <InputGroup w="100%" display="block">
-                                        <Box display="flex" w="70%">
-                                            <InputLeftAddon children="+62" />
-                                            <Input
-                                                onChange={formChangeHandler}
-                                                name="phone_number"
-                                                defaultValue={
-                                                    userData.phone_number
-                                                }
-                                                w="100%"
-                                                type="number"
-                                                maxLength={15}
-                                                minLength={9}
-                                            />
-                                        </Box>
-                                        <FormErrorMessage>
-                                            {formik.errors.phone_number}
-                                        </FormErrorMessage>
-                                    </InputGroup>
-                                </HStack>
-                            </FormControl>
-
-                            {/* Email */}
-                            <FormControl>
-                                <HStack>
-                                    <FormLabel w="300px" mr="16px" align="left">
-                                        Email
-                                    </FormLabel>
-                                    <InputGroup w="100%" display="block">
-                                        <Box display="flex" w="70%">
-                                            <Input
-                                                onChange={formChangeHandler}
-                                                name="email"
-                                                defaultValue={
-                                                    authSelector.email
-                                                }
-                                                isDisabled
-                                            />
-                                        </Box>
-                                    </InputGroup>
-                                </HStack>
-                            </FormControl>
-
-                            {/* Button Submit */}
-                            <Center>
-                                <Button
-                                    bg="#F7931E"
-                                    color="rgba(0,0,0,.54)"
-                                    onClick={formik.handleSubmit}
-                                    _hover={{ bgColor: "#F7942f" }}
-                                >
-                                    Submit
-                                </Button>
-                            </Center>
-                        </Stack>
+                {isLoading === false ? (
+                    <Box
+                        w={"850px"}
+                        h={"400px"}
+                        display={"flex"}
+                        justifyContent={"center"}
+                        alignItems={"center"}
+                        alignContent={"center"}
+                    >
+                        <CircularProgress
+                            isIndeterminate
+                            color="#F7931E"
+                            thickness="160px"
+                            size="100px"
+                        />
                     </Box>
-                </Box>
+                ) : (
+                    <Flex>
+                        <ImageCard userData={userData} btnSubmit={btnSubmit} />
+
+                        {/* Change Personal Info */}
+                        <Box p="16px">
+                            <Center>
+                                <Text
+                                    p="14px 0 55px"
+                                    fontWeight={"bold"}
+                                    fontSize="xl"
+                                >
+                                    Change Your Info
+                                </Text>
+                            </Center>
+
+                            {/* Form */}
+                            <Box fontSize="13px" alignItems="flex-start">
+                                <Stack spacing="10">
+                                    {/* Name */}
+                                    <FormControl
+                                        isInvalid={formik.errors.username}
+                                    >
+                                        <HStack>
+                                            <FormLabel
+                                                w="300px"
+                                                mr="16px"
+                                                align="left"
+                                            >
+                                                Name
+                                            </FormLabel>
+                                            <InputGroup
+                                                w="100%"
+                                                display="block"
+                                            >
+                                                <Box display="flex" w="70%">
+                                                    <Input
+                                                        onChange={
+                                                            formChangeHandler
+                                                        }
+                                                        name="username"
+                                                        defaultValue={
+                                                            userData.username
+                                                        }
+                                                    />
+                                                </Box>
+
+                                                <FormErrorMessage>
+                                                    {formik.errors.username}
+                                                </FormErrorMessage>
+                                            </InputGroup>
+                                        </HStack>
+                                    </FormControl>
+
+                                    {/* Phone Number */}
+                                    <FormControl
+                                        isInvalid={formik.errors.phone_number}
+                                    >
+                                        <HStack>
+                                            <FormLabel
+                                                w="300px"
+                                                mr="16px"
+                                                align="left"
+                                            >
+                                                Phone Number
+                                            </FormLabel>
+                                            <InputGroup
+                                                w="100%"
+                                                display="block"
+                                            >
+                                                <Box display="flex" w="70%">
+                                                    <InputLeftAddon children="+62" />
+                                                    <Input
+                                                        onChange={
+                                                            formChangeHandler
+                                                        }
+                                                        name="phone_number"
+                                                        defaultValue={
+                                                            userData.phone_number
+                                                        }
+                                                        w="100%"
+                                                        type="number"
+                                                        maxLength={15}
+                                                        minLength={9}
+                                                    />
+                                                </Box>
+                                                <FormErrorMessage>
+                                                    {formik.errors.phone_number}
+                                                </FormErrorMessage>
+                                            </InputGroup>
+                                        </HStack>
+                                    </FormControl>
+
+                                    {/* Email */}
+                                    <FormControl>
+                                        <HStack>
+                                            <FormLabel
+                                                w="300px"
+                                                mr="16px"
+                                                align="left"
+                                            >
+                                                Email
+                                            </FormLabel>
+                                            <InputGroup
+                                                w="100%"
+                                                display="block"
+                                            >
+                                                <Box display="flex" w="70%">
+                                                    <Input
+                                                        onChange={
+                                                            formChangeHandler
+                                                        }
+                                                        name="email"
+                                                        defaultValue={
+                                                            authSelector.email
+                                                        }
+                                                        isDisabled
+                                                    />
+                                                </Box>
+                                            </InputGroup>
+                                        </HStack>
+                                    </FormControl>
+
+                                    {/* Button Submit */}
+                                    <Center>
+                                        <Button
+                                            bg="#F7931E"
+                                            color="rgba(0,0,0,.54)"
+                                            onClick={formik.handleSubmit}
+                                            _hover={{ bgColor: "#F7942f" }}
+                                        >
+                                            Submit
+                                        </Button>
+                                    </Center>
+                                </Stack>
+                            </Box>
+                        </Box>
+                    </Flex>
+                )}
             </Box>
 
             {/* Responsive */}

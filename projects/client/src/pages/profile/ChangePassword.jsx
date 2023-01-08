@@ -6,7 +6,6 @@ import { useSelector } from "react-redux"
 
 const ChangePassword = () => {
     const authSelector = useSelector((state) => state.auth)
-
     return (
         <>
             <Box

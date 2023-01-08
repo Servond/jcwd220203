@@ -3,6 +3,8 @@ import {
     Box,
     Button,
     Center,
+    CircularProgress,
+    Flex,
     FormControl,
     FormErrorMessage,
     FormHelperText,
@@ -39,6 +41,7 @@ const Password = () => {
     const toast = useToast()
     const authSelector = useSelector((state) => state.auth)
     const apiImg = process.env.REACT_APP_IMAGE_URL
+    const [isLoading, setIsLoading] = useState(false)
 
     const fetchUserData = async () => {
         try {
@@ -46,6 +49,7 @@ const Password = () => {
                 `user-profile/get/${authSelector.id}`
             )
             setUserData(response.data.data)
+            setIsLoading(true)
         } catch (err) {
             console.log(err)
         }
@@ -107,154 +111,200 @@ const Password = () => {
                 display={{ base: "none", md: "none", lg: "flex" }}
                 border="1px solid #dfe1e3"
             >
-                {/* Profile Photo */}
-                <Box p="16px" w="290px">
+                {isLoading === false ? (
                     <Box
-                        p="16px"
-                        mb="24px"
-                        boxShadow={"rgba(0, 0, 0, 0.24) 0px 3px 8px"}
-                        borderRadius="8px"
+                        w={"850px"}
+                        h={"400px"}
+                        display={"flex"}
+                        justifyContent={"center"}
+                        alignItems={"center"}
+                        alignContent={"center"}
                     >
-                        <Avatar
-                            src={`${apiImg}/${authSelector.profile_picture}`}
-                            name={userData.username}
-                            w="225px"
-                            h="225px"
-                            borderRadius="3px"
+                        <CircularProgress
+                            isIndeterminate
+                            color="#F7931E"
+                            thickness="160px"
+                            size="100px"
                         />
                     </Box>
-                </Box>
-
-                {/* Change Password */}
-                <Box
-                    p="16px"
-                    display={{ base: "none", md: "none", lg: "grid" }}
-                >
-                    <Center>
-                        <Text p="14px 0 55px" fontWeight={"bold"} fontSize="xl">
-                            Change Your Password
-                        </Text>
-                    </Center>
-
-                    {/* Form */}
-                    <Box fontSize="13px" alignItems="flex-start">
-                        <Stack spacing="10">
-                            {/* Password */}
-                            <FormControl isInvalid={formik.errors.password}>
-                                <HStack>
-                                    <FormLabel
-                                        w="300px"
-                                        mr="16px"
-                                        align="left"
-                                        fontSize="xl"
-                                    >
-                                        New Password
-                                    </FormLabel>
-                                    <InputGroup w="100%" display="block">
-                                        <Box display="flex" w="70%">
-                                            <InputGroup>
-                                                <Input
-                                                    onChange={formChangeHandler}
-                                                    name="password"
-                                                    value={
-                                                        formik.values.password
-                                                    }
-                                                    type={
-                                                        showNewPassword
-                                                            ? "text"
-                                                            : "password"
-                                                    }
-                                                />
-                                                <InputRightElement width="3rem">
-                                                    <Button
-                                                        onClick={
-                                                            toggleNewPassword
-                                                        }
-                                                        variant="ghost"
-                                                    >
-                                                        {showNewPassword ? (
-                                                            <BiShow />
-                                                        ) : (
-                                                            <BiHide />
-                                                        )}
-                                                    </Button>
-                                                </InputRightElement>
-                                            </InputGroup>
-                                        </Box>
-                                        <FormErrorMessage fontSize={"11px"}>
-                                            {formik.errors.password}
-                                        </FormErrorMessage>
-                                    </InputGroup>
-                                </HStack>
-                            </FormControl>
-
-                            {/* Change Password */}
-                            <FormControl
-                                isInvalid={formik.errors.confirmPassword}
+                ) : (
+                    <Flex>
+                        {/* Profile Photo */}
+                        <Box p="16px" w="290px">
+                            <Box
+                                p="16px"
+                                mb="24px"
+                                boxShadow={"rgba(0, 0, 0, 0.24) 0px 3px 8px"}
+                                borderRadius="8px"
                             >
-                                <HStack>
-                                    <FormLabel
-                                        w="300px"
-                                        mr="16px"
-                                        align="left"
-                                        fontSize="xl"
+                                <Avatar
+                                    src={`${apiImg}/${authSelector.profile_picture}`}
+                                    name={userData.username}
+                                    w="225px"
+                                    h="225px"
+                                    borderRadius="3px"
+                                />
+                            </Box>
+                        </Box>
+
+                        {/* Change Password */}
+                        <Box
+                            p="16px"
+                            display={{ base: "none", md: "none", lg: "grid" }}
+                        >
+                            <Center>
+                                <Text
+                                    p="14px 0 55px"
+                                    fontWeight={"bold"}
+                                    fontSize="xl"
+                                >
+                                    Change Your Password
+                                </Text>
+                            </Center>
+
+                            {/* Form */}
+                            <Box fontSize="13px" alignItems="flex-start">
+                                <Stack spacing="10">
+                                    {/* Password */}
+                                    <FormControl
+                                        isInvalid={formik.errors.password}
                                     >
-                                        Confirm Password
-                                    </FormLabel>
-                                    <InputGroup w="100%" display="block">
-                                        <Box w="70%" display="flex">
-                                            <InputGroup>
-                                                <Input
-                                                    onChange={formChangeHandler}
-                                                    name="confirmPassword"
-                                                    value={
-                                                        formik.values
+                                        <HStack>
+                                            <FormLabel
+                                                w="300px"
+                                                mr="16px"
+                                                align="left"
+                                                fontSize="xl"
+                                            >
+                                                New Password
+                                            </FormLabel>
+                                            <InputGroup
+                                                w="100%"
+                                                display="block"
+                                            >
+                                                <Box display="flex" w="70%">
+                                                    <InputGroup>
+                                                        <Input
+                                                            onChange={
+                                                                formChangeHandler
+                                                            }
+                                                            name="password"
+                                                            value={
+                                                                formik.values
+                                                                    .password
+                                                            }
+                                                            type={
+                                                                showNewPassword
+                                                                    ? "text"
+                                                                    : "password"
+                                                            }
+                                                        />
+                                                        <InputRightElement width="3rem">
+                                                            <Button
+                                                                onClick={
+                                                                    toggleNewPassword
+                                                                }
+                                                                variant="ghost"
+                                                            >
+                                                                {showNewPassword ? (
+                                                                    <BiShow />
+                                                                ) : (
+                                                                    <BiHide />
+                                                                )}
+                                                            </Button>
+                                                        </InputRightElement>
+                                                    </InputGroup>
+                                                </Box>
+                                                <FormErrorMessage
+                                                    fontSize={"11px"}
+                                                >
+                                                    {formik.errors.password}
+                                                </FormErrorMessage>
+                                            </InputGroup>
+                                        </HStack>
+                                    </FormControl>
+
+                                    {/* Change Password */}
+                                    <FormControl
+                                        isInvalid={
+                                            formik.errors.confirmPassword
+                                        }
+                                    >
+                                        <HStack>
+                                            <FormLabel
+                                                w="300px"
+                                                mr="16px"
+                                                align="left"
+                                                fontSize="xl"
+                                            >
+                                                Confirm Password
+                                            </FormLabel>
+                                            <InputGroup
+                                                w="100%"
+                                                display="block"
+                                            >
+                                                <Box w="70%" display="flex">
+                                                    <InputGroup>
+                                                        <Input
+                                                            onChange={
+                                                                formChangeHandler
+                                                            }
+                                                            name="confirmPassword"
+                                                            value={
+                                                                formik.values
+                                                                    .confirmPassword
+                                                            }
+                                                            type={
+                                                                showPasswordConfirmation
+                                                                    ? "text"
+                                                                    : "password"
+                                                            }
+                                                        />
+                                                        <InputRightElement width="3rem">
+                                                            <Button
+                                                                onClick={
+                                                                    toggleNewPasswordConfirmation
+                                                                }
+                                                                variant="ghost"
+                                                            >
+                                                                {showPasswordConfirmation ? (
+                                                                    <BiShow />
+                                                                ) : (
+                                                                    <BiHide />
+                                                                )}
+                                                            </Button>
+                                                        </InputRightElement>
+                                                    </InputGroup>
+                                                </Box>
+
+                                                <FormErrorMessage
+                                                    fontSize={"11px"}
+                                                >
+                                                    {
+                                                        formik.errors
                                                             .confirmPassword
                                                     }
-                                                    type={
-                                                        showPasswordConfirmation
-                                                            ? "text"
-                                                            : "password"
-                                                    }
-                                                />
-                                                <InputRightElement width="3rem">
-                                                    <Button
-                                                        onClick={
-                                                            toggleNewPasswordConfirmation
-                                                        }
-                                                        variant="ghost"
-                                                    >
-                                                        {showPasswordConfirmation ? (
-                                                            <BiShow />
-                                                        ) : (
-                                                            <BiHide />
-                                                        )}
-                                                    </Button>
-                                                </InputRightElement>
+                                                </FormErrorMessage>
                                             </InputGroup>
-                                        </Box>
+                                        </HStack>
+                                    </FormControl>
 
-                                        <FormErrorMessage fontSize={"11px"}>
-                                            {formik.errors.confirmPassword}
-                                        </FormErrorMessage>
-                                    </InputGroup>
-                                </HStack>
-                            </FormControl>
-
-                            {/* Button Submit */}
-                            <Center>
-                                <Button
-                                    bg="#F7931E"
-                                    color="rgba(0,0,0,.54)"
-                                    onClick={formik.handleSubmit}
-                                    type="submit"
-                                >
-                                    Submit
-                                </Button>
-                            </Center>
-                        </Stack>
-                    </Box>
-                </Box>
+                                    {/* Button Submit */}
+                                    <Center>
+                                        <Button
+                                            bg="#F7931E"
+                                            color="rgba(0,0,0,.54)"
+                                            onClick={formik.handleSubmit}
+                                            type="submit"
+                                        >
+                                            Submit
+                                        </Button>
+                                    </Center>
+                                </Stack>
+                            </Box>
+                        </Box>
+                    </Flex>
+                )}
             </Box>
 
             {/* Responsive */}
@@ -262,160 +312,167 @@ const Password = () => {
                 display={{ base: "block", md: "block", lg: "none" }}
                 maxW="500px"
             >
-                <Center>
-                    <Box p="16px">
-                        <Box
-                            p="16px"
-                            boxShadow={"rgba(0, 0, 0, 0.24) 0px 3px 8px"}
-                            borderRadius="full"
-                            w="fit-content"
-                            h="fit-content"
-                        >
-                            <Center>
-                                <Avatar
-                                    src={`${apiImg}/${authSelector.profile_picture}`}
-                                    name={userData.username}
-                                    w="120px"
-                                    h="120px"
-                                    borderRadius="full"
-                                />
-                            </Center>
-                        </Box>
-                    </Box>
-                </Center>
-
-                {/* Change Password */}
-                <Box
-                    p="16px"
-                    display={{ base: "block", md: "block", lg: "none" }}
-                >
+                <Box>
                     <Center>
-                        <Text
-                            p="14px 0 55px"
-                            fontWeight={"bold"}
-                            fontSize="18px"
-                        >
-                            Change Your Password
-                        </Text>
+                        <Box p="16px">
+                            <Box
+                                p="16px"
+                                boxShadow={"rgba(0, 0, 0, 0.24) 0px 3px 8px"}
+                                borderRadius="full"
+                                w="fit-content"
+                                h="fit-content"
+                            >
+                                <Center>
+                                    <Avatar
+                                        src={`${apiImg}/${authSelector.profile_picture}`}
+                                        name={userData.username}
+                                        w="120px"
+                                        h="120px"
+                                        borderRadius="full"
+                                    />
+                                </Center>
+                            </Box>
+                        </Box>
                     </Center>
 
-                    {/* Form */}
-                    <Box fontSize="13px" alignItems="flex-start">
-                        <Stack spacing="10">
-                            {/* Password */}
-                            <FormControl isInvalid={formik.errors.password}>
-                                <HStack>
-                                    <FormLabel
-                                        w="300px"
-                                        mr="16px"
-                                        align="left"
-                                        fontSize="14px"
-                                    >
-                                        New Password
-                                    </FormLabel>
-                                    <InputGroup w="100%" display="block">
-                                        <Box display="flex" w="70%">
-                                            <InputGroup>
-                                                <Input
-                                                    onChange={formChangeHandler}
-                                                    name="password"
-                                                    value={
-                                                        formik.values.password
-                                                    }
-                                                    type={
-                                                        showNewPassword
-                                                            ? "text"
-                                                            : "password"
-                                                    }
-                                                />
-                                                <InputRightElement width="3rem">
-                                                    <Button
-                                                        onClick={
-                                                            toggleNewPassword
-                                                        }
-                                                        variant="ghost"
-                                                    >
-                                                        {showNewPassword ? (
-                                                            <BiShow />
-                                                        ) : (
-                                                            <BiHide />
-                                                        )}
-                                                    </Button>
-                                                </InputRightElement>
-                                            </InputGroup>
-                                        </Box>
-                                        <FormErrorMessage fontSize={"11px"}>
-                                            {formik.errors.password}
-                                        </FormErrorMessage>
-                                    </InputGroup>
-                                </HStack>
-                            </FormControl>
-
-                            {/* Change Password */}
-                            <FormControl
-                                isInvalid={formik.errors.confirmPassword}
+                    {/* Change Password */}
+                    <Box
+                        p="16px"
+                        display={{ base: "block", md: "block", lg: "none" }}
+                    >
+                        <Center>
+                            <Text
+                                p="14px 0 55px"
+                                fontWeight={"bold"}
+                                fontSize="18px"
                             >
-                                <HStack>
-                                    <FormLabel
-                                        w="300px"
-                                        mr="16px"
-                                        align="left"
-                                        fontSize="14px"
-                                    >
-                                        Confirm Password
-                                    </FormLabel>
-                                    <InputGroup w="100%" display="block">
-                                        <Box w="70%" display="flex">
-                                            <InputGroup>
-                                                <Input
-                                                    onChange={formChangeHandler}
-                                                    name="confirmPassword"
-                                                    value={
-                                                        formik.values
-                                                            .confirmPassword
-                                                    }
-                                                    type={
-                                                        showPasswordConfirmation
-                                                            ? "text"
-                                                            : "password"
-                                                    }
-                                                />
-                                                <InputRightElement width="3rem">
-                                                    <Button
-                                                        onClick={
-                                                            toggleNewPasswordConfirmation
+                                Change Your Password
+                            </Text>
+                        </Center>
+
+                        {/* Form */}
+                        <Box fontSize="13px" alignItems="flex-start">
+                            <Stack spacing="10">
+                                {/* Password */}
+                                <FormControl isInvalid={formik.errors.password}>
+                                    <HStack>
+                                        <FormLabel
+                                            w="300px"
+                                            mr="16px"
+                                            align="left"
+                                            fontSize="14px"
+                                        >
+                                            New Password
+                                        </FormLabel>
+                                        <InputGroup w="100%" display="block">
+                                            <Box display="flex" w="100%">
+                                                <InputGroup>
+                                                    <Input
+                                                        onChange={
+                                                            formChangeHandler
                                                         }
-                                                        variant="ghost"
-                                                    >
-                                                        {showPasswordConfirmation ? (
-                                                            <BiShow />
-                                                        ) : (
-                                                            <BiHide />
-                                                        )}
-                                                    </Button>
-                                                </InputRightElement>
-                                            </InputGroup>
-                                        </Box>
+                                                        name="password"
+                                                        value={
+                                                            formik.values
+                                                                .password
+                                                        }
+                                                        type={
+                                                            showNewPassword
+                                                                ? "text"
+                                                                : "password"
+                                                        }
+                                                    />
+                                                    <InputRightElement width="3rem">
+                                                        <Button
+                                                            onClick={
+                                                                toggleNewPassword
+                                                            }
+                                                            variant="ghost"
+                                                        >
+                                                            {showNewPassword ? (
+                                                                <BiShow />
+                                                            ) : (
+                                                                <BiHide />
+                                                            )}
+                                                        </Button>
+                                                    </InputRightElement>
+                                                </InputGroup>
+                                            </Box>
+                                            <FormErrorMessage fontSize={"11px"}>
+                                                {formik.errors.password}
+                                            </FormErrorMessage>
+                                        </InputGroup>
+                                    </HStack>
+                                </FormControl>
 
-                                        <FormErrorMessage fontSize={"11px"}>
-                                            {formik.errors.confirmPassword}
-                                        </FormErrorMessage>
-                                    </InputGroup>
-                                </HStack>
-                            </FormControl>
-
-                            {/* Button Submit */}
-                            <Center>
-                                <Button
-                                    bg="#F7931E"
-                                    color="rgba(0,0,0,.54)"
-                                    onClick={formik.handleSubmit}
-                                    type="submit"
+                                {/* Change Password */}
+                                <FormControl
+                                    isInvalid={formik.errors.confirmPassword}
                                 >
-                                    Submit
-                                </Button>
-                            </Center>
-                        </Stack>
+                                    <HStack>
+                                        <FormLabel
+                                            w="300px"
+                                            mr="16px"
+                                            align="left"
+                                            fontSize="14px"
+                                        >
+                                            Confirm Password
+                                        </FormLabel>
+                                        <InputGroup w="100%" display="block">
+                                            <Box w="100%" display="flex">
+                                                <InputGroup>
+                                                    <Input
+                                                        onChange={
+                                                            formChangeHandler
+                                                        }
+                                                        name="confirmPassword"
+                                                        value={
+                                                            formik.values
+                                                                .confirmPassword
+                                                        }
+                                                        type={
+                                                            showPasswordConfirmation
+                                                                ? "text"
+                                                                : "password"
+                                                        }
+                                                    />
+                                                    <InputRightElement width="3rem">
+                                                        <Button
+                                                            onClick={
+                                                                toggleNewPasswordConfirmation
+                                                            }
+                                                            variant="ghost"
+                                                        >
+                                                            {showPasswordConfirmation ? (
+                                                                <BiShow />
+                                                            ) : (
+                                                                <BiHide />
+                                                            )}
+                                                        </Button>
+                                                    </InputRightElement>
+                                                </InputGroup>
+                                            </Box>
+
+                                            <FormErrorMessage fontSize={"11px"}>
+                                                {formik.errors.confirmPassword}
+                                            </FormErrorMessage>
+                                        </InputGroup>
+                                    </HStack>
+                                </FormControl>
+
+                                {/* Button Submit */}
+                                <Center>
+                                    <Button
+                                        bg="#F7931E"
+                                        color="rgba(0,0,0,.54)"
+                                        onClick={formik.handleSubmit}
+                                        type="submit"
+                                    >
+                                        Submit
+                                    </Button>
+                                </Center>
+                            </Stack>
+                        </Box>
                     </Box>
                 </Box>
             </Box>
