@@ -1,7 +1,6 @@
 import {
     Box,
     Button,
-    Flex,
     Text,
     Th,
     Thead,
@@ -11,7 +10,6 @@ import {
     Tbody,
     Td,
     Image,
-    Spacer,
     Select,
     HStack,
     useDisclosure,
@@ -26,10 +24,11 @@ import {
     InputGroup,
     GridItem,
     Grid,
+    ModalHeader,
 } from "@chakra-ui/react"
 import { useEffect } from "react"
 import { useState } from "react"
-import { CgChevronLeft, CgChevronRight } from "react-icons/cg"
+import moment from "moment"
 import { axiosInstance } from "../../api"
 import { Carousel } from "react-responsive-carousel"
 import "react-responsive-carousel/lib/styles/carousel.min.css"
@@ -41,42 +40,40 @@ const AdminOrderHistory = () => {
     const [transactionData, setTransactionData] = useState([])
     const [warehouseData, setWarehouseData] = useState([])
     const [imageData, setImageData] = useState([])
-    const [productData, setProductData] = useState({
-        product_name: "",
-        description: "",
-        price: "",
-        id: "",
-    })
+    const [productData, setProductData] = useState([])
     const [productId, setProductId] = useState(0)
     const [page, setPage] = useState(1)
     const [maxPage, setMaxPage] = useState(1)
-    const [filter, setFilter] = useState("")
     const { isOpen, onOpen, onClose } = useDisclosure()
     const authSelector = useSelector((state) => state.auth)
     const [isLoading, setIsLoading] = useState(false)
+    const [filterWarehouse, setFilterWarehouse] = useState("")
+    const [filterMonth, setFilterMonth] = useState("")
+    const [sort, setSort] = useState("DESC")
+    const [searchValue, setSearchValue] = useState("")
+    const [searchInput, setSearchInput] = useState("")
+    const [dataById, setDataById] = useState([])
 
-    const maxItemsPerPage = 7
+    const maxItemsPerPage = 10
     const fetchData = async () => {
         try {
-            let url = `/admin/order-history/get`
-
-            console.log("CCCCCC", authSelector)
+            let url = `/admin/order-history/get4`
             if (authSelector.WarehouseId) {
                 await axiosInstance.get(
                     (url += `?WarehouseId=${authSelector.WarehouseId}`)
                 )
             }
-            console.log("URLLL", url)
             const response = await axiosInstance.get(url, {
                 params: {
                     _page: page,
                     _limit: maxItemsPerPage,
-                    WarehouseId: filter,
+                    WarehouseId: filterWarehouse,
+                    createdAt: filterMonth,
+                    _sortBy: sort,
+                    transaction_name: searchValue,
                 },
             })
-            console.log(`AAAAAAAAAAAAA`, authSelector.WarehouseId)
             setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
-            console.log("response", response.data)
             if (page === 1) {
                 setTransactionData(response.data.data)
             } else {
@@ -88,34 +85,11 @@ const AdminOrderHistory = () => {
         }
     }
 
-    const fetchData2 = async () => {
-        try {
-            let url = `/admin/order-history/get2`
-
-            if (authSelector.WarehouseId) {
-                url += `?WarehouseId=${authSelector.WarehouseId}`
-            }
-
-            const response = await axiosInstance.get(url, {
-                params: {
-                    _page: page,
-                    _limit: maxItemsPerPage,
-                    WarehouseId: filter,
-                },
-            })
-            setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
-            if (page === 1) {
-                setTransactionData(response.data.data)
-            } else {
-                setTransactionData(response.data.data)
-            }
-        } catch (err) {
-            console.log(err)
-        }
-    }
     const fetchWarehouse = async () => {
         try {
-            const response = await axiosInstance.get("/warehouse")
+            const response = await axiosInstance.get(
+                "/admin/order-history/findWarehouse"
+            )
             setWarehouseData(response.data.data)
         } catch (err) {
             console.log(err)
@@ -124,21 +98,43 @@ const AdminOrderHistory = () => {
 
     const fetchProduct = async () => {
         try {
-            const response = await axiosInstance.get(`/product/${productId}`)
-            setProductData(response.data.data)
-            setImageData(response.data.data.Image_Urls)
+            const response = await axiosInstance.get(
+                `/admin/order-history/getId/${productId}`
+            )
+            console.log("RESID", response.data.data)
+            setDataById(response.data.data)
+            setIsLoading(true)
         } catch (err) {
             console.log(err)
         }
     }
 
-    const filterBtnHandler = ({ target }) => {
+    const filterWarehouseBtnHandler = ({ target }) => {
         const { value } = target
-        setFilter(value)
+        setFilterWarehouse(value)
         setIsLoading(false)
-        // setSortBy(value)
     }
 
+    const filterMonthBtnHandler = ({ target }) => {
+        const { value } = target
+        setFilterMonth(value)
+        setIsLoading(false)
+    }
+
+    const sortHandler = ({ target }) => {
+        const { value } = target
+        setSort(value)
+        setIsLoading(false)
+    }
+    const searchBtnHandler = () => {
+        setSearchValue(searchInput)
+        setIsLoading(false)
+    }
+    const handleKeyEnter = (e) => {
+        if (e.key === "Enter") {
+            setSearchValue(searchInput)
+        }
+    }
     const nextPageBtnHandler = () => {
         setPage(page + 1)
         setIsLoading(false)
@@ -148,13 +144,37 @@ const AdminOrderHistory = () => {
         setPage(page - 1)
         setIsLoading(false)
     }
-    console.log("trans", transactionData.map((val) => val.WarehouseId)[0])
+    console.log(
+        "trans",
+        transactionData.map((val) =>
+            val.TransactionItems.map((ti) =>
+                ti.Product.Image_Urls.map((img) => img.image_url)
+            )
+        )
+    )
+    console.log("TRXID", transactionData.map((val) => val.id)[0])
+    console.log(
+        "ID",
+        dataById.map((val) =>
+            val.TransactionItems.map((ti) =>
+                ti.Product.Image_Urls.map((img) => img.image_url)
+            )
+        )
+    )
+    console.log("PR", productId)
     useEffect(() => {
         fetchData()
-        // fetchData2()
         fetchWarehouse()
         fetchProduct()
-    }, [page, filter, productId, authSelector])
+    }, [
+        page,
+        filterMonth,
+        filterWarehouse,
+        sort,
+        productId,
+        authSelector,
+        searchValue,
+    ])
     return (
         <>
             <Box ml="250px" mr="1.5em">
@@ -164,7 +184,7 @@ const AdminOrderHistory = () => {
                         fontWeight="bold"
                         fontFamily="sans-serif"
                     >
-                        Transaction History
+                        Order History
                     </Text>
                     <Box mt="3vh">
                         <Grid
@@ -179,7 +199,7 @@ const AdminOrderHistory = () => {
                                 justifySelf="center"
                                 border="1px solid #dfe1e3"
                                 borderRadius="8px"
-                                // onChange={sortHandler}
+                                onChange={sortHandler}
                             >
                                 <Select placeholder="Sort">
                                     <option value={"ASC"}>Old</option>
@@ -193,7 +213,7 @@ const AdminOrderHistory = () => {
                                 justifySelf="center"
                                 border="1px solid #dfe1e3"
                                 borderRadius="8px"
-                                // onChange={filterMonthBtnHandler}
+                                onChange={filterMonthBtnHandler}
                             >
                                 <Select>
                                     <option value="">By Month</option>
@@ -216,24 +236,26 @@ const AdminOrderHistory = () => {
                             <GridItem
                                 w="full"
                                 justifySelf="center"
-                                // onChange={filterWarehouseBtnHandler}
+                                onChange={filterWarehouseBtnHandler}
                                 border="1px solid #dfe1e3"
                                 borderRadius="8px"
                             >
                                 <Select>
                                     <option value="">By Warehouse</option>
-                                    {/* {authSelector.WarehouseId ===
-                                    salesData.map((val) => val.WarehouseId)[0]
-                                        ? salesData.map((val) => (
+                                    {authSelector.WarehouseId ===
+                                    transactionData.map(
+                                        (val) => val.WarehouseId
+                                    )[0]
+                                        ? transactionData.map((val) => (
                                               <option value={val.WarehouseId}>
-                                                  {val.warehouse_name}
+                                                  {val.Warehouse.warehouse_name}
                                               </option>
                                           ))[0]
                                         : warehouseData.map((val) => (
                                               <option value={val.id}>
                                                   {val.warehouse_name}
                                               </option>
-                                          ))} */}
+                                          ))}
                                 </Select>
                             </GridItem>
 
@@ -248,11 +270,11 @@ const AdminOrderHistory = () => {
                                     <Input
                                         placeholder="Search here"
                                         _placeholder={{ fontSize: "14px" }}
-                                        // onChange={(e) =>
-                                        //     setSearchInput(e.target.value)
-                                        // }
-                                        // onKeyDown={handleKeyEnter}
-                                        // value={searchInput}
+                                        onChange={(e) =>
+                                            setSearchInput(e.target.value)
+                                        }
+                                        onKeyDown={handleKeyEnter}
+                                        value={searchInput}
                                     />
                                     <Button
                                         borderLeftRadius={"0"}
@@ -260,7 +282,7 @@ const AdminOrderHistory = () => {
                                         bgColor={"white"}
                                         border="1px solid #e2e8f0"
                                         borderLeft={"0px"}
-                                        // onClick={searchBtnHandler}
+                                        onClick={searchBtnHandler}
                                     >
                                         <TbSearch />
                                     </Button>
@@ -279,91 +301,73 @@ const AdminOrderHistory = () => {
                         <Table variant={"striped"} colorScheme={"blue"}>
                             <Thead>
                                 <Tr>
-                                    <Th w="100px">
+                                    <Th p="10px">
                                         <Text fontSize="10px">invoice</Text>
                                     </Th>
-                                    <Th w="100px">
+                                    <Th p="10px">
                                         <Text fontSize="10px">User</Text>
                                     </Th>
-                                    <Th w="100px">
+                                    <Th p="10px">
                                         <Text fontSize="10px">Order Date</Text>
                                     </Th>
-                                    <Th w="100px">
+                                    <Th p="10px">
                                         <Text fontSize="10px">
                                             Total quantity
                                         </Text>
                                     </Th>
-                                    <Th w="100px">
+                                    <Th p="10px">
                                         <Text fontSize="10px">Total Price</Text>
                                     </Th>
-                                    <Th w="150px">
+                                    <Th p="10px">
                                         <Text fontSize="10px">
                                             Order status
                                         </Text>
                                     </Th>
-                                    <Th w="200px">
-                                        <Text fontSize="10px">
-                                            Warehouse Branch
-                                        </Text>
+                                    <Th p="10px">
+                                        <Text fontSize="10px">Warehouse</Text>
                                     </Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
                                 {isLoading &&
                                     transactionData.map((val) => (
-                                        <Tr>
-                                            <Td>
+                                        <Tr h="50px">
+                                            <Td p="10px">
                                                 <Button
                                                     variant="link"
                                                     onClick={() => {
-                                                        setProductId(
-                                                            //     val.TransactionItems.map(
-                                                            //         (val) =>
-                                                            //             val.ProductId
-                                                            //     )
-                                                            // )
-
-                                                            val.productId //raw query
-                                                        )
+                                                        setProductId(val.id)
                                                         onOpen()
                                                     }}
                                                 >
                                                     <Text color="#0095DA">
-                                                        #
-                                                        {
-                                                            // val.transaction_name
-
-                                                            val.transaction_name //raw query
-                                                        }
+                                                        {val.transaction_name}
                                                     </Text>
                                                 </Button>
                                             </Td>
-                                            <Td maxW="100px">
+                                            <Td p="10px">
                                                 <Text
                                                     overflow="hidden"
                                                     textOverflow="ellipsis"
                                                 >
-                                                    {/* {val.User.username} */}
-
-                                                    {/* raw query */}
-                                                    {val.username}
+                                                    {val.User.username}
                                                 </Text>
                                             </Td>
-                                            <Td>
+                                            <Td p="10px">
                                                 <Text>
-                                                    {
-                                                        val.createdAt.split(
-                                                            "T"
-                                                        )[0]
-                                                    }
+                                                    {moment(
+                                                        val.createdAt
+                                                    ).format(
+                                                        "DD MMMM YYYY, HH:mm:ss"
+                                                    )}
                                                 </Text>
                                             </Td>
-                                            <Td>
+                                            <Td p="10px">
                                                 <Text>
                                                     {val.total_quantity}
                                                 </Text>
                                             </Td>
-                                            <Td>
+                                            <Td p="10px">
                                                 <Text>
                                                     {new Intl.NumberFormat(
                                                         "id-ID",
@@ -375,24 +379,21 @@ const AdminOrderHistory = () => {
                                                     ).format(val.total_price)}
                                                 </Text>
                                             </Td>
-                                            <Td>
+                                            <Td p="10px">
                                                 <Text>
-                                                    {/* {
-                                                    val.Order_status
-                                                        .order_status_name
-                                                } */}
-
-                                                    {/* raw query */}
-                                                    {val.order_status}
+                                                    {
+                                                        val.Order_status
+                                                            .order_status_name
+                                                    }
                                                 </Text>
                                             </Td>
 
-                                            <Td>
+                                            <Td p="10px">
                                                 <Text>
-                                                    {/* {val.Warehouse.warehouse_name} */}
-
-                                                    {/* raw query */}
-                                                    {val.warehouse_name}
+                                                    {
+                                                        val.Warehouse
+                                                            .warehouse_name
+                                                    }
                                                 </Text>
                                             </Td>
                                         </Tr>
@@ -535,103 +536,140 @@ const AdminOrderHistory = () => {
             </Box>
 
             {/* Modal */}
-            <Modal isOpen={isOpen} onClose={onClose} isCentered size="4xl">
+            <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
-                <ModalContent h="410px">
+                <ModalContent maxH="50%" overflow="scroll">
+                    <ModalHeader>
+                        <Text fontSize="16px">Product List</Text>
+                    </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        <Box
-                            mx="auto"
-                            mt="20px"
-                            w="auto"
-                            h="350px"
-                            display="block"
-                        >
-                            <Box display="flex" gap="20px">
-                                <Box
-                                    borderRadius="12px"
-                                    display="block"
-                                    w="348px"
-                                    h="420px"
-                                >
-                                    <Carousel
-                                        showStatus={false}
-                                        showArrows={true}
-                                        showIndicators={false}
-                                        verticalSwipe="natural"
-                                        swipeable={true}
+                        {dataById.map((val) => (
+                            <Box
+                                p={"16px"}
+                                border={"1px solid #e5e7e9"}
+                                borderRadius={"8px"}
+                                cursor={"default"}
+                                mb={"10px"}
+                            >
+                                <Grid templateColumns="3.25fr 1.75fr" gap={0}>
+                                    <GridItem
+                                        borderRight={"thin dashed #e5e7e9"}
+                                        maxH={"90px"}
                                     >
-                                        {imageData.map((val) => (
-                                            <Stack>
-                                                <Box
-                                                    w="348px"
-                                                    h="348px"
-                                                    borderRadius="12px"
-                                                    display="block"
-                                                >
-                                                    <Image
-                                                        src={val.image_url}
-                                                        w="348px"
-                                                        h="348px"
-                                                        objectFit="cover"
-                                                        borderRadius="12px"
-                                                    />
-                                                </Box>
-                                            </Stack>
-                                        ))}
-                                    </Carousel>
-                                </Box>
-                                <Box
-                                    borderRadius="12px"
-                                    w="468px"
-                                    h="700px"
-                                    display="block"
-                                >
-                                    <Box display="grid" gap="20px">
-                                        <Stack w="468px" h="48px">
-                                            <Text
-                                                fontSize="16"
-                                                fontFamily="sans-serif"
-                                                fontWeight="bold"
-                                            >
-                                                {productData?.product_name}
-                                            </Text>
-                                        </Stack>
-                                        <Stack
-                                            w="468px"
-                                            h="80px"
-                                            borderBottom="1px solid #dfe1e3"
+                                        <Box
+                                            pr={"14px"}
+                                            display={"flex"}
+                                            alignItems={"flex-start"}
+                                            mt={"2px"}
                                         >
-                                            <Text
-                                                fontSize="28"
-                                                fontFamily="sans-serif"
-                                                fontWeight="bold"
-                                            >
-                                                {new Intl.NumberFormat(
-                                                    "id-ID",
-                                                    {
-                                                        style: "currency",
-                                                        currency: "IDR",
-                                                        minimumFractionDigits: 0,
+                                            <Image
+                                                src={val.TransactionItems.map(
+                                                    (ti) =>
+                                                        ti.Product.Image_Urls.map(
+                                                            (img) =>
+                                                                img.image_url
+                                                        )
+                                                )}
+                                                w={"45.99px"}
+                                                h={"45.99px"}
+                                                mr={"13px"}
+                                                borderRadius={"6px"}
+                                            />
+                                            <Box>
+                                                <Text
+                                                    color={"#31353BF5"}
+                                                    fontSize={"12px"}
+                                                    fontFamily={
+                                                        "Open Sauce One, Nunito Sans, -apple-system, sans-serif"
                                                     }
-                                                ).format(productData?.price)}
-                                            </Text>
-                                        </Stack>
-                                        <Stack w="468px" h="110px">
+                                                    fontWeight={"bold"}
+                                                    lineHeight={"18px"}
+                                                    letterSpacing={"0px"}
+                                                >
+                                                    {productData}
+                                                </Text>
+                                                {/* 
                                             <Text
-                                                fontSize="14"
-                                                fontFamily="sans-serif"
-                                                overflow="hidden"
-                                                textOverflow="ellipsis"
-                                                noOfLines={[1, 5]}
+                                                color={"#31353BAD"}
+                                                fontSize={"12px"}
+                                                fontFamily={
+                                                    "Open Sauce One, Nunito Sans, -apple-system, sans-serif"
+                                                }
+                                                fontWeight={400}
+                                                lineHeight={"18px"}
+                                                letterSpacing={"0px"}
                                             >
-                                                {productData?.description}
-                                            </Text>
-                                        </Stack>
-                                    </Box>
-                                </Box>
+                                                {quantity}{" "}
+                                                {quantity > 1
+                                                    ? "items"
+                                                    : "item"}{" "}
+                                                x{" "}
+                                                {
+                                                    new Intl.NumberFormat(
+                                                        "id-ID",
+                                                        {
+                                                            style: "currency",
+                                                            currency: "IDR",
+                                                        }
+                                                    )
+                                                        .format(price)
+                                                        .split(",")[0]
+                                                }
+                                            </Text> */}
+                                            </Box>
+                                        </Box>
+                                    </GridItem>
+                                    <GridItem
+                                        pl={"16px"}
+                                        w={"151.99px"}
+                                        naxH={"90px"}
+                                        display={"flex"}
+                                        flexDir={"column"}
+                                        justifyContent={"center"}
+                                    >
+                                        <Box
+                                            display={"flex"}
+                                            flexDir={"column"}
+                                            alignItems={"flex-end"}
+                                        >
+                                            {/* <Text
+                                            fontSize={"14px"}
+                                            fontFamily={
+                                                "Open Sauce One, Nunito Sans, -apple-system, sans-serif"
+                                            }
+                                            mb={"2px"}
+                                            color={"#31353BF5"}
+                                            fontWeight={400}
+                                            lineHeight={"20px"}
+                                            letterSpacing={"0px"}
+                                        >
+                                            Total Price
+                                        </Text> */}
+                                            {/* <Text
+                                            color={"#31353BF5"}
+                                            fontSize={"14px"}
+                                            fontFamily={
+                                                "Open Sauce One, Nunito Sans, -apple-system, sans-serif"
+                                            }
+                                            lineHeight={"20px"}
+                                            letterSpacing={"0px"}
+                                            fontWeight={700}
+                                        >
+                                            {
+                                                new Intl.NumberFormat("id-ID", {
+                                                    style: "currency",
+                                                    currency: "IDR",
+                                                })
+                                                    .format(quantity * price)
+                                                    .split(",")[0]
+                                            }
+                                        </Text> */}
+                                        </Box>
+                                    </GridItem>
+                                </Grid>
                             </Box>
-                        </Box>
+                        ))}
                     </ModalBody>
                 </ModalContent>
             </Modal>

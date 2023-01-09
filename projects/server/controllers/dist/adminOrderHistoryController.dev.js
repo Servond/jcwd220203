@@ -11,12 +11,12 @@ var _require2 = require("../models"),
     sequelize = _require2.sequelize;
 
 var Transaction = db.Transaction;
-var Transaction_Item = db.TransactionItem;
+var TransactionItem = db.TransactionItem;
 var Warehouse = db.Warehouse;
 var Product = db.Product;
 var Total_Stock = db.Total_Stock;
 var User = db.User;
-var Order_status = db.Order_status;
+var Image_Url = db.Image_Url;
 var adminOrderHistoryController = {
   // showAllTransaction: async (req, res) => {
   //     const {
@@ -271,6 +271,320 @@ var adminOrderHistoryController = {
         }
       }
     }, null, null, [[0, 13]]);
+  },
+  getTransactionList: function getTransactionList(req, res) {
+    var _req$query3, _req$query3$_limit, _limit, _req$query3$_page, _page, _req$query3$_sortBy, _sortBy, _req$query3$_sortDir, _sortDir, _req$query3$searching, searching, WarehouseId, rawQuery, getDataQuery, getTransactionId, _MyTransactionList, _dataCount, MyTransactionList, MyTransactionListAll, count, dataCount;
+
+    return regeneratorRuntime.async(function getTransactionList$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            _context3.prev = 0;
+            _req$query3 = req.query, _req$query3$_limit = _req$query3._limit, _limit = _req$query3$_limit === void 0 ? 10 : _req$query3$_limit, _req$query3$_page = _req$query3._page, _page = _req$query3$_page === void 0 ? 1 : _req$query3$_page, _req$query3$_sortBy = _req$query3._sortBy, _sortBy = _req$query3$_sortBy === void 0 ? "id" : _req$query3$_sortBy, _req$query3$_sortDir = _req$query3._sortDir, _sortDir = _req$query3$_sortDir === void 0 ? "DESC" : _req$query3$_sortDir, _req$query3$searching = _req$query3.searching, searching = _req$query3$searching === void 0 ? "" : _req$query3$searching;
+            WarehouseId = req.query.WarehouseId;
+            rawQuery = "SELECT p.product_name,  t.id AS TransactionId, transaction_name, t.UserId \n                    FROM transactionItems AS ti\n                    JOIN products AS p ON p.id = ti.ProductId\n                    JOIN transactions AS t ON ti.TransactionId = t.id\n                    JOIN warehouses AS wr ON wr.id = t.WarehouseId\n                    WHERE t.transaction_name Like '%".concat(searching, "%' && WarehouseId='").concat(WarehouseId, "'\n                    GROUP BY t.id ");
+
+            if (!(WarehouseId && searching)) {
+              _context3.next = 14;
+              break;
+            }
+
+            _context3.next = 7;
+            return regeneratorRuntime.awrap(db.sequelize.query(rawQuery));
+
+          case 7:
+            getDataQuery = _context3.sent;
+            getTransactionId = getDataQuery[0].map(function (val) {
+              return val.TransactionId;
+            });
+            _context3.next = 11;
+            return regeneratorRuntime.awrap(Transaction.findAndCountAll({
+              limit: Number(_limit),
+              offset: (_page - 1) * _limit,
+              order: [[_sortBy, _sortDir]],
+              include: [{
+                model: TransactionItem,
+                include: [{
+                  model: Product,
+                  include: [{
+                    model: Image_Url
+                  }, {
+                    model: Total_Stock
+                  }]
+                }]
+              }, {
+                model: Warehouse
+              }, {
+                model: db.Order_status
+              }, {
+                model: User
+              }],
+              where: {
+                id: getTransactionId
+              }
+            }));
+
+          case 11:
+            _MyTransactionList = _context3.sent;
+            _dataCount = getTransactionId.length;
+            return _context3.abrupt("return", res.status(200).json({
+              message: "Get Keyword with status On Going List",
+              data: _MyTransactionList.rows,
+              dataCount: _dataCount
+            }));
+
+          case 14:
+            _context3.next = 16;
+            return regeneratorRuntime.awrap(Transaction.findAndCountAll({
+              limit: Number(_limit),
+              offset: (_page - 1) * _limit,
+              order: [[_sortBy, _sortDir]],
+              include: [{
+                model: TransactionItem,
+                include: [{
+                  model: db.Product,
+                  include: [{
+                    model: db.Image_Url
+                  }, {
+                    model: db.Total_Stock
+                  }]
+                }]
+              }, {
+                model: Warehouse
+              }, {
+                model: db.Order_status
+              }, {
+                model: User
+              }]
+            }));
+
+          case 16:
+            MyTransactionList = _context3.sent;
+            _context3.next = 19;
+            return regeneratorRuntime.awrap(Transaction.findAll({
+              order: [[_sortBy, _sortDir]],
+              include: [{
+                model: TransactionItem,
+                include: [{
+                  model: db.Product,
+                  include: [{
+                    model: db.Image_Url
+                  }, {
+                    model: db.Total_Stock
+                  }]
+                }]
+              }, {
+                model: Warehouse
+              }, {
+                model: db.Order_status
+              }, {
+                model: User
+              }]
+            }));
+
+          case 19:
+            MyTransactionListAll = _context3.sent;
+            count = MyTransactionListAll.map(function (val) {
+              return val.id;
+            });
+            dataCount = count.length;
+            return _context3.abrupt("return", res.status(200).json({
+              message: "Get keyword",
+              data: MyTransactionList.rows,
+              dataCount: dataCount
+            }));
+
+          case 25:
+            _context3.prev = 25;
+            _context3.t0 = _context3["catch"](0);
+            console.log(_context3.t0);
+            return _context3.abrupt("return", res.status(500).json({
+              message: "Server error"
+            }));
+
+          case 29:
+          case "end":
+            return _context3.stop();
+        }
+      }
+    }, null, null, [[0, 25]]);
+  },
+  getReport: function getReport(req, res) {
+    var WarehouseId, _req$query4, createdAt, _req$query4$transacti, transaction_name, _req$query4$_limit, _limit, _req$query4$_page, _page, _req$query4$_sortBy, _sortBy, sql, findData, getTransactionId, dataCount, transactionList;
+
+    return regeneratorRuntime.async(function getReport$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            WarehouseId = req.query.WarehouseId[0];
+            _req$query4 = req.query, createdAt = _req$query4.createdAt, _req$query4$transacti = _req$query4.transaction_name, transaction_name = _req$query4$transacti === void 0 ? "" : _req$query4$transacti, _req$query4$_limit = _req$query4._limit, _limit = _req$query4$_limit === void 0 ? 10 : _req$query4$_limit, _req$query4$_page = _req$query4._page, _page = _req$query4$_page === void 0 ? 1 : _req$query4$_page, _req$query4$_sortBy = _req$query4._sortBy, _sortBy = _req$query4$_sortBy === void 0 ? "" : _req$query4$_sortBy;
+            _context4.prev = 2;
+            sql = "SELECT  trx.id AS TransactionId,  trx.WarehouseId, wr.warehouse_name\n                        FROM transactionitems AS trx_items\n                        JOIN products AS pr ON pr.id = trx_items.ProductId\n                        JOIN transactions AS trx ON trx.id = trx_items.TransactionId\n                        JOIN warehouses as wr ON wr.id = trx.WarehouseId ";
+
+            if (WarehouseId && createdAt && transaction_name) {
+              sql += "WHERE WarehouseId=".concat(WarehouseId, " AND MONTH(trx.createdAt)=").concat(createdAt, " AND trx.transaction_name LIKE \"%").concat(transaction_name, "%\" ");
+            } else if (WarehouseId && transaction_name) {
+              sql += "WHERE WarehouseId=".concat(WarehouseId, " AND trx.transaction_name LIKE \"%").concat(transaction_name, "%\"  ");
+            } else if (WarehouseId && createdAt) {
+              sql += "WHERE WarehouseId=".concat(WarehouseId, " AND MONTH(trx.createdAt)=").concat(createdAt, " ");
+            } else if (createdAt && transaction_name) {
+              sql += "WHERE MONTH(trx.createdAt)=".concat(createdAt, " AND trx.transaction_name LIKE \"%").concat(transaction_name, "%\" ");
+            } else if (WarehouseId) {
+              sql += "WHERE WarehouseId=".concat(WarehouseId, " ");
+            } else if (createdAt) {
+              sql += "WHERE MONTH(trx.createdAt)=".concat(createdAt, " ");
+            } else if (transaction_name) {
+              sql += "WHERE trx.transaction_name LIKE \"%".concat(transaction_name, "%\" ");
+            }
+
+            _context4.next = 7;
+            return regeneratorRuntime.awrap(db.sequelize.query(sql += "GROUP BY trx.id\n                        ORDER BY trx.createdAt ".concat(_sortBy, " ")));
+
+          case 7:
+            findData = _context4.sent;
+            getTransactionId = findData[0].map(function (val) {
+              return val.TransactionId;
+            });
+            dataCount = getTransactionId.length;
+            _context4.next = 12;
+            return regeneratorRuntime.awrap(Transaction.findAndCountAll({
+              limit: Number(_limit),
+              offset: (_page - 1) * _limit,
+              include: [{
+                model: TransactionItem,
+                include: [{
+                  model: Product,
+                  include: [{
+                    model: Image_Url
+                  }, {
+                    model: Total_Stock
+                  }]
+                }]
+              }, {
+                model: db.Order_status
+              }, {
+                model: User
+              }, {
+                model: Warehouse
+              }],
+              where: {
+                id: getTransactionId
+              }
+            }));
+
+          case 12:
+            transactionList = _context4.sent;
+            return _context4.abrupt("return", res.status(200).json({
+              message: "Filtered",
+              data: transactionList.rows,
+              dataCount: dataCount
+            }));
+
+          case 16:
+            _context4.prev = 16;
+            _context4.t0 = _context4["catch"](2);
+            return _context4.abrupt("return", res.status(500).json({
+              message: _context4.t0.message
+            }));
+
+          case 19:
+          case "end":
+            return _context4.stop();
+        }
+      }
+    }, null, null, [[2, 16]]);
+  },
+  findWarehouse: function findWarehouse(req, res) {
+    var response;
+    return regeneratorRuntime.async(function findWarehouse$(_context5) {
+      while (1) {
+        switch (_context5.prev = _context5.next) {
+          case 0:
+            _context5.prev = 0;
+            _context5.next = 3;
+            return regeneratorRuntime.awrap(db.Warehouse.findAll());
+
+          case 3:
+            response = _context5.sent;
+            return _context5.abrupt("return", res.status(200).json({
+              message: "Find all warehouse",
+              data: response
+            }));
+
+          case 7:
+            _context5.prev = 7;
+            _context5.t0 = _context5["catch"](0);
+            return _context5.abrupt("return", res.status(500).json({
+              message: "Server Error"
+            }));
+
+          case 10:
+          case "end":
+            return _context5.stop();
+        }
+      }
+    }, null, null, [[0, 7]]);
+  },
+  getById: function getById(req, res) {
+    var sql, findData, getTransactionId, transactionList;
+    return regeneratorRuntime.async(function getById$(_context6) {
+      while (1) {
+        switch (_context6.prev = _context6.next) {
+          case 0:
+            _context6.prev = 0;
+            sql = "SELECT  trx.id AS TransactionId,  trx.WarehouseId, wr.warehouse_name\n                        FROM transactionitems AS trx_items\n                        JOIN products AS pr ON pr.id = trx_items.ProductId\n                        JOIN transactions AS trx ON trx.id = trx_items.TransactionId\n                        JOIN warehouses as wr ON wr.id = trx.WarehouseId ";
+            _context6.next = 4;
+            return regeneratorRuntime.awrap(db.sequelize.query(sql += "GROUP BY trx.id "));
+
+          case 4:
+            findData = _context6.sent;
+            getTransactionId = findData[0].map(function (val) {
+              return val.TransactionId;
+            });
+            _context6.next = 8;
+            return regeneratorRuntime.awrap(Transaction.findAll({
+              where: {
+                id: req.params.id
+              },
+              include: [{
+                model: TransactionItem,
+                include: [{
+                  model: Product,
+                  include: [{
+                    model: Image_Url
+                  }, {
+                    model: Total_Stock
+                  }]
+                }]
+              }, {
+                model: db.Order_status
+              }, {
+                model: User
+              }, {
+                model: Warehouse
+              }]
+            }));
+
+          case 8:
+            transactionList = _context6.sent;
+            return _context6.abrupt("return", res.status(200).json({
+              data: transactionList,
+              message: "Get By Id"
+            }));
+
+          case 12:
+            _context6.prev = 12;
+            _context6.t0 = _context6["catch"](0);
+            res.status(500).json({
+              message: _context6.t0.message
+            });
+
+          case 15:
+          case "end":
+            return _context6.stop();
+        }
+      }
+    }, null, null, [[0, 12]]);
   }
 };
 module.exports = adminOrderHistoryController;
