@@ -14,24 +14,23 @@ module.exports = (sequelize, DataTypes) => {
       User.belongsTo(models.Role)
       User.hasMany(models.Transaction)
     }
-  }
-  User.init(
-    {
-      username: DataTypes.STRING,
-      email: DataTypes.STRING,
-      password: DataTypes.STRING,
-      phone_number: DataTypes.BIGINT,
-      profile_picture: DataTypes.STRING,
+    User.init(
+        {
+            username: DataTypes.STRING,
+            email: DataTypes.STRING,
+            password: DataTypes.STRING,
+            phone_number: DataTypes.BIGINT,
+            profile_picture: DataTypes.STRING,
 
-      is_verify: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-    },
-    {
-      sequelize,
-      modelName: "User",
-    }
-  )
-  return User
+            is_verify: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+            },
+        },
+        {
+            sequelize,
+            modelName: "User",
+        }
+    )
+    return User
 }
