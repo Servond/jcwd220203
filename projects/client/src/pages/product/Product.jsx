@@ -11,6 +11,8 @@ import {
     Spacer,
     Text,
     Flex,
+    Center,
+    CircularProgress,
 } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
@@ -33,9 +35,15 @@ const Product = () => {
     const [searchParam, setSearchParam] = useSearchParams()
     const [catPage, setCatPage] = useState(1)
     const [catTotalCount, setCatTotalCount] = useState(0)
+    const [isLoading, setIsLoading] = useState(false)
+    const [catId, setCatId] = useState([])
+
+    const catPerRow = 5
+    const [next, setNext] = useState(catPerRow)
 
     const fetchProduct = async () => {
         const maxItemsPerPage = 10
+
         try {
             const response = await axiosInstance.get(`/product`, {
                 params: {
@@ -56,6 +64,7 @@ const Product = () => {
             } else {
                 setProducts(response.data.data)
             }
+            setIsLoading(true)
         } catch (err) {
             console.log(err)
         }
@@ -79,12 +88,24 @@ const Product = () => {
             console.log(err)
         }
     }
+
+    const test = async () => {
+        try {
+            const response = await axiosInstance.get(
+                `/product/category/${filter}`
+            )
+            setCatId(response.data.data)
+        } catch (err) {
+            console.log(err)
+        }
+    }
     const renderProduct = () => {
         return products.map((val) => {
             return (
                 <ProductItem
                     key={val.id.toString()}
                     product_name={val.product_name}
+                    image_url={val.Image_Urls[0]?.image_url}
                     price={val.price}
                     id={val.id}
                 />
@@ -105,10 +126,14 @@ const Product = () => {
         params[value.split(" ")[0]] = value.split(" ")[1]
         setSearchParam(params)
     }
+
     const filterBtnHandler = ({ target }) => {
         const { value } = target
         setFilter(value)
+
+        setSearchParam(value)
     }
+
     const nextPageBtnHandler = () => {
         setPage(page + 1)
     }
@@ -129,7 +154,10 @@ const Product = () => {
         }
     }
     const seeMoreBtnHandler = () => {
-        setCatPage(catPage + 1)
+        setNext(next + category.length)
+    }
+    const seeLessBtnHandler = () => {
+        setNext(catPerRow)
     }
     const resetBtnHandler = () => {
         setSearchParam(false)
@@ -147,10 +175,14 @@ const Product = () => {
                 setSortBy(entry[0])
                 setSortDir(entry[1])
             }
+            if ((entry = [0] === "category")) {
+                setFilter(entry[1])
+            }
         }
         fetchProduct()
         fetchCategory()
-    }, [page, sortBy, sortDir, filter, searchValue, catPage])
+        test()
+    }, [page, sortBy, sortDir, filter, searchValue, catPage, searchParam])
     return (
         <>
             <Navbar
@@ -159,17 +191,13 @@ const Product = () => {
                 onKeyDown={handleKeyEnter}
             />
             <Box
-                // border="1px solid red"
                 mx="auto"
                 mt="90px"
                 w="1100px"
-                h="1600px"
-                display="block"
-            // borderBottom="1px solid #dfe1e3"
+                display={{ base: "none", md: "none", lg: "block" }}
             >
                 {/* Filter and Search */}
                 <Box
-                    // border="1px solid blue"
                     marginBlockEnd="16px"
                     marginBlockStart="18px"
                     display="flex"
@@ -192,12 +220,7 @@ const Product = () => {
                 </Box>
 
                 {/* Content */}
-                <Box
-                    // border="1px solid brown"
-                    display="flex"
-                    gap="4px"
-                // borderBottom="1px solid #dfe1e3"
-                >
+                <Box display="flex" gap="4px">
                     {/* Fitler */}
                     <Box
                         border="1px solid #dfe1e3"
@@ -205,7 +228,7 @@ const Product = () => {
                         boxShadow="1px 1px 6px 1px #e0e0e0"
                         display="block"
                         w="auto"
-                        h="800px"
+                        h="50%"
                         p="12px"
                     >
                         <Flex borderBottom="1px solid #dfe1e3">
@@ -225,14 +248,152 @@ const Product = () => {
                                 </Text>
                             </Button>
                         </Flex>
-                        <Box mt="20px" display="grid" h="auto">
+
+                        <Box mt="20px" display="grid" h="auto" w="160px">
                             <Text fontWeight="bold" fontSize="14px" mb="10px">
                                 Categories
                             </Text>
                             <Grid gap="5px">
-                                {category.map((val) => (
+                                {category.slice(0, next).map((val, i) => (
                                     <Button
                                         onClick={filterBtnHandler}
+                                        value={val.id || val.category_name}
+                                        bgColor="white"
+                                        borderBottom="1px solid #dfe1e3"
+                                        justifyContent="flex-start"
+                                        _hover={{
+                                            bgColor: "#dfe1e3",
+                                            borderRadius: "10px",
+                                            color: "#0095DA",
+                                        }}
+                                        key={i}
+                                    >
+                                        {val.category_name}
+                                    </Button>
+                                ))}
+                            </Grid>
+                            {next < category.length ? (
+                                <Button
+                                    onClick={() => seeMoreBtnHandler()}
+                                    mt="6"
+                                    colorScheme="linkedin"
+                                    variant="link"
+                                    justifyContent="flex-start"
+                                >
+                                    <Text
+                                        fontSize="12px"
+                                        w="110px"
+                                        textAlign="start"
+                                    >
+                                        See More
+                                    </Text>
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={() => seeLessBtnHandler()}
+                                    mt="6"
+                                    colorScheme="linkedin"
+                                    variant="link"
+                                    justifyContent="flex-start"
+                                >
+                                    <Text
+                                        fontSize="12px"
+                                        w="110px"
+                                        textAlign="start"
+                                    >
+                                        See Less
+                                    </Text>
+                                </Button>
+                            )}
+                        </Box>
+                    </Box>
+
+                    {/* Product */}
+                    <Box borderRadius="12px" w="912px" display="grid">
+                        {isLoading === false ? (
+                            <Box
+                                display={"grid"}
+                                justifyContent={"center"}
+                                alignItems={"center"}
+                                alignContent={"center"}
+                            >
+                                <CircularProgress
+                                    isIndeterminate
+                                    color="#0095DA"
+                                    thickness="160px"
+                                    size="100px"
+                                />
+                            </Box>
+                        ) : !products.length ? (
+                            <Alert status="warning">
+                                <AlertIcon />
+                                <AlertTitle textAlign="center">
+                                    No Products Found
+                                </AlertTitle>
+                            </Alert>
+                        ) : null}
+                        <GridItem>
+                            <Grid
+                                p="16px 0"
+                                pl="16px"
+                                gap="4"
+                                templateColumns="repeat(5,1fr)"
+                            >
+                                {isLoading && renderProduct()}
+                            </Grid>
+                            <HStack justifyContent="end" gap="2px">
+                                {page === 1 ? null : (
+                                    <CgChevronLeft
+                                        bgColor="#0095DA"
+                                        onClick={prevPageBtnHandler}
+                                        color="#0095DA"
+                                        cursor="pointer"
+                                        size={30}
+                                    />
+                                )}
+                                <Text>{page}</Text>
+                                {page >= maxPage ? null : (
+                                    <CgChevronRight
+                                        bgColor="#0095DA"
+                                        color="#0095DA"
+                                        onClick={nextPageBtnHandler}
+                                        cursor="pointer"
+                                        size={30}
+                                    />
+                                )}
+                            </HStack>
+                        </GridItem>
+                    </Box>
+                </Box>
+            </Box>
+
+            {/* Responsive */}
+            <Box
+                mx="auto"
+                mt="52px"
+                display={{ base: "block", md: "block", lg: "none" }}
+                maxW="500px"
+            >
+                {/* Filter and Search */}
+                <Box position="fixed" bgColor="white" w="100%">
+                    <Box
+                        marginBlockEnd="16px"
+                        marginBlockStart="18px"
+                        display="grid"
+                        alignItems="center"
+                        gridTemplateColumns="repeat(3,1fr)"
+                        gap="4px"
+                        maxW="500px"
+                        p="16px"
+                    >
+                        {/* Filter */}
+                        <GridItem justifySelf="end" ml="30px">
+                            <Select
+                                placeholder="Filter"
+                                onChange={filterBtnHandler}
+                            >
+                                {category.map((val) => (
+                                    <option
                                         value={val.id}
                                         bgColor="white"
                                         borderBottom="1px solid #dfe1e3"
@@ -244,74 +405,106 @@ const Product = () => {
                                         }}
                                     >
                                         {val.category_name}
-                                    </Button>
+                                    </option>
                                 ))}
-                            </Grid>
+                            </Select>
+                        </GridItem>
 
-                            {/* {category.length >= catTotalCount ? null : (
-                                <Button
-                                    onClick={seeMoreBtnHandler}
-                                    mt="6"
-                                    colorScheme="linkedin"
-                                    w="100%"
-                                >
-                                    See More
-                                </Button>
-                            )} */}
-                        </Box>
-                    </Box>
-
-                    {/* Product */}
-                    <Box
-                        // border="1px solid green"
-                        borderRadius="12px"
-                        w="912px"
-                        h="1000px"
-                        display="grid"
-                    >
-                        {!products.length ? (
-                            <Alert status="warning">
-                                <AlertIcon />
-                                <AlertTitle textAlign="center">
-                                    No Products Found
-                                </AlertTitle>
-                            </Alert>
-                        ) : null}
-                        <GridItem>
-                            <Grid
-                                // border="1px solid green"
-                                p="16px 0"
-                                pl="16px"
-                                // px="8px"
-                                gap="4"
-                                // cursor="pointer"
-                                templateColumns="repeat(5,1fr)"
+                        {/* Sort */}
+                        <GridItem justifySelf="end" ml="30px">
+                            <Select
+                                onChange={sortBtnHandler}
+                                placeholder="Sort"
                             >
-                                {renderProduct()}
-                            </Grid>
-                            <HStack justifyContent="end" gap="2px">
-                                {page === 1 ? null : (
-                                    <CgChevronLeft
-                                        bgColor="#0095DA"
-                                        onClick={prevPageBtnHandler}
-                                        color="#0095DA"
-                                        cursor="pointer"
-                                        size={20}
-                                    />
-                                )}
+                                <option value="product_name ASC">A - Z</option>
+                                <option value="product_name DESC">Z - A</option>
+                                <option value="price DESC">Highest</option>
+                                <option value="price ASC">Lowest</option>
+                            </Select>
+                        </GridItem>
 
-                                {page >= maxPage ? null : (
-                                    <CgChevronRight
-                                        bgColor="#0095DA"
-                                        color="#0095DA"
-                                        onClick={nextPageBtnHandler}
-                                        cursor="pointer"
-                                        size={20}
-                                    />
-                                )}
-                            </HStack>
+                        {/* Reset */}
+                        <GridItem justifySelf="end">
+                            <Button
+                                variant="unstyled"
+                                onClick={() => resetBtnHandler()}
+                                color="#F7931E"
+                                fontWeight="bold"
+                            >
+                                <Text fontSize="12px" pr="15px">
+                                    RESET
+                                </Text>
+                            </Button>
                         </GridItem>
                     </Box>
+                </Box>
+
+                {/* Content */}
+                <Box mx="auto" w="500px">
+                    <Center>
+                        {/* Product */}
+                        <Box borderRadius="12px" mt="110px" w="500px">
+                            {isLoading === false ? (
+                                <Box
+                                    display={"flex"}
+                                    justifyContent={"center"}
+                                    alignItems={"center"}
+                                    alignContent={"center"}
+                                >
+                                    <CircularProgress
+                                        isIndeterminate
+                                        color="#0095DA"
+                                        thickness="160px"
+                                        size="100px"
+                                    />
+                                </Box>
+                            ) : !products.length ? (
+                                <Alert status="warning">
+                                    <AlertIcon />
+                                    <AlertTitle textAlign="center">
+                                        No Products Found
+                                    </AlertTitle>
+                                </Alert>
+                            ) : null}
+
+                            <Grid
+                                p="16px 0"
+                                pl="16px"
+                                gap="4"
+                                templateColumns="repeat(2,1fr)"
+                                justifyItems="center"
+                                w="500px"
+                            >
+                                {isLoading && renderProduct()}
+                            </Grid>
+                        </Box>
+                    </Center>
+                </Box>
+
+                {/* Page */}
+
+                <Box gap="2px" mb="10px" w="500px">
+                    <Center>
+                        {page === 1 ? null : (
+                            <CgChevronLeft
+                                bgColor="#0095DA"
+                                onClick={prevPageBtnHandler}
+                                color="#0095DA"
+                                cursor="pointer"
+                                size={30}
+                            />
+                        )}
+                        <Text>{page}</Text>
+                        {page >= maxPage ? null : (
+                            <CgChevronRight
+                                bgColor="#0095DA"
+                                color="#0095DA"
+                                onClick={nextPageBtnHandler}
+                                cursor="pointer"
+                                size={30}
+                            />
+                        )}
+                    </Center>
                 </Box>
             </Box>
         </>
