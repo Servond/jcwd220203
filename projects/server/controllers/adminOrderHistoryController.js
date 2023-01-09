@@ -552,7 +552,7 @@ const adminOrderHistoryController = {
             )
             const getTransactionId = findData[0].map((val) => val.TransactionId)
             const transactionList = await Transaction.findAll({
-                where: { id: req.params.id },
+                where: { id: getTransactionId || req.params.id },
                 include: [
                     {
                         model: TransactionItem,

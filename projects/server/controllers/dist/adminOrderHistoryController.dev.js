@@ -544,7 +544,7 @@ var adminOrderHistoryController = {
             _context6.next = 8;
             return regeneratorRuntime.awrap(Transaction.findAll({
               where: {
-                id: req.params.id
+                id: getTransactionId || req.params.id
               },
               include: [{
                 model: TransactionItem,
