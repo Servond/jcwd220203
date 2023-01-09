@@ -10,6 +10,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Skeleton,
   Text,
   useDisclosure,
   useToast,
@@ -57,6 +58,7 @@ const ChangeAddress = ({ defaultAddressUser }) => {
   const [currentSearch, setCurrentSearch] = useState("")
   const [defaultAddressId, setDefaultAddressId] = useState(0)
   const [refreshAddress, setRefreshAddress] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   defaultAddressUser(defaultAddressId)
 
   const fetchAddress = async () => {
@@ -66,6 +68,7 @@ const ChangeAddress = ({ defaultAddressUser }) => {
       )
       setAddress(response.data.data)
       setDefaultAddressId(response.data.data.id)
+      setIsLoading(true)
     } catch (error) {
       console.log(error.response)
     }
@@ -331,7 +334,16 @@ const ChangeAddress = ({ defaultAddressUser }) => {
                 lineHeight={"1.4"}
                 fontFamily={"Open Sauce One, sans-serif"}
               >
-                {address.recipients_name}
+                {isLoading && address.recipients_name}
+                {/* {isLoading=== false ?  */}
+                <Skeleton
+                  height={"16px"}
+                  startColor="#bab8b8"
+                  endColor="#d4d2d2"
+                  w="64px"
+                  borderRadius="8px"
+                />
+                {/* :null} */}
               </Text>
               <Text
                 mr="2px"

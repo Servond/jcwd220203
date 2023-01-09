@@ -95,33 +95,33 @@ const userDataController = {
         _page = 1,
       } = req.query
 
-      // if (_sortBy === "username" || _sortBy === "createdAt" || username) {
-      //   const findUser = await db.User.findAndCountAll({
-      //     limit: Number(_limit),
-      //     offset: (_page - 1) * _limit,
-      //     order: [[_sortBy, _sortDir]],
-      //     include: [
-      //       { model: db.Role },
-      //       {
-      //         model: db.Warehouse,
-      //         where: {
-      //           UserId: "$User.id$",
-      //         },
-      //       },
-      //     ],
-      //     where: {
-      //       RoleId: 2,
-      //       username: {
-      //         [Op.like]: `%${username}%`,
-      //       },
-      //     },
-      //   })
-      //   return res.status(200).json({
-      //     message: "Find Admin by Name",
-      //     data: findUser.rows,
-      //     dataCount: findUser.count,
-      //   })
-      // }
+      if (_sortBy === "username" || _sortBy === "createdAt" || username) {
+        const findUser = await db.User.findAndCountAll({
+          limit: Number(_limit),
+          offset: (_page - 1) * _limit,
+          order: [[_sortBy, _sortDir]],
+          include: [
+            { model: db.Role },
+            {
+              model: db.Warehouse,
+              where: {
+                UserId: "$User.id$",
+              },
+            },
+          ],
+          where: {
+            RoleId: 2,
+            username: {
+              [Op.like]: `%${username}%`,
+            },
+          },
+        })
+        return res.status(200).json({
+          message: "Find Admin by Name",
+          data: findUser.rows,
+          dataCount: findUser.count,
+        })
+      }
 
       const findUser = await db.User.findAndCountAll({
         offset: (_page - 1) * _limit,
@@ -198,17 +198,6 @@ const userDataController = {
         RoleId: 2,
       })
 
-      await db.Warehouse.update(
-        {
-          UserId: newUser.id,
-        },
-        {
-          where: {
-            id: WarehouseId,
-          },
-        }
-      )
-
       return res.status(200).json({
         message: "Admin Registered",
         data: newUser,
@@ -251,16 +240,6 @@ const userDataController = {
         }
       )
 
-      await db.Warehouse.update(
-        {
-          UserId: id,
-        },
-        {
-          where: {
-            id: WarehouseId,
-          },
-        }
-      )
       const findData = await db.User.findByPk(id)
       return res.status(200).json({
         message: "Admin Edited",
