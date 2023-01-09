@@ -152,6 +152,7 @@ const EditForm = ({
                     mt={{ md: "-2", base: "-2" }}
                     bgColor={"#fff"}
                     _hover={false}
+                    _active={false}
                   >
                     <CgClose fontSize={"20px"} />
                   </Button>
@@ -352,6 +353,7 @@ const EditForm = ({
                   fontWeight={"bold"}
                   w={{ lg: "80px", md: "60px", base: "60px" }}
                   _hover={false}
+                  _active={false}
                   bgColor="#F7931E"
                   onClick={doubleOnClick1}
                 >
