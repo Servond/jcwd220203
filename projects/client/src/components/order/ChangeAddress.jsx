@@ -335,15 +335,15 @@ const ChangeAddress = ({ defaultAddressUser }) => {
                 fontFamily={"Open Sauce One, sans-serif"}
               >
                 {isLoading && address.recipients_name}
-                {/* {isLoading=== false ?  */}
-                <Skeleton
-                  height={"16px"}
-                  startColor="#bab8b8"
-                  endColor="#d4d2d2"
-                  w="64px"
-                  borderRadius="8px"
-                />
-                {/* :null} */}
+                {isLoading === false ? (
+                  <Skeleton
+                    height={"16px"}
+                    startColor="#bab8b8"
+                    endColor="#d4d2d2"
+                    w="70px"
+                    borderRadius="8px"
+                  />
+                ) : null}
               </Text>
               <Text
                 mr="2px"
@@ -352,7 +352,16 @@ const ChangeAddress = ({ defaultAddressUser }) => {
                 fontFamily={"Open Sauce One, sans-serif"}
                 fontSize={"13px"}
               >
-                {`(${address.address_labels})`}
+                {`(${isLoading && address.address_labels})`}
+                {isLoading === false ? (
+                  <Skeleton
+                    height={"16px"}
+                    startColor="#bab8b8"
+                    endColor="#d4d2d2"
+                    w="60px"
+                    borderRadius="8px"
+                  />
+                ) : null}
               </Text>
               <Box
                 display={"inline-flex"}
@@ -382,7 +391,16 @@ const ChangeAddress = ({ defaultAddressUser }) => {
                 fontSize={"13px"}
                 mb="4px"
               >
-                {address.phone_number}
+                {isLoading && address.phone_number}
+                {isLoading === false ? (
+                  <Skeleton
+                    height={"16px"}
+                    startColor="#bab8b8"
+                    endColor="#d4d2d2"
+                    w="90px"
+                    borderRadius="8px"
+                  />
+                ) : null}
               </Text>
             </Box>
             <Box
@@ -392,9 +410,30 @@ const ChangeAddress = ({ defaultAddressUser }) => {
               wordBreak={"break-word"}
               lineHeight={"1.4"}
             >
-              <Text>{address.full_address}</Text>
               <Text>
-                {address.districts}, {address.city}, {address.province}
+                {isLoading && address.full_address}
+                {isLoading === false ? (
+                  <Skeleton
+                    height={"14px"}
+                    startColor="#bab8b8"
+                    endColor="#d4d2d2"
+                    w="150px"
+                    borderRadius="8px"
+                  />
+                ) : null}
+              </Text>
+              <Text>
+                {isLoading && address.districts}, {isLoading && address.city},
+                {isLoading && address.province}
+                {isLoading === false ? (
+                  <Skeleton
+                    height={"14px"}
+                    startColor="#bab8b8"
+                    endColor="#d4d2d2"
+                    w="240px"
+                    borderRadius="8px"
+                  />
+                ) : null}
               </Text>
             </Box>
           </Box>

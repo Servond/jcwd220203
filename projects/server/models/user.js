@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       User.hasMany(models.Address)
-      User.hasOne(models.Warehouse)
+      User.belongsTo(models.Warehouse)
       User.belongsTo(models.Role)
       User.hasMany(models.Transaction)
     }
