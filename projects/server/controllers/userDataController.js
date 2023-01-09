@@ -100,21 +100,13 @@ const userDataController = {
           limit: Number(_limit),
           offset: (_page - 1) * _limit,
           order: [[_sortBy, _sortDir]],
-          include: [
-            { model: db.Role },
-            {
-              model: db.Warehouse,
-              where: {
-                UserId: "$User.id$",
-              },
-            },
-          ],
           where: {
             RoleId: 2,
             username: {
               [Op.like]: `%${username}%`,
             },
           },
+          include: [{ model: db.Role }, { model: db.Warehouse }],
         })
         return res.status(200).json({
           message: "Find Admin by Name",
@@ -127,15 +119,10 @@ const userDataController = {
         offset: (_page - 1) * _limit,
         limit: Number(_limit),
         order: [[_sortBy, _sortDir]],
-        include: [
-          { model: db.Role },
-          {
-            model: db.Warehouse,
-          },
-        ],
         where: {
           RoleId: 2,
         },
+        include: [{ model: db.Role }, { model: db.Warehouse }],
       })
       return res.status(200).json({
         message: "Find All Admin Data",
@@ -196,6 +183,7 @@ const userDataController = {
         WarehouseId,
         is_verify: true,
         RoleId: 2,
+        WarehouseId,
       })
 
       return res.status(200).json({
@@ -232,6 +220,7 @@ const userDataController = {
           phone_number,
           profile_picture,
           username,
+          WarehouseId,
         },
         {
           where: {
@@ -239,7 +228,6 @@ const userDataController = {
           },
         }
       )
-
       const findData = await db.User.findByPk(id)
       return res.status(200).json({
         message: "Admin Edited",
@@ -291,9 +279,7 @@ const userDataController = {
       }
 
       const response = await db.Warehouse.findAll({
-        where: {
-          UserId: null,
-        },
+        // include: [{ model: db.User }],
       })
 
       return res.status(200).json({
