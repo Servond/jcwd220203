@@ -1,5 +1,5 @@
-import { Box, Button, CircularProgress, FormControl, Image, Input, InputGroup, InputLeftElement, InputRightElement, Menu, MenuButton, MenuItem, MenuList, Text } from "@chakra-ui/react"
-import { BiSearch, BiSearchAlt2 } from "react-icons/bi"
+import { Box, Button, CircularProgress, FormControl, Image, Input, InputGroup, InputRightElement, Menu, MenuButton, MenuItem, MenuList, Text } from "@chakra-ui/react"
+import { BiSearchAlt2 } from "react-icons/bi"
 import rupiah from "../../assets/rupiah.svg"
 import { MdKeyboardArrowDown, MdOutlineKeyboardArrowRight } from "react-icons/md"
 import { axiosInstance } from "../../api"
@@ -9,12 +9,10 @@ import { Link, useLocation, useSearchParams } from "react-router-dom"
 import noTransaction from "../../assets/noTransaction.png"
 import Pagination from "./Pagination"
 import { useFormik } from "formik"
-import { HiOutlineArrowLeft } from "react-icons/hi"
 
 const TransactionList = () => {
 
     const [transactionList, setTransactionList] = useState([])
-    const [transactionListMobile, setTransactionListMobile] = useState([])
     const [unpaidTransaction, setUnpaidTransaction] = useState([])
     const [payment, setPayment] = useState(true)
     const [goingOn, setGoingOn] = useState(false)
@@ -31,6 +29,7 @@ const TransactionList = () => {
     const [sortBy, setSortBy] = useState("id")
     const [sortDir, setSortDir] = useState("Desc")
     const [pageCount, setPageCount] = useState(1)
+    const [inputSearch, setInputSearch] = useState("")
 
     const query = new URLSearchParams(useLocation().search)
 
@@ -64,29 +63,6 @@ const TransactionList = () => {
             console.log(err)
         }
     }
-
-
-    // const fetchMyTransactionListMobile = async () => {
-    //     try {
-    //         const response = await axiosInstance.get("/transactions/transaction-list", {
-    //             params: {
-    //                 status: order_status,
-    //                 keyword: search_keyword,
-    //                 _limit: 100,
-    //                 _sortBy: sortBy,
-    //                 _sortDir: sortDir
-    //             }
-    //         })
-
-    //         setTransData(response.data.data)
-    //         setPageCount(response.data.data.map((val) => val.id).length)
-    //         setCount(response.data.dataCount)
-    //         setTransactionListMobile(response.data.data)
-    //         setIsLoading(true)
-    //     } catch (err) {
-    //         console.log(err)
-    //     }
-    // }
 
     const fetchUnpaidTransaction = async () => {
         try {
@@ -145,7 +121,10 @@ const TransactionList = () => {
     const searchKeywordHandler = ({ target }) => {
         const { name, value } = target
         searchFormik.setFieldValue(name, value)
+        setInputSearch(value)
     }
+
+    console.log(inputSearch)
 
     // status
     const allBtnHandler = () => {
@@ -344,7 +323,7 @@ const TransactionList = () => {
     }
 
     const failedBtnHandler = () => {
-        setStatus("Cancelled")
+        setStatus("Canceled")
         setPayment(false)
         setGoingOn(false)
         setPage(1)
@@ -367,7 +346,7 @@ const TransactionList = () => {
             params["keyword"] = searchParam.get("keyword")
         }
 
-        params["status"] = "Cancelled"
+        params["status"] = "Canceled"
         setSearchParam(params)
     }
 
@@ -575,29 +554,6 @@ const TransactionList = () => {
         })
     }
 
-    // const renderTransactionListMobile = () => {
-    //     return transactionListMobile.map((val) => {
-    //         return (
-    //             <TransactionListItems
-    //                 key={val.id.toString()}
-    //                 paymentDate={val.payment_date}
-    //                 orderStatusName={val.Order_status.order_status_name}
-    //                 transactionName={val.transaction_name}
-    //                 totalPrice={val.total_price}
-    //                 transactionItems={val.TransactionItems}
-    //                 courirDuration={val.courir_duration}
-    //                 transactionAddress={val.Address}
-    //                 paymentMethod={val.payment_method}
-    //                 totalQuantity={val.total_quantity}
-    //                 shippingFee={val.shipping_fee}
-    //                 fetchMyTransactionListMobile={fetchMyTransactionListMobile}
-    //                 transactionId={val.id}
-    //             />
-    //         )
-    //     })
-    // }
-
-
     useEffect(() => {
         if (order_status === "On Going" || order_status === "Awaiting Confirmation" || order_status === "Processed" || order_status === "Shipping" || order_status === "Delivered") {
             setGoingOn(true)
@@ -607,11 +563,13 @@ const TransactionList = () => {
         if (search_keyword) {
             setPayment(false)
         }
+        if (search_keyword) {
+            setInputSearch(search_keyword)
+        }
+        if (transaction_page) {
+            setPage(transaction_page)
+        }
     }, [transData])
-
-    // useEffect(() => {
-    //     fetchMyTransactionListMobile()
-    // }, [])
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -654,7 +612,8 @@ const TransactionList = () => {
                                                 borderRadius={"8px"}
                                                 onChange={searchKeywordHandler}
                                                 name="search"
-                                                value={searchFormik.values.search}
+                                                // value={searchFormik.values.search}
+                                                defaultValue={inputSearch}
                                             />
                                             <InputRightElement >
                                                 <Box
@@ -727,7 +686,7 @@ const TransactionList = () => {
                             </Box>
 
                             {/* transaction status */}
-                            <Box display={'flex'} h={'48px'} justifyContent={'flex-start'} p={'0px 16px'} mb={search_keyword !== null || order_status === "Done" || order_status === "Cancelled" ? '12px' : null} alignItems={'center'}>
+                            <Box display={'flex'} h={'48px'} justifyContent={'flex-start'} p={'0px 16px'} mb={search_keyword !== null || order_status === "Done" || order_status === "Canceled" ? '12px' : null} alignItems={'center'}>
                                 <Text
                                     fontSize={'13px'}
                                     fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}
@@ -811,7 +770,7 @@ const TransactionList = () => {
                                 </Box>
                                 <Box
                                     h={'40px'}
-                                    border={order_status === "Cancelled" ? '2px solid #0095DA' : '1px solid #E5E7E9'}
+                                    border={order_status === "Canceled" ? '2px solid #0095DA' : '1px solid #E5E7E9'}
                                     m={'4px 8px 4px 0px'}
                                     p={'0px 13px'}
                                     display={'flex'}
@@ -821,13 +780,13 @@ const TransactionList = () => {
                                     alignItems={'center'}
                                     borderRadius={'16px'}
                                     onClick={failedBtnHandler}
-                                    bgColor={order_status === "Cancelled" ? '#ebffef' : 'fff'}
+                                    bgColor={order_status === "Canceled" ? '#ebffef' : 'fff'}
                                 >
                                     <Text
                                         fontSize={'13px'}
                                         lineHeight={'16px'}
                                         textAlign={'center'}
-                                        color={order_status === "Cancelled" ? '#0095DA' : '#31353BAD'}
+                                        color={order_status === "Canceled" ? '#0095DA' : '#31353BAD'}
                                     >
                                         Failed
                                     </Text>
@@ -1116,164 +1075,6 @@ const TransactionList = () => {
                     </Box>
                 </Box >
             </Box>
-
-            {/* Mobile Responsive */}
-            {/* <Box display={{ lg: 'none', base: 'inline' }}>
-                <Box
-                    position={'fixed'}
-                    left="0"
-                    right={"0"}
-                    top="0"
-                    zIndex="9998"
-                    h={'148px'}
-                    bgColor={'#fff'}
-                >
-                    <Box
-                        h={'52px'}
-                        maxW={'500px'}
-                        display={'flex'}
-                        alignItems={'center'}
-                        flexdir={'row'}
-                        justifyContent={'flex-start'}
-                        bgColor={'white'}
-                    >
-                        <Link to={'/'}>
-                            <Box w={'52px'} h={'52px'} p={'1px 6px'} display={'flex'} alignItems={'center'} justifyContent={'center'}>
-                                <HiOutlineArrowLeft style={{ height: "24px", width: "24px", color: "#7d8086" }} />
-                            </Box>
-                        </Link>
-                        <Text
-                            fontSize={'16px'}
-                            color={'#31353BF5'}
-                            fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}
-                            lineHeight={'20px'}
-                            fontWeight={700}
-                        >
-                            Transaction List
-                        </Text>
-                    </Box>
-                    <Box m={'4px 16px'} maxW={'500px'}>
-                        <form onSubmit={searchFormik.handleSubmit}>
-                            <FormControl>
-                                <InputGroup w={'100%'}>
-                                    <InputLeftElement>
-                                        <Box
-                                            display={'flex'}
-                                            justifyContent={'center'}
-                                            alignItems={'center'}
-                                            h={'24px'}
-                                            w={'24px'}
-                                            pr={'8px'}
-                                            pb={'5px'}
-                                        >
-                                            <BiSearch color={"#9fa6b0"} />
-                                        </Box>
-                                    </InputLeftElement>
-                                    <Input
-                                        h={'36px'}
-                                        p={'12px 24px 12px 28px'}
-                                        placeholder={'Find transaction'}
-                                        fontSize={'14px'}
-                                        fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}
-                                        color={'#31353BF5'}
-                                        borderRadius={"10px"}
-                                        onChange={searchKeywordHandler}
-                                        name="search"
-                                        value={searchFormik.values.search}
-                                    />
-                                </InputGroup>
-                            </FormControl>
-                        </form>
-                    </Box>
-                    <Box h={'52px'} pl={'16px'} pt={'8px'}>
-                        <Menu>
-                            <MenuButton borderRadius={'12px'} border={'1px solid #d6dce7'} h={'32px'} mr={'4px'} p={'0px 12px'}>
-                                <Box display={'flex'} flexDir={'row'} justifyContent={'flex-start'} alignItems={'center'}>
-                                    <Text
-                                        fontSize={'14px'}
-                                        fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}
-                                        color={'#6D7588'}
-                                        lineHeight={'18px'}
-                                    >
-                                        All Status
-                                    </Text>
-                                    <Box m={'0px -4px 0px 4px'}>
-                                        <MdKeyboardArrowDown style={{ fontSize: "25px" }} />
-                                    </Box>
-                                </Box>
-                            </MenuButton>
-                            <MenuButton borderRadius={'12px'} border={'1px solid #d6dce7'} h={'32px'} mr={'4px'} p={'0px 12px'}>
-                                <Box display={'flex'} flexDir={'row'} justifyContent={'flex-start'} alignItems={'center'}>
-                                    <Text
-                                        fontSize={'14px'}
-                                        fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}
-                                        color={'#6D7588'}
-                                        lineHeight={'18px'}
-                                    >
-                                        All Transaction
-                                    </Text>
-                                    <Box m={'0px -4px 0px 4px'}>
-                                        <MdKeyboardArrowDown style={{ fontSize: "25px" }} />
-                                    </Box>
-                                </Box>
-                            </MenuButton>
-                        </Menu>
-
-                    </Box>
-                </Box>
-                <Box w={'100%'} h={'148px'} />
-                {payment === false ? null : (
-                    <Link to={'/transaction/payment-list'}>
-                        <Box
-                            cursor={'pointer'}
-                            h={'42px'}
-                            m={'2px 16px 0px 16px'}
-                            p={'8px 12px'}
-                            border={'1px solid #dce4ee'}
-                            borderRadius={'8px'}
-                            display={'flex'}
-                            alignItems={'center'}
-                        >
-                            <Image
-                                w={'24px'}
-                                h={'24px'}
-                                src={rupiah}
-                            />
-                            <Text
-                                color={'#31353BAD'}
-                                fontFamily={"Open Sauce One, Nunito Sans, -apple-system, sans-serif"}
-                                fontSize={'12px'}
-                                m={'0px 8px 0px 12px'}
-                                fontWeight={400}
-                                lineHeight={'18px'}
-                                letterSpacing={'0px'}
-                                w={'100%'}
-                            >
-                                Waiting For Payment
-                            </Text>
-                            <Text
-                                fontSize={'10px '}
-                                fontFamily={'Open Sauce One, sans-serif'}
-                                bgColor={unpaidTransaction.length === 0 ? null : '#ef144a'}
-                                p={'0px 2px'}
-                                minW={'15px'}
-                                h={'16px'}
-                                fontWeight={700}
-                                textAlign={'center'}
-                                borderRadius={'6px'}
-                                color={'#fff'}
-                                display={'inline-block'}
-                            >
-                                {unpaidTransaction.length === 0 ? null : unpaidTransaction.length}
-                            </Text>
-                            <MdOutlineKeyboardArrowRight style={{ height: "24px", minWidth: "24px", color: "rgba(0,0,0,.54)" }} />
-                        </Box>
-                    </Link>
-                )}
-                <Box mt={'15px'}>
-                    {renderTransactionList()}
-                </Box>
-            </Box> */}
         </>
     )
 }
