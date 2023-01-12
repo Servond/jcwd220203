@@ -1,5 +1,6 @@
 import {
     Box,
+    Button,
     Text,
     Th,
     Thead,
@@ -8,63 +9,74 @@ import {
     TableContainer,
     Tbody,
     Td,
+    Image,
     Select,
     HStack,
-    Grid,
-    GridItem,
+    useDisclosure,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalCloseButton,
+    ModalBody,
+    Skeleton,
     Input,
     InputGroup,
-    Button,
-    Skeleton,
+    GridItem,
+    Grid,
+    ModalHeader,
 } from "@chakra-ui/react"
 import { useEffect } from "react"
 import { useState } from "react"
+import moment from "moment"
 import { axiosInstance } from "../../api"
+import "react-responsive-carousel/lib/styles/carousel.min.css"
 import { useSelector } from "react-redux"
-import { TbSearch } from "react-icons/tb"
 import { AiOutlineLeftCircle, AiOutlineRightCircle } from "react-icons/ai"
+import { TbSearch } from "react-icons/tb"
+import ModalOrderHistory from "../../components/admin/order/ModalOrderHistory"
 
-const AdminSalesReport = () => {
-    const [salesData, setSalesData] = useState([])
+const AdminOrderHistory = () => {
+    const [transactionData, setTransactionData] = useState([])
     const [warehouseData, setWarehouseData] = useState([])
-    const [categoryData, setCategoryData] = useState([])
+    const [productId, setProductId] = useState(0)
     const [page, setPage] = useState(1)
     const [maxPage, setMaxPage] = useState(1)
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const authSelector = useSelector((state) => state.auth)
+    const [isLoading, setIsLoading] = useState(false)
     const [filterWarehouse, setFilterWarehouse] = useState("")
-    const [filterCategory, setFilterCategory] = useState("")
     const [filterMonth, setFilterMonth] = useState("")
+    const [sortBy, setSortBy] = useState("id")
+    const [sortDir, setSortDir] = useState("DESC")
     const [searchValue, setSearchValue] = useState("")
     const [searchInput, setSearchInput] = useState("")
-    const [sort, setSort] = useState("")
-    const [isLoading, setIsLoading] = useState(false)
-    const authSelector = useSelector((state) => state.auth)
+    const [dataById, setDataById] = useState([])
 
     const maxItemsPerPage = 10
     const fetchData = async () => {
         try {
-            let url = `/admin/sales-report/get`
-
+            let url = `/admin/order-history/get4`
             if (authSelector.WarehouseId) {
-                url += `?WarehouseId=${authSelector.WarehouseId}`
+                await axiosInstance.get(
+                    (url += `?WarehouseId=${authSelector.WarehouseId}`)
+                )
             }
-            console.log("url", url)
             const response = await axiosInstance.get(url, {
                 params: {
                     _page: page,
                     _limit: maxItemsPerPage,
                     WarehouseId: filterWarehouse,
-                    CategoryId: filterCategory,
                     createdAt: filterMonth,
-                    product_name: searchValue,
-                    category_name: searchValue,
-                    _sortBy: sort,
+                    _sortBy: sortBy,
+                    _sortDir: sortDir,
+                    transaction_name: searchValue,
                 },
             })
             setMaxPage(Math.ceil(response.data.dataCount / maxItemsPerPage))
             if (page === 1) {
-                setSalesData(response.data.data)
+                setTransactionData(response.data.data)
             } else {
-                setSalesData(response.data.data)
+                setTransactionData(response.data.data)
             }
             setIsLoading(true)
         } catch (err) {
@@ -75,19 +87,22 @@ const AdminSalesReport = () => {
     const fetchWarehouse = async () => {
         try {
             const response = await axiosInstance.get(
-                "/admin/sales-report/findWarehouse"
+                "/admin/order-history/findWarehouse"
             )
-
             setWarehouseData(response.data.data)
         } catch (err) {
             console.log(err)
         }
     }
 
-    const fetchCategory = async () => {
+    const fetchProduct = async () => {
         try {
-            const response = await axiosInstance.get("/categories")
-            setCategoryData(response.data.data)
+            const response = await axiosInstance.get(
+                `/admin/order-history/getId/${productId}`
+            )
+            console.log("RESID", response.data.data)
+            setDataById(response.data.data)
+            setIsLoading(true)
         } catch (err) {
             console.log(err)
         }
@@ -99,35 +114,27 @@ const AdminSalesReport = () => {
         setIsLoading(false)
     }
 
-    const filterCategoryBtnHandler = ({ target }) => {
-        const { value } = target
-        setFilterCategory(value)
-        setIsLoading(false)
-    }
-
     const filterMonthBtnHandler = ({ target }) => {
         const { value } = target
         setFilterMonth(value)
         setIsLoading(false)
     }
 
+    const sortHandler = ({ target }) => {
+        const { value } = target
+        setSortBy(value.split(" ")[0])
+        setSortDir(value.split(" ")[1])
+        setIsLoading(false)
+    }
     const searchBtnHandler = () => {
         setSearchValue(searchInput)
         setIsLoading(false)
     }
-
     const handleKeyEnter = (e) => {
         if (e.key === "Enter") {
             setSearchValue(searchInput)
         }
     }
-
-    const sortHandler = ({ target }) => {
-        const { value } = target
-        setSort(value)
-        setIsLoading(false)
-    }
-
     const nextPageBtnHandler = () => {
         setPage(page + 1)
         setIsLoading(false)
@@ -137,22 +144,38 @@ const AdminSalesReport = () => {
         setPage(page - 1)
         setIsLoading(false)
     }
+    console.log(
+        "trans",
+        transactionData.map((val) =>
+            val.TransactionItems.map((ti) =>
+                ti.Product.Image_Urls.map((img) => img.image_url)
+            )
+        )
+    )
+    console.log("TRXID", transactionData.map((val) => val.id)[0])
+    console.log(
+        "ID",
+        dataById.map((val) =>
+            val.TransactionItems.map((ti) =>
+                ti.Product.Image_Urls.map((img) => img.image_url)
+            )
+        )
+    )
+    console.log("PR", productId)
     useEffect(() => {
         fetchData()
-    }, [
-        filterWarehouse,
-        filterCategory,
-        filterMonth,
-        page,
-        sort,
-        searchValue,
-        authSelector,
-    ])
-
-    useEffect(() => {
         fetchWarehouse()
-        fetchCategory()
-    }, [])
+        fetchProduct()
+    }, [
+        page,
+        filterMonth,
+        filterWarehouse,
+        sortBy,
+        sortDir,
+        productId,
+        authSelector,
+        searchValue,
+    ])
     return (
         <>
             <Box ml="250px" mr="1.5em">
@@ -161,16 +184,15 @@ const AdminSalesReport = () => {
                         fontSize="3xl"
                         fontWeight="bold"
                         fontFamily="sans-serif"
-                        color="#F7931E"
                     >
-                        Sales Report
+                        Order History
                     </Text>
                     <Box mt="3vh">
                         <Grid
                             p="5px"
                             gap="5"
                             w="full"
-                            gridTemplateColumns="repeat(5,1fr)"
+                            gridTemplateColumns="repeat(4,1fr)"
                         >
                             {/* Sort */}
                             <GridItem
@@ -180,9 +202,12 @@ const AdminSalesReport = () => {
                                 borderRadius="8px"
                                 onChange={sortHandler}
                             >
-                                <Select placeholder="---Sort---">
-                                    <option value={"ASC"}>Old</option>
-                                    <option value={"DESC"}>Latest</option>
+                                <Select>
+                                    <option value="id">Sort</option>
+                                    <option value="createdAt DESC">
+                                        Latest
+                                    </option>
+                                    <option value="createdAt ASC">Old</option>
                                 </Select>
                             </GridItem>
 
@@ -195,7 +220,7 @@ const AdminSalesReport = () => {
                                 onChange={filterMonthBtnHandler}
                             >
                                 <Select>
-                                    <option value="">---By Month---</option>
+                                    <option value="">By Month</option>
                                     <option value={1}>January</option>
                                     <option value={2}>February</option>
                                     <option value={3}>March</option>
@@ -211,24 +236,6 @@ const AdminSalesReport = () => {
                                 </Select>
                             </GridItem>
 
-                            {/* Category */}
-                            <GridItem
-                                w="full"
-                                justifySelf="center"
-                                border="1px solid #dfe1e3"
-                                borderRadius="8px"
-                                onChange={filterCategoryBtnHandler}
-                            >
-                                <Select>
-                                    <option value="">---By Category---</option>
-                                    {categoryData.map((val) => (
-                                        <option value={val.id}>
-                                            {val.category_name}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </GridItem>
-
                             {/* Warehouse */}
                             <GridItem
                                 w="full"
@@ -238,12 +245,14 @@ const AdminSalesReport = () => {
                                 borderRadius="8px"
                             >
                                 <Select>
-                                    <option value="">---By Warehouse---</option>
+                                    <option value="">By Warehouse</option>
                                     {authSelector.WarehouseId ===
-                                    salesData.map((val) => val.WarehouseId)[0]
-                                        ? salesData.map((val) => (
+                                    transactionData.map(
+                                        (val) => val.WarehouseId
+                                    )[0]
+                                        ? transactionData.map((val) => (
                                               <option value={val.WarehouseId}>
-                                                  {val.warehouse_name}
+                                                  {val.Warehouse.warehouse_name}
                                               </option>
                                           ))[0]
                                         : warehouseData.map((val) => (
@@ -263,7 +272,7 @@ const AdminSalesReport = () => {
                             >
                                 <InputGroup>
                                     <Input
-                                        placeholder="Find product or category"
+                                        placeholder="Search here"
                                         _placeholder={{ fontSize: "14px" }}
                                         onChange={(e) =>
                                             setSearchInput(e.target.value)
@@ -296,61 +305,76 @@ const AdminSalesReport = () => {
                         <Table variant={"striped"} colorScheme={"blue"}>
                             <Thead>
                                 <Tr>
-                                    <Th w="150px" fontWeight="bold">
-                                        <Text fontSize="10px">Date</Text>
+                                    <Th p="10px">
+                                        <Text fontSize="10px">invoice</Text>
                                     </Th>
-                                    <Th w="100px" fontWeight="bold">
-                                        <Text fontSize="10px">Category</Text>
+                                    <Th p="10px">
+                                        <Text fontSize="10px">User</Text>
                                     </Th>
-                                    <Th w="200px" fontWeight="bold">
+                                    <Th p="10px">
+                                        <Text fontSize="10px">Order Date</Text>
+                                    </Th>
+                                    <Th p="10px">
                                         <Text fontSize="10px">
-                                            Product Name
+                                            Total quantity
                                         </Text>
                                     </Th>
-                                    <Th w="130px" fontWeight="bold">
-                                        <Text fontSize="10px">Price</Text>
+                                    <Th p="10px">
+                                        <Text fontSize="10px">Total Price</Text>
                                     </Th>
-                                    <Th w="50px" fontWeight="bold">
-                                        <Text fontSize="10px">quantity</Text>
+                                    <Th p="10px">
+                                        <Text fontSize="10px">
+                                            Order status
+                                        </Text>
                                     </Th>
-                                    <Th w="130px" fontWeight="bold">
-                                        <Text fontSize="10px">Total</Text>
-                                    </Th>
-                                    <Th w="100px" fontWeight="bold">
+                                    <Th p="10px">
                                         <Text fontSize="10px">Warehouse</Text>
                                     </Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
                                 {isLoading &&
-                                    salesData.map((val) => (
-                                        <Tr>
-                                            <Td maxW="150px">
-                                                <Text>
-                                                    {
-                                                        val.createdAt.split(
-                                                            "T"
-                                                        )[0]
-                                                    }{" "}
-                                                    /{" "}
-                                                    {val.createdAt
-                                                        .split("T")[1]
-                                                        .split(".000Z")}
+                                    transactionData.map((val) => (
+                                        <Tr h="50px">
+                                            <Td p="10px">
+                                                {/* <Button
+                                                    variant="link"
+                                                    onClick={() => {
+                                                        setProductId(val.id)
+                                                        onOpen()
+                                                    }}
+                                                > */}
+                                                <Text
+                                                    color="#0095DA"
+                                                    onClick={() => onOpen()}
+                                                >
+                                                    {val.transaction_name}
                                                 </Text>
+                                                {/* </Button> */}
                                             </Td>
-
-                                            <Td maxW="100px">
-                                                <Text>{val.category_name}</Text>
-                                            </Td>
-                                            <Td maxW="200px">
+                                            <Td p="10px">
                                                 <Text
                                                     overflow="hidden"
                                                     textOverflow="ellipsis"
                                                 >
-                                                    {val.product_name}
+                                                    {val.User.username}
                                                 </Text>
                                             </Td>
-                                            <Td maxW="130px">
+                                            <Td p="10px">
+                                                <Text>
+                                                    {moment(
+                                                        val.createdAt
+                                                    ).format(
+                                                        "DD MMMM YYYY, HH:mm:ss"
+                                                    )}
+                                                </Text>
+                                            </Td>
+                                            <Td p="10px">
+                                                <Text>
+                                                    {val.total_quantity}
+                                                </Text>
+                                            </Td>
+                                            <Td p="10px">
                                                 <Text>
                                                     {new Intl.NumberFormat(
                                                         "id-ID",
@@ -359,28 +383,24 @@ const AdminSalesReport = () => {
                                                             currency: "IDR",
                                                             minimumFractionDigits: 0,
                                                         }
-                                                    ).format(val.price)}
+                                                    ).format(val.total_price)}
                                                 </Text>
                                             </Td>
-                                            <Td maxW="50px">
-                                                <Text>{val.quantity}</Text>
+                                            <Td p="10px">
+                                                <Text>
+                                                    {
+                                                        val.Order_status
+                                                            .order_status_name
+                                                    }
+                                                </Text>
                                             </Td>
 
-                                            <Td maxW="130px">
+                                            <Td p="10px">
                                                 <Text>
-                                                    {new Intl.NumberFormat(
-                                                        "id-ID",
-                                                        {
-                                                            style: "currency",
-                                                            currency: "IDR",
-                                                            minimumFractionDigits: 0,
-                                                        }
-                                                    ).format(val.total)}
-                                                </Text>
-                                            </Td>
-                                            <Td>
-                                                <Text>
-                                                    {val.warehouse_name}
+                                                    {
+                                                        val.Warehouse
+                                                            .warehouse_name
+                                                    }
                                                 </Text>
                                             </Td>
                                         </Tr>
@@ -525,4 +545,4 @@ const AdminSalesReport = () => {
     )
 }
 
-export default AdminSalesReport
+export default AdminOrderHistory
