@@ -79,7 +79,7 @@ const ModalTransactionItemDetail = ({ courirDuration, transactionItems, transact
                         >
                             <Text>Status :</Text>
                             <Text
-                                color={orderStatusName === "Done" ? "#0095DA" : orderStatusName === "Cancelled" ? "#EF144A" : "#F7931E"
+                                color={orderStatusName === "Done" ? "#0095DA" : orderStatusName === "Canceled" ? "#EF144A" : "#F7931E"
                                 }
                             >
                                 {orderStatusName}

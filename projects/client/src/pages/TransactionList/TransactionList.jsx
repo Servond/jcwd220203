@@ -31,6 +31,7 @@ const TransactionList = () => {
     const [sortDir, setSortDir] = useState("Desc")
     const [pageCount, setPageCount] = useState(1)
     const [inputSearch, setInputSearch] = useState("")
+    const [defaultInput, setDefaultInput] = useState(false)
 
     const query = new URLSearchParams(useLocation().search)
 
@@ -361,6 +362,8 @@ const TransactionList = () => {
         setSortDir("Desc")
         setSortBy("id")
         setKeyword("")
+        setInputSearch("")
+        setDefaultInput(true)
 
         searchFormik.setFieldValue("search", "")
 
@@ -385,6 +388,10 @@ const TransactionList = () => {
         params[""] = ""
         setSearchParam("")
     }
+
+    console.log("IS", inputSearch)
+    console.log("SF", searchFormik.values.search)
+    console.log("SK", search_keyword)
 
     // change page
     const nextPageBtn = () => {
@@ -567,6 +574,7 @@ const TransactionList = () => {
         if (search_keyword) {
             setInputSearch(search_keyword)
         }
+
         if (transaction_page) {
             setPage(transaction_page)
         }
@@ -604,18 +612,31 @@ const TransactionList = () => {
                                 <form onSubmit={searchFormik.handleSubmit}>
                                     <FormControl>
                                         <InputGroup w={'346px'}>
-                                            <Input
-                                                h={'40px'}
-                                                placeholder={'Find your transaction here'}
-                                                fontSize={'14px'}
-                                                fontFamily={'Open Sauce One, sans-serif'}
-                                                color={'#31353BF5'}
-                                                borderRadius={"8px"}
-                                                onChange={searchKeywordHandler}
-                                                name="search"
-                                                // value={searchFormik.values.search}
-                                                defaultValue={inputSearch}
-                                            />
+                                            {defaultInput ? (
+                                                <Input
+                                                    h={'40px'}
+                                                    placeholder={'Find your transaction here'}
+                                                    fontSize={'14px'}
+                                                    fontFamily={'Open Sauce One, sans-serif'}
+                                                    color={'#31353BF5'}
+                                                    borderRadius={"8px"}
+                                                    onChange={searchKeywordHandler}
+                                                    name="search"
+                                                    value={searchFormik.values.search}
+                                                />
+                                            ) : (
+                                                <Input
+                                                    h={'40px'}
+                                                    placeholder={'Find your transaction here'}
+                                                    fontSize={'14px'}
+                                                    fontFamily={'Open Sauce One, sans-serif'}
+                                                    color={'#31353BF5'}
+                                                    borderRadius={"8px"}
+                                                    onChange={searchKeywordHandler}
+                                                    name="search"
+                                                    defaultValue={inputSearch}
+                                                />
+                                            )}
                                             <InputRightElement >
                                                 <Box
                                                     pb={'2px'}
