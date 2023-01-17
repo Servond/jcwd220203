@@ -44,16 +44,18 @@ const AdminOrderHistory = () => {
     const fetchData = async () => {
         try {
             let url = `/admin/order-history/getOrder`
-            if (authSelector.WarehouseId) {
-                await axiosInstance.get(
-                    (url += `?WarehouseId=${authSelector.WarehouseId}`)
-                )
-            }
+            // if (authSelector.WarehouseId) {
+            //     await axiosInstance.get(
+            //         (url += `?WarehouseId=${authSelector.WarehouseId}`)
+            //     )
+            // }
             const response = await axiosInstance.get(url, {
                 params: {
                     _page: page,
                     _limit: maxItemsPerPage,
-                    WarehouseId: filterWarehouse,
+                    WarehouseId: authSelector.WarehouseId
+                        ? authSelector.WarehouseId
+                        : filterWarehouse,
                     createdAt: filterMonth,
                     _sortBy: sortBy,
                     _sortDir: sortDir,

@@ -75,10 +75,24 @@ const productController = {
                     dataCount: getAllProducts2.count,
                 })
             }
+
             const getAllProducts3 = await Product.findAndCountAll({
                 limit: Number(_limit),
                 offset: (_page - 1) * _limit,
-                include: [{ model: Category }, { model: Image_Url }],
+                include: [
+                    { model: Category, required: true },
+                    { model: Image_Url },
+                ],
+                where: {
+                    [Op.or]: {
+                        product_name: {
+                            [Op.like]: `%${product_name}%`,
+                        },
+                        "$Category.category_name$": {
+                            [Op.like]: `%${category_name}%`,
+                        },
+                    },
+                },
                 order: [
                     [_sortBy, _sortDir],
                     ["price", "DESC"],
